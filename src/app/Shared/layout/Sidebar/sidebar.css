@@ -1,0 +1,402 @@
+/* =====================================================================================================
+   SIDEBAR - all of its styles live here.
+     [icon] Menu name              v      top rows: 18px slate line icon, name, chevron
+        |   Page                          pages under a thin guide line, text only
+        |   Page (current: dark, bold, the guide line marks it)
+   Colours are tokens on :host - change --nav-active to retheme the current-page colour.
+   ===================================================================================================== */
+:host {
+  --nav-ink: #2c3140;
+  --nav-sub: #3a3f4d;
+  --nav-muted: #8a909c;
+  --nav-line: #dde0e5;
+  --nav-hover: #f5f6f8;
+  --nav-active: #2f5a49;
+  --nav-icon: #6a7083;      /* menu icons: one quiet slate grey, like the studio theme */
+
+  display: block;
+  min-width: 0
+}
+
+/* ---- frame ---- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 24px 14px 12px;
+  background: #fff;
+  border-right: 1px solid var(--line)
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 22px
+}
+
+.brand strong {
+  font-size: 23px;
+  letter-spacing: -1px;
+  line-height: 1
+}
+
+.brand small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 1.7px;
+  text-transform: uppercase
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 37px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 25px
+}
+
+.nav {
+  flex: 1;
+  overflow: auto;
+  padding: 2px 0 8px;
+  scrollbar-width: thin
+}
+
+/* ---- main headings: WORKSPACE / SALES & RELATIONSHIPS … ---- */
+.nav-heading {
+  padding: 18px 10px 6px;
+  color: #979baa;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 1.2px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.nav-heading:first-child {
+  padding-top: 4px
+}
+
+/* ---- top rows ---- */
+.nav-entry {
+  position: relative
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  margin: 1px 0;
+  padding: 10px 10px 10px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--nav-ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer
+}
+
+.nav-link:hover {
+  background: var(--nav-hover)
+}
+
+.nav-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+/* menu icon: 18px thin line icon in one slate grey (studio theme) - no fill, no per-menu colours */
+.nav-ico {
+  display: grid;
+  place-items: center;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--nav-icon)
+}
+
+.nav-ico svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+/* the tone-* classes from sidebar.ts all take the same grey now */
+.nav-ico[class*="tone-"] {
+  color: var(--nav-icon)
+}
+
+/* the icon follows its row: accent on the current page, darker on the row holding it */
+.nav-link.active .nav-ico {
+  color: var(--accent)
+}
+
+.nav-entry.has-current > .nav-link .nav-ico {
+  color: var(--nav-ink)
+}
+
+/* count pill (e.g. Enquiries & RFPs 2) */
+.nav-badge {
+  flex: 0 0 auto;
+  min-width: 20px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accentbg);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1
+}
+
+.nav-badge.sm {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  font-size: 10px
+}
+
+/* current page (a top row with a route): pink accent, bold - no fill */
+.nav-link.active {
+  color: var(--accent);
+  font-weight: 650
+}
+
+/* a row holding the current page */
+.nav-entry.has-current > .nav-link {
+  color: var(--nav-ink);
+  font-weight: 600
+}
+
+/* chevron */
+.nav-chev {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: var(--nav-muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .18s ease
+}
+
+.nav-entry.is-open > .nav-link .nav-chev,
+.nav-entry.sub.is-open .nav-chev {
+  transform: rotate(90deg)
+}
+
+/* ---- pages under a guide line ---- */
+.nav-children {
+  margin: 0 0 8px 19px;
+  padding: 4px 0;
+  border-left: 1px solid var(--nav-line);
+  animation: nav-sub-in .16s ease-out
+}
+
+@keyframes nav-sub-in {
+  from { opacity: 0; transform: translateY(-3px) }
+}
+
+/* each page row starts 2px to the left, over the grey guide line, so the current page's accent bar
+   can sit exactly on that line (the row clips its overflow for the ellipsis, so the bar must live inside) */
+.nav-child {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: calc(100% + 2px);
+  margin: 1px 0 1px -2px;
+  padding: 8px 10px 8px 24px;
+  border: 0;
+  border-radius: 0 8px 8px 0;
+  background: none;
+  color: var(--nav-sub);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer
+}
+
+/* fills start after the first 2px, so the grey guide line stays visible on hover */
+.nav-child:hover {
+  background: linear-gradient(90deg, transparent 2px, var(--nav-hover) 2px)
+}
+
+/* current page: pink accent pill, bold - matches the theme screenshot */
+.nav-child.active {
+  background: linear-gradient(90deg, transparent 2px, var(--accentbg) 2px);
+  color: var(--accent);
+  font-weight: 650
+}
+
+/* the accent bar: a slim 2px line, centred on the 1px grey guide line */
+.nav-child.active:after {
+  content: "";
+position: absolute;
+    left: 1.7px;
+    top: 7px;
+    bottom: 7px;
+    width: 1px;
+    border-radius: 2px;
+    background: var(--accent);
+}
+
+/* a page with its own pages: chevron on the right, one step deeper below */
+.nav-entry.sub > .nav-child.has-kids {
+  padding-right: 36px
+}
+
+.nav-entry.sub.has-current > .nav-child.has-kids:not(.active) {
+  color: var(--nav-ink);
+  font-weight: 600
+}
+
+.nav-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  transform: translateY(-50%)
+}
+
+.nav-toggle:hover {
+  background: #eceef2
+}
+
+.nav-children.deep {
+  margin: 0 0 4px 22px;
+  border-left-style: dashed
+}
+
+.nav-children.deep .nav-child {
+  padding-left: 18px;
+  font-size: 12px
+}
+
+/* ---- sizes ---- */
+@media(min-width:1800px) {
+  .nav-link { font-size: 14px; padding: 11px 12px }
+  .nav-child { font-size: 13.5px }
+}
+
+@media(max-width:1250px) {
+  .sidebar { padding-left: 10px; padding-right: 10px }
+}
+
+/* ---- collapsed: an icon rail ---- */
+:host(.is-collapsed) .sidebar {
+  padding-left: 10px;
+  padding-right: 10px
+}
+
+:host(.is-collapsed) .brand {
+  justify-content: center;
+  padding: 0 0 22px
+}
+
+:host(.is-collapsed) .brand > div,
+:host(.is-collapsed) .nav-text,
+:host(.is-collapsed) .nav-chev {
+  display: none
+}
+
+:host(.is-collapsed) .nav-link {
+  justify-content: center;
+  padding: 10px 0
+}
+
+/* on the rail a heading becomes a short divider */
+:host(.is-collapsed) .nav-heading {
+  height: 1px;
+  margin: 10px 8px;
+  padding: 0;
+  background: var(--nav-line)
+}
+
+:host(.is-collapsed) .nav-heading:first-child {
+  display: none
+}
+
+:host(.is-collapsed) .nav-heading span {
+  display: none
+}
+
+/* on the rail the current page / its menu shows as a soft tile behind the icon */
+:host(.is-collapsed) .nav-link.active,
+:host(.is-collapsed) .nav-entry.has-current > .nav-link {
+  background: var(--nav-hover);
+  box-shadow: inset 0 0 0 1px var(--nav-line)
+}
+
+@media(max-width:800px) {
+  .sidebar {
+    display: none;
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    top: 0;
+    width: 250px;
+    box-shadow: 0 0 0 100vmax #0005
+  }
+
+  .sidebar.open {
+    display: flex
+  }
+
+  :host(.is-collapsed) .brand > div,
+  :host(.is-collapsed) .nav-text,
+  :host(.is-collapsed) .nav-chev {
+    display: initial
+  }
+
+  :host(.is-collapsed) .brand { justify-content: flex-start; padding: 0 10px 22px }
+  :host(.is-collapsed) .nav-heading { height: auto; margin: 0; padding: 18px 10px 6px; background: none }
+  :host(.is-collapsed) .nav-heading span { display: inline }
+  :host(.is-collapsed) .nav-link { justify-content: flex-start; padding: 10px }
+}
+
+@media print {
+  .sidebar { display: none !important }
+}

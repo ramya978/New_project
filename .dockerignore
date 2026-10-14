@@ -1,0 +1,14 @@
+node_modules
+dist
+.angular
+.git
+.vscode
+.gitignore
+.prettierrc
+.editorconfig
+README.md
+Dockerfile
+.dockerignore
+docker-build.log
+docker-compose.yml
+**/*.spec.ts

@@ -1,0 +1,189 @@
+<div class="pagehead">
+  <div>
+    <h1>Payments &amp; Receipts</h1>
+    <p>Donation payment events and issued receipts across the selected scope.</p>
+  </div>
+</div>
+
+<!-- summary cards from the capture: totals + per-status counts -->
+<div class="pr-stats mb">
+  @for (s of stats; track s.label) {
+    <section [class]="'card stat pr-stat tone-' + s.tone">
+      <div class="stat-label">
+        <span>{{ s.label }}</span>
+        <span class="stat-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.55"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path [attr.d]="iconPath(s.icon)" />
+          </svg>
+        </span>
+      </div>
+      <strong class="value" [style.color]="toneColor(s.tone)">{{ s.value }}</strong>
+      <div class="stat-note">{{ s.note }}</div>
+    </section>
+  }
+</div>
+
+<!-- receipt history -->
+<section class="card">
+  <div class="card-head">
+    <div><h2>Receipt History</h2></div>
+    <div class="pr-tools">
+      <label class="pr-search">
+        <input type="search" placeholder="Search by event reference, donor name, e-mail"
+               [value]="query()" (input)="setQuery($any($event.target).value)" aria-label="Search receipts" />
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.55"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path [attr.d]="iconPath('search')" />
+        </svg>
+      </label>
+      <select class="pr-select" [value]="statusFilter()" (change)="setStatus($any($event.target).value)"
+              aria-label="Filter by payment status">
+        <option value="all">All statuses</option>
+        <option value="successful">Successful</option>
+        <option value="pending">Pending</option>
+        <option value="failed">Failed</option>
+      </select>
+    </div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Event / Receipt ref</th>
+          <th>Donor name</th>
+          <th>E-mail</th>
+          <th>Amount</th>
+          <th>Payment status</th>
+          <th>Received at</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of pageRows(); track r.ref) {
+          <tr>
+            <td>
+              <span class="pr-ref">{{ r.ref }}</span>
+              <small>{{ r.subRef ?? '—' }}</small>
+            </td>
+            <td>{{ r.donor ?? '–' }}</td>
+            <td>{{ r.email ?? '–' }}</td>
+            <td class="num nowrap">{{ inr(r.amount) }}</td>
+            <td >
+              <span [class]="'pr-st st-' + r.status" [attr.title]="statusLabel(r.status)"
+                    [attr.aria-label]="statusLabel(r.status)" role="img">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.55"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path [attr.d]="iconPath(statusIcon(r.status))" />
+                </svg>
+              </span>
+            </td>
+            <td class="nowrap">{{ fmtDate(r.receivedAt) }}</td>
+            <td>
+              <button type="button" class="pr-eye" [attr.aria-label]="'View ' + r.ref" (click)="selected.set(r)">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.55"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path [attr.d]="iconPath('eye')" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="empty">No receipts match this filter. Try a different search term or status.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-foot pr-foot">
+    <div class="pr-foot-left">
+      <span class="muted">Showing {{ from() }}–{{ to() }} of {{ filtered().length }}</span>
+      <label class="pr-rows">Rows
+        <select [value]="pageSize()" (change)="setPageSize($any($event.target).value)" aria-label="Rows per page">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+        </select>
+      </label>
+    </div>
+    <div class="pr-pager">
+      <button type="button" class="pr-page" [disabled]="page() === 1" (click)="page.set(page() - 1)"
+              aria-label="Previous page">‹</button>
+      @for (p of pages(); track p) {
+        <button type="button" class="pr-page" [class.active]="p === page()"
+                [attr.aria-current]="p === page() ? 'page' : null" (click)="page.set(p)">{{ p }}</button>
+      }
+      <button type="button" class="pr-page" [disabled]="page() === totalPages()"
+              (click)="page.set(page() + 1)" aria-label="Next page">›</button>
+    </div>
+  </div>
+
+</section>
+
+<!-- view receipt / event dialog -->
+@if (selected(); as row) {
+  <div class="pr-overlay" (click)="close()">
+    <div class="pr-dialog" role="dialog" aria-modal="true" aria-labelledby="pr-dialog-title"
+         (click)="$event.stopPropagation()">
+
+      <header class="pr-dialog-head">
+        <h2 id="pr-dialog-title">{{ row.status === 'successful' ? 'Donation receipt' : 'Payment event' }}</h2>
+        <button type="button" class="pr-dialog-x" (click)="close()" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path [attr.d]="iconPath('x')" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="pr-dialog-body">
+        <div class="pr-hero">
+          <div class="pr-hero-text">
+            <span class="pr-eyebrow">Donation · <span class="pr-eyebrow-ref">{{ row.ref }}</span></span>
+            <h3 class="pr-hero-name">{{ row.donor ?? 'Anonymous donation' }}</h3>
+          </div>
+          <span [class]="'pr-pill pill-' + row.status">{{ statusLabel(row.status) }}</span>
+        </div>
+
+        <dl class="pr-fields">
+          <div class="pr-field">
+            <dt>Amount</dt>
+            <dd class="num">{{ inr(row.amount) }}</dd>
+          </div>
+          <div class="pr-field">
+            <dt>Received at</dt>
+            <dd>{{ fmtDate(row.receivedAt) }}</dd>
+          </div>
+          <div class="pr-field">
+            <dt>E-mail</dt>
+            <dd>{{ row.email ?? '—' }}</dd>
+          </div>
+          <div class="pr-field">
+            <dt>Event / Receipt ref</dt>
+            <dd>{{ row.ref }}</dd>
+          </div>
+          <div class="pr-field">
+            <dt>Intent reference</dt>
+            <dd>{{ row.subRef ?? '—' }}</dd>
+          </div>
+          <div class="pr-field">
+            <dt>Receipt</dt>
+            <dd>{{ receiptNote(row.status) }}</dd>
+          </div>
+        </dl>
+
+        <p class="pr-note">
+          Illustrative record for design review. No live payment gateway is connected. A receipt is issued only
+          after a successful payment event; pending and failed events stay without a receipt number until the
+          payment is confirmed.
+        </p>
+      </div>
+
+      <footer class="pr-dialog-foot">
+        <button type="button" class="pr-btn" (click)="close()">Close</button>
+      </footer>
+    </div>
+  </div>
+}

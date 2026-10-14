@@ -1,0 +1,91 @@
+<!-- SIDEBAR - brand + menu. Logic: sidebar.ts · styles: sidebar.css -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><span class="mark">Y</span>
+    <div><strong>YDot<span style="color:var(--accent)">.</span></strong><small>Hotel Sales Studio</small></div>
+  </div>
+
+  <!-- SIDEBAR MENU - built from the menu JSON (Shared/layout/menu.data.ts). Functions in sidebar.ts:
+         sections()            headings + their top-level menus, in display order
+         items()               top-level menus, in display order
+         iconPath(name)        the SVG for the API icon name      toneOf(item)      icon colour class
+         hasChildren(item)     row has sub-items                  childrenOf(item)  its sub-items, in order
+         toggle(item)          show / hide the sub-items          isExpanded(item)  sub-items are shown
+         hasActiveChild(item)  a sub-item is the page on screen   openOrGo(item)    open first, then follow
+         targetOf(item)        "_blank" when opensInNewTab        closeMobileMenu() closes the phone overlay -->
+  <nav class="nav" id="nav" aria-label="Main navigation">
+    @for (section of sections(); track section.label + $index) {
+      <!-- main heading: uppercase grey label (on the icon rail: a thin divider) -->
+      <div class="nav-heading" role="presentation">
+        <span>{{ section.label }}</span>
+      </div>
+
+      @for (item of section.items; track item.id) {
+        <div class="nav-entry" [class.is-open]="isExpanded(item)" [class.has-current]="hasActiveChild(item)">
+          <!-- top row: coloured icon + name (+ chevron when it has pages) -->
+          @if (item.route && !hasChildren(item)) {
+            <a class="nav-link" [routerLink]="item.route" routerLinkActive="active" ariaCurrentWhenActive="page"
+               [attr.target]="targetOf(item)" [attr.title]="collapsed() ? item.name : null" (click)="closeMobileMenu()">
+              <span class="nav-ico" [class]="toneOf(item)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconPath(item.icon)" /></svg>
+              </span>
+              <span class="nav-text">{{ item.name }}</span>
+              @if (item.badge) {
+                <span class="nav-badge">{{ item.badge }}</span>
+              }
+            </a>
+          } @else {
+            <button type="button" class="nav-link" [attr.aria-expanded]="isExpanded(item)"
+                    [attr.aria-controls]="'nav-sub-' + item.id" [attr.title]="collapsed() ? item.name : null" (click)="toggle(item)">
+              <span class="nav-ico" [class]="toneOf(item)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconPath(item.icon)" /></svg>
+              </span>
+              <span class="nav-text">{{ item.name }}</span>
+              @if (item.badge) {
+                <span class="nav-badge">{{ item.badge }}</span>
+              }
+              <svg class="nav-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+            </button>
+          }
+        </div>
+
+        <!-- its pages, under a thin guide line -->
+        @if (hasChildren(item) && isExpanded(item) && !collapsed()) {
+          <div class="nav-children" [id]="'nav-sub-' + item.id">
+            @for (child of childrenOf(item); track child.id) {
+              @if (hasChildren(child)) {
+                <!-- a page with its own pages (Organisations -> Create / Approval Queue) -->
+                <div class="nav-entry sub" [class.is-open]="isExpanded(child)" [class.has-current]="hasActiveChild(child)">
+                  @if (child.route) {
+                    <a class="nav-child has-kids" [routerLink]="child.route" routerLinkActive="active" ariaCurrentWhenActive="page"
+                       [attr.target]="targetOf(child)" (click)="openOrGo(child, $event)">{{ child.name }}</a>
+                  } @else {
+                    <button type="button" class="nav-child has-kids" [attr.aria-expanded]="isExpanded(child)" (click)="toggle(child)">{{ child.name }}</button>
+                  }
+                  <button type="button" class="nav-toggle" [attr.aria-expanded]="isExpanded(child)"
+                          [attr.aria-label]="(isExpanded(child) ? 'Hide ' : 'Show ') + child.name + ' pages'" (click)="toggle(child, $event)">
+                    <svg class="nav-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+                  </button>
+                </div>
+                @if (isExpanded(child)) {
+                  <div class="nav-children deep">
+                    @for (grand of childrenOf(child); track grand.id) {
+                      <a class="nav-child" [routerLink]="grand.route" routerLinkActive="active" ariaCurrentWhenActive="page"
+                         [attr.target]="targetOf(grand)" (click)="closeMobileMenu()">{{ grand.name }}</a>
+                    }
+                  </div>
+                }
+              } @else {
+                <a class="nav-child" [routerLink]="child.route" routerLinkActive="active" ariaCurrentWhenActive="page"
+                   [attr.target]="targetOf(child)" (click)="closeMobileMenu()">{{ child.name }}
+                  @if (child.badge) {
+                    <span class="nav-badge sm">{{ child.badge }}</span>
+                  }
+                </a>
+              }
+            }
+          </div>
+        }
+      }
+    }
+  </nav>
+</aside>
