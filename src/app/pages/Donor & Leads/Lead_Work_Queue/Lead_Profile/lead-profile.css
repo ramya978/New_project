@@ -838,7 +838,7 @@ dd.is-due {
 }
 
 .lp-col {
-  display: grid;
+  /* display: grid; */
   gap: 20px;
   min-width: 0
 }
@@ -847,7 +847,8 @@ dd.is-due {
   padding: 22px 22px 20px;
   background: #fff;
   border: 1px solid var(--lp-line);
-  border-radius: 12px
+  border-radius: 12px;
+      margin-bottom: 10px;
 }
 
 .lp-card-head {
