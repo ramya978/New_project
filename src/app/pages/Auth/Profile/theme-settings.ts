@@ -1,65 +1,43 @@
 import { Injectable, signal } from '@angular/core';
 
 export interface ThemePrefs {
-  /** Primary accent -> --accent / --primary (+ derived --accentbg). */
   themeColor: string;
-  /** Secondary / success accent -> --teal. */
   secondaryColor: string;
-  /** Sidebar on the left (default) or a horizontal top menu. */
   layout: 'vertical' | 'horizontal';
-  /** Font per surface -> --font-menu / --font-heading / --font-number / --font-body. */
   menuFont: string;
   headingFont: string;
   numberFont: string;
   bodyFont: string;
-  /** Base font size in px -> --font-size. */
   fontSize: number;
-  /** Base font weight -> --font-weight. */
   fontWeight: 'light' | 'regular' | 'medium' | 'bold';
-  /** Base line height -> --line-height. */
   lineHeight: number;
-  /** Light (default) or dark - sets <html data-mode>. */
   mode: 'light' | 'dark';
-  /** CSS background for the sidebar (null = plain surface) -> --sidebar-bg. */
   sidebarBg: string | null;
-  /** Menu icon colour -> --icon-color. */
   iconColor: string;
-  /** h1 / h2 / h3 colour -> --heading-color. */
   headingColor: string;
-  /** Shadow strength 0-30 -> --shadow. */
   shadow: number;
-  /** Card / panel radius in px -> --radius. */
   borderRadius: number;
-  /** Button / input radius in px -> --btn-radius. */
   buttonRadius: number;
-  /** Index into PROFILE_IMAGES, or -1 for the initials avatar. */
   profileImage: number;
-  /** Extra swatch colours the user picked (persisted so they survive reload). */
   customThemeColors: string[];
   customSecondaryColors: string[];
   customIconColors: string[];
   customHeadingColors: string[];
-  /** Appearance palette id (PALETTES) - accent + hover + pressed tones; null = custom Theme Color. */
   palette: string | null;
-  /** Sidebar row spacing - sets <html data-density>. */
   navDensity: 'comfortable' | 'compact';
 }
 
 export interface SidebarBgOption {
   label: string;
-  /** CSS `background` shorthand for the sidebar; null = plain surface. */
   value: string | null;
-  /** Text tone the sidebar needs on top of this background. */
   tone: 'light' | 'dark';
 }
 
 export interface ProfileImageOption {
   label: string;
-  /** Photo URL (remote or a local asset path such as 'assets/avatars/forest.jpg'). */
   src: string;
 }
 
-/** An appearance palette: one accent plus the hover and pressed tones used across header, menu and submenus. */
 export interface ThemePalette {
   id: string;
   name: string;
@@ -68,19 +46,14 @@ export interface ThemePalette {
   pressed: string;
 }
 
-/** Theme (primary) colours shown in the "Theme Colors" row - includes the current default maroon. */
 export const THEME_COLORS: string[] = ['#c78028', '#bd4d53', '#7c3348', '#8763bd', '#138879', '#e0559b'];
 
-/** Secondary colours - default is the theme's orange. */
 export const SECONDARY_COLORS: string[] = ['#c78028', '#bd4d53', '#7c3348', '#4169c4', '#138879', '#232b3e'];
 
-/** Icon colours - default is a quiet slate. */
 export const ICON_COLORS: string[] = ['#6a7083', '#c78028', '#bd4d53', '#138879', '#4169c4', '#232b3e'];
 
-/** Heading colours - default ink. */
 export const HEADING_COLORS: string[] = ['#202333', '#7c3348', '#138879', '#4169c4', '#e0559b'];
 
-/** The nine OtoSolve appearance palettes. */
 export const PALETTES: ThemePalette[] = [
   { id: 'classic', name: 'Original Navy & Teal', accent: '#087e8b', hover: '#066a75', pressed: '#075762' },
   { id: 'ocean', name: 'Blueberry & Slate', accent: '#2f3a55', hover: '#5c6b8a', pressed: '#6e6f73' },
@@ -96,13 +69,10 @@ export const PALETTES: ThemePalette[] = [
 export const paletteById = (id: string | null): ThemePalette | null =>
   (id && PALETTES.find((p) => p.id === id)) || null;
 
-/** Font choices offered per surface (Google fonts + system serif / mono). */
 export const FONT_CHOICES: string[] = ['Inter', 'Roboto', 'Poppins', 'Nunito', 'Georgia', 'Times', 'Courier', 'Montserrat', 'Lato'];
 
-/** Base font sizes (px) offered in Font Size & Style. */
 export const FONT_SIZES: number[] = [12, 13, 14, 15, 16, 18];
 
-/** Font weight choices. */
 export const FONT_WEIGHTS: { id: 'light' | 'regular' | 'medium' | 'bold'; label: string; value: number }[] = [
   { id: 'light', label: 'Light', value: 300 },
   { id: 'regular', label: 'Regular', value: 400 },
@@ -110,9 +80,6 @@ export const FONT_WEIGHTS: { id: 'light' | 'regular' | 'medium' | 'bold'; label:
   { id: 'bold', label: 'Bold', value: 700 }
 ];
 
-/* =====================================================================================================
-   SIDEBAR IMAGES - inline SVG data URIs, so no asset files are needed.
-   ===================================================================================================== */
 
 const svgUrl = (svg: string): string => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 const bgImage = (svg: string, base: string): string => `${svgUrl(svg)} center / cover no-repeat, ${base}`;
@@ -180,7 +147,6 @@ export const SIDEBAR_BGS: SidebarBgOption[] = [
   { label: 'Sunset', value: bgImage(sunset, '#2a1540'), tone: 'dark' }
 ];
 
-/** Gradient values used by earlier versions - migrated to "None" on load. */
 const LEGACY_SIDEBAR_BGS: string[] = [
   'linear-gradient(180deg,#f6f7fa,#e8e9ee)',
   'linear-gradient(180deg,#fbf0f3,#f3dde5)',
@@ -190,17 +156,10 @@ const LEGACY_SIDEBAR_BGS: string[] = [
   'linear-gradient(180deg,#eef2fd,#dfe7f9)'
 ];
 
-/** Text tone for a sidebar background; uploaded images are treated as dark. */
 export const sidebarTone = (value: string | null): 'light' | 'dark' => {
   if (!value) return 'light';
   return SIDEBAR_BGS.find((b) => b.value === value)?.tone ?? 'dark';
 };
-
-/* =====================================================================================================
-   PROFILE IMAGES - nature photos (free Unsplash photos served by picsum.photos with fixed IDs).
-   Preview any of them at https://picsum.photos/id/<ID>/240/240 and swap the ID if needed.
-   For production, download them into src/assets/avatars/ and use the local path instead.
-   ===================================================================================================== */
 
 const nature = (id: number): string => `https://picsum.photos/id/${id}/240/240`;
 
@@ -217,15 +176,9 @@ export const PROFILE_IMAGES: ProfileImageOption[] = [
   { label: 'Waterfall', src: nature(1039) }
 ];
 
-/** Avatar src for a profileImage index, or null when initials are used. */
 export const profileImageSrc = (index: number): string | null =>
   index >= 0 ? PROFILE_IMAGES[index]?.src ?? null : null;
 
-/* =====================================================================================================
-   DEFAULTS
-   ===================================================================================================== */
-
-/** The out-of-the-box look of this app (also what Reset restores). */
 export const THEME_DEFAULTS: ThemePrefs = {
   themeColor: '#7c3348',
   secondaryColor: '#c78028',
@@ -253,11 +206,9 @@ export const THEME_DEFAULTS: ThemePrefs = {
   navDensity: 'comfortable'
 };
 
-/* ---------- colour helpers ---------- */
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
 
-/** "#rrggbb" + t (0-1 toward white) -> "#rrggbb" lightened tint, used for --accentbg. */
 export const tint = (hex: string, t: number): string => {
   const raw = hex.replace('#', '');
   const full = raw.length === 3 ? raw.split('').map((c) => c + c).join('') : raw;
@@ -269,7 +220,6 @@ export const tint = (hex: string, t: number): string => {
   return `#${r}${g}${b}`;
 };
 
-/** CSS font stack for a choice name (Google families fall back to the UI sans). */
 export const fontStack = (name: string): string => {
   if (name === 'Georgia') return 'Georgia, "Times New Roman", serif';
   if (name === 'Times') return '"Times New Roman", Times, serif';
@@ -277,22 +227,25 @@ export const fontStack = (name: string): string => {
   return `"${name}", Inter, "Segoe UI", Arial, sans-serif`;
 };
 
-/* ---------- apply: prefs -> CSS custom properties on <html> ---------- */
 
 export function applyTheme(prefs: ThemePrefs): void {
   const el = document.documentElement;
   const set = (k: string, v: string): void => el.style.setProperty(k, v);
 
-  // colours - --primary drives the sidebar and header, --accent the rest of the app
+  const palette = paletteById(prefs.palette);
+
   set('--accent', prefs.themeColor);
   set('--primary', prefs.themeColor);
   set('--accentbg', prefs.mode === 'dark' ? tint(prefs.themeColor, 0.78) : tint(prefs.themeColor, 0.92));
-  set('--teal', prefs.secondaryColor);
+
+  // secondary accent -> --teal (drives .btn-secondary / success tones).
+  // With an appearance palette active the secondary follows the palette's SECOND
+  // tone (its hover strip) - distinct from the accent that drives the primary colour.
+  // Without a palette it is the user's picked Secondary colour.
+  set('--teal', palette ? palette.hover : prefs.secondaryColor);
   set('--icon-color', prefs.iconColor);
   set('--heading-color', prefs.headingColor);
 
-  // favicon: the O follows the current primary colour (tile = its light tint), so the tab icon
-  // updates live whenever the theme colour changes. Written as an SVG data URI on <link rel="icon">.
   const favTile = prefs.mode === 'dark' ? tint(prefs.themeColor, 0.78) : tint(prefs.themeColor, 0.92);
   const favSvg =
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">` +
@@ -301,9 +254,6 @@ export function applyTheme(prefs: ThemePrefs): void {
   const favLink = document.querySelector<HTMLLinkElement>('link[rel~="icon"]:not([rel~="alternate"])');
   if (favLink) favLink.href = `data:image/svg+xml,${encodeURIComponent(favSvg)}`;
 
-  // appearance palette: its own hover + pressed tones (header, main menu and submenus).
-  // Without a palette the hover / pressed tones fall back to the theme colour.
-  const palette = paletteById(prefs.palette);
   if (palette) {
     set('--theme-hover', palette.hover);
     set('--theme-press', palette.pressed);
@@ -326,12 +276,9 @@ export function applyTheme(prefs: ThemePrefs): void {
   set('--btn-radius', `${prefs.buttonRadius}px`);
   set('--shadow', `0 4px ${Math.round(prefs.shadow * 1.5)}px rgba(34,40,63,${clamp(prefs.shadow / 300, 0, 0.3).toFixed(3)})`);
 
-  // sidebar background (remove the property for "None" so the fallback surface shows)
   if (prefs.sidebarBg) set('--sidebar-bg', prefs.sidebarBg);
   else el.style.removeProperty('--sidebar-bg');
 
-  // sidebar text tone: a picked image decides it; with no image the surface follows the mode
-  // (dark mode's plain sidebar is dark, so it needs light text).
   el.dataset['sidebar'] = prefs.sidebarBg
     ? sidebarTone(prefs.sidebarBg)
     : prefs.mode === 'dark'
@@ -348,17 +295,14 @@ export function applyTheme(prefs: ThemePrefs): void {
 
 const STORE_KEY = 'ydot-theme-settings';
 
-/** Fix values saved by older versions of the settings panel. */
 function migrate(prefs: ThemePrefs): ThemePrefs {
   const next = { ...prefs };
   if (next.sidebarBg && LEGACY_SIDEBAR_BGS.includes(next.sidebarBg)) next.sidebarBg = null;
   if (next.profileImage >= PROFILE_IMAGES.length) next.profileImage = -1;
-  // older saves predate the custom swatch arrays - always give them a fresh array
   next.customThemeColors = Array.isArray(next.customThemeColors) ? next.customThemeColors : [];
   next.customSecondaryColors = Array.isArray(next.customSecondaryColors) ? next.customSecondaryColors : [];
   next.customIconColors = Array.isArray(next.customIconColors) ? next.customIconColors : [];
   next.customHeadingColors = Array.isArray(next.customHeadingColors) ? next.customHeadingColors : [];
-  // unknown palette ids and spacing values fall back to the defaults
   if (!paletteById(next.palette)) next.palette = null;
   if (next.navDensity !== 'compact') next.navDensity = 'comfortable';
   return next;
@@ -379,7 +323,6 @@ export function saveTheme(prefs: ThemePrefs): void {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(prefs));
   } catch {
-    // storage full or blocked (e.g. a large uploaded sidebar image) - keep the live theme anyway
   }
 }
 

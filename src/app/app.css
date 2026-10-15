@@ -574,10 +574,10 @@ html[data-mode="dark"] .topbar.hd-bar {
   right: 2px;
   display: grid;
   place-items: center;
-  min-width: 16px;
-  height: 16px;
+      min-width: 19px;
+    height: 19px;
   padding: 0 3px;
-  border: 2px solid var(--white);
+  border: 2px solid var(--white); 
   border-radius: 10px;
   background: var(--hd-strong);
   color: #fff;
