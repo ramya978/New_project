@@ -1,7 +1,8 @@
-import { Component, DestroyRef, HostListener, ViewEncapsulation, computed, effect, inject, signal } from '@angular/core';
+import { Component, DestroyRef, HostListener, ViewEncapsulation, computed, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { Sidebar } from './Shared/layout/Sidebar/sidebar';
 import { ThemeSettingsService, profileImageSrc } from './pages/Auth/Profile/theme-settings';
+import { ClockSettingsService, ClockZone, cityOf } from './Shared/studio/data/clock-settings';
 
 export interface Organisation {
   id: string;
@@ -56,51 +57,7 @@ const ICONS: Record<HeaderIcon, string> = {
   check: 'M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4 12 14.01l-3-3'
 };
 
-/** A timezone the workspace clock can show. */
-export interface ClockZone {
-  /** IANA id, e.g. "Asia/Kolkata". */
-  id: string;
-  /** What the dropdown shows, e.g. "India · Kolkata". */
-  label: string;
-}
-
-const CLOCK_ZONES: ClockZone[] = [
-  { id: 'Asia/Kolkata', label: 'India · Kolkata' },
-  { id: 'Asia/Dubai', label: 'United Arab Emirates · Dubai' },
-  { id: 'Asia/Singapore', label: 'Singapore · Singapore' },
-  { id: 'Asia/Tokyo', label: 'Japan · Tokyo' },
-  { id: 'Australia/Sydney', label: 'Australia · Sydney' },
-  { id: 'Europe/London', label: 'United Kingdom · London' },
-  { id: 'Europe/Berlin', label: 'Germany · Berlin' },
-  { id: 'America/New_York', label: 'United States · New York' },
-  { id: 'America/Los_Angeles', label: 'United States · Los Angeles' },
-  { id: 'UTC', label: 'Coordinated Universal Time · UTC' }
-];
-
-/** The city part of an IANA id ("America/New_York" -> "New York"). */
-const cityOf = (id: string): string => (id.split('/').pop() ?? id).replace(/_/g, ' ');
-
-/** A zone the browser accepts, or null. */
-const validZone = (id: string | null | undefined): string | null => {
-  if (!id) return null;
-  try {
-    new Intl.DateTimeFormat('en-US', { timeZone: id });
-    return id;
-  } catch {
-    return null;
-  }
-};
-
-interface ClockPrefs {
-  zone: string;
-  h12: boolean;
-  seconds: boolean;
-  paused: boolean;
-  inHeader: boolean;
-}
-
 const SIDEBAR_KEY = 'ydot-sidebar-collapsed';
-const CLOCK_KEY = 'ydot-clock';
 
 @Component({
   selector: 'app-root',
@@ -114,6 +71,8 @@ export class App {
 
   private readonly router = inject(Router);
   private readonly theme = inject(ThemeSettingsService);
+  /** Shared with Theme Settings → Workspace (Clock presentation). */
+  private readonly clock = inject(ClockSettingsService);
 
   protected readonly avatarSrc = computed<string | null>(
     () => profileImageSrc(this.theme.prefs().profileImage)
@@ -144,20 +103,18 @@ export class App {
   protected readonly notes = signal<Note[]>(NOTES);
   protected readonly unreadCount = computed(() => this.notes().filter((n) => n.unread).length);
 
-  // ---- workspace clock --------------------------------------------------------------------------
-  private readonly clockPrefs = this.readClockPrefs();
-
+  // ---- workspace clock (settings live in ClockSettingsService) ----------------------------------
   /** Timezones in the dropdown (the device's own zone is added when it is not in the list). */
-  protected readonly zones: ClockZone[] = this.buildZones();
+  protected readonly zones: ClockZone[] = this.clock.zones;
 
   protected readonly now = signal(new Date());
   protected readonly clockOpen = signal(false);
   protected readonly zoneListOpen = signal(false);
-  protected readonly clockZone = signal<ClockZone>(this.zoneById(this.clockPrefs.zone));
-  protected readonly clock12h = signal(this.clockPrefs.h12);
-  protected readonly clockSeconds = signal(this.clockPrefs.seconds);
-  protected readonly clockPaused = signal(this.clockPrefs.paused);
-  protected readonly showClockInHeader = signal(this.clockPrefs.inHeader);
+  protected readonly clockZone = this.clock.zone;
+  protected readonly clock12h = this.clock.h12;
+  protected readonly clockSeconds = this.clock.seconds;
+  protected readonly clockPaused = this.clock.paused;
+  protected readonly showClockInHeader = this.clock.inHeader;
 
   /** City shown under the header time ("London"). */
   protected readonly clockCity = computed(() => cityOf(this.clockZone().id));
@@ -210,22 +167,6 @@ export class App {
       if (!this.clockPaused()) this.now.set(new Date());
     }, 1000);
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
-
-    // keep the clock settings between visits
-    effect(() => {
-      const prefs: ClockPrefs = {
-        zone: this.clockZone().id,
-        h12: this.clock12h(),
-        seconds: this.clockSeconds(),
-        paused: this.clockPaused(),
-        inHeader: this.showClockInHeader()
-      };
-      try {
-        localStorage.setItem(CLOCK_KEY, JSON.stringify(prefs));
-      } catch {
-        // storage blocked - keep the in-memory settings
-      }
-    });
   }
 
   /** The SVG path for a top-bar icon. */
@@ -294,38 +235,6 @@ export class App {
   protected setPaused(paused: boolean): void {
     this.clockPaused.set(paused);
     if (!paused) this.now.set(new Date());
-  }
-
-  private buildZones(): ClockZone[] {
-    const device = validZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
-    const list = [...CLOCK_ZONES];
-    // "Asia/Calcutta" is the older name of "Asia/Kolkata"
-    const known = (id: string) => list.some((z) => z.id === id) || (id === 'Asia/Calcutta' && list.some((z) => z.id === 'Asia/Kolkata'));
-    if (device && !known(device)) list.unshift({ id: device, label: 'This device · ' + cityOf(device) });
-    return list;
-  }
-
-  private zoneById(id: string): ClockZone {
-    const wanted = id === 'Asia/Calcutta' ? 'Asia/Kolkata' : id;
-    return this.zones.find((z) => z.id === wanted) ?? this.zones[0];
-  }
-
-  private readClockPrefs(): ClockPrefs {
-    const device = validZone(Intl.DateTimeFormat().resolvedOptions().timeZone) ?? 'UTC';
-    const fallback: ClockPrefs = { zone: device, h12: true, seconds: false, paused: false, inHeader: true };
-    try {
-      const saved = JSON.parse(localStorage.getItem(CLOCK_KEY) ?? 'null') as Partial<ClockPrefs> | null;
-      if (!saved) return fallback;
-      return {
-        zone: validZone(saved.zone) ?? fallback.zone,
-        h12: saved.h12 ?? fallback.h12,
-        seconds: saved.seconds ?? fallback.seconds,
-        paused: saved.paused ?? fallback.paused,
-        inHeader: saved.inHeader ?? fallback.inHeader
-      };
-    } catch {
-      return fallback;
-    }
   }
 
   // ---------------------------------------------------------------------------------------------

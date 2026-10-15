@@ -1,6 +1,7 @@
 /* =====================================================================================================
    THEME SETTINGS OFFCANVAS - page-scoped (.ts-*). Surfaces use the global tokens (--white, --line,
    --ink, --muted, --accent, --accentbg, --teal) so the panel follows light/dark mode and theme colour.
+   Tabs: Theme (existing cards) · Workspace (palette, navigation spacing, clock presentation).
    ===================================================================================================== */
 
 /* ---- backdrop + sliding panel ---- */
@@ -97,17 +98,76 @@
   transform: rotate(90deg)
 }
 
+/* ---- tabs: segmented control under the header ---- */
+.ts-tabbar {
+  padding: 12px 22px;
+  border-bottom: 1px solid var(--line);
+  background: var(--white)
+}
+
+.ts-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--line) 35%, var(--white))
+}
+
+.ts-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease
+}
+
+.ts-tab:hover {
+  color: var(--ink)
+}
+
+.ts-tab.is-on {
+  background: var(--white);
+  color: var(--accent);
+  font-weight: 650;
+  box-shadow: 0 1px 3px #1e233414, inset 0 0 0 1px var(--line)
+}
+
+.ts-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px
+}
+
 /* ---- scrolling body ---- */
 .ts-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   padding: 18px 22px 22px;
+  background: color-mix(in srgb, var(--line) 22%, var(--white));
+  scrollbar-width: thin
+}
+
+/* each tab stacks its cards with the same gap */
+.ts-pane {
   display: grid;
   align-content: start;
   gap: 14px;
-  background: color-mix(in srgb, var(--line) 22%, var(--white));
-  scrollbar-width: thin
+  animation: ts-pane-in .16s ease-out
+}
+
+@keyframes ts-pane-in {
+  from { opacity: 0; transform: translateY(4px) }
 }
 
 /* ---- live preview ---- */
@@ -282,6 +342,19 @@
   margin: 2px 0 0;
   font-size: 12.5px;
   color: var(--muted)
+}
+
+/* small note under a control */
+.ts-hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted)
+}
+
+.ts-hint strong {
+  color: var(--ink);
+  font-weight: 600
 }
 
 /* ---- labels + groups ---- */
@@ -717,7 +790,7 @@
   color: var(--muted)
 }
 
-/* ---- theme mode ---- */
+/* ---- theme mode (also used for navigation spacing) ---- */
 .ts-modes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -732,6 +805,7 @@
   border: 1.5px solid var(--line);
   border-radius: 12px;
   background: var(--white);
+  text-align: left;
   cursor: pointer;
   transition: border-color .12s ease
 }
@@ -776,6 +850,12 @@
 
 .ts-mode.is-on .ts-mode-label {
   color: var(--accent)
+}
+
+.ts-mode-note {
+  margin-top: -6px;
+  font-size: 12px;
+  color: var(--muted)
 }
 
 /* ---- profile images (None + avatars, tile pattern like sidebar backgrounds) ---- */
@@ -846,6 +926,172 @@
   right: -1px;
   width: 18px;
   height: 18px
+}
+
+/* =====================================================================================================
+   WORKSPACE TAB
+   ===================================================================================================== */
+
+/* ---- appearance palettes: 3 per row, colour strip + name ---- */
+.ts-palettes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px
+}
+
+.ts-palette {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .12s ease, transform .12s ease
+}
+
+.ts-palette:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+  transform: translateY(-1px)
+}
+
+.ts-palette.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accentbg) 50%, var(--white))
+}
+
+.ts-palette:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px
+}
+
+/* accent (wide) · hover · pressed · selected tint */
+.ts-palette-art {
+  display: flex;
+  height: 38px;
+  border-radius: 7px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px #00000012
+}
+
+.ts-palette-art span {
+  flex: 1
+}
+
+.ts-palette-art span.main {
+  flex: 2
+}
+
+.ts-palette-name {
+  min-height: 2.6em;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink)
+}
+
+.ts-palette .ts-check {
+  top: -7px;
+  right: -7px
+}
+
+.ts-palette-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 12px;
+  color: var(--muted)
+}
+
+.ts-palette-foot strong {
+  color: var(--ink);
+  font-weight: 600
+}
+
+.ts-text-btn {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer
+}
+
+.ts-text-btn:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px
+}
+
+/* ---- navigation spacing art: four menu rows, tighter when compact ---- */
+.ts-density-art {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  height: 64px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f2f4f8
+}
+
+.ts-density-art.compact {
+  gap: 3px
+}
+
+.ts-density-art i {
+  display: block;
+  height: 7px;
+  border-radius: 3px;
+  background: #d9dde6
+}
+
+.ts-density-art i.on {
+  width: 70%;
+  background: var(--accent)
+}
+
+/* ---- clock presentation: segmented control ---- */
+.ts-seg {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--line) 35%, var(--white))
+}
+
+.ts-seg-btn {
+  height: 36px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease
+}
+
+.ts-seg-btn:hover {
+  color: var(--ink)
+}
+
+.ts-seg-btn.is-on {
+  background: var(--white);
+  color: var(--accent);
+  font-weight: 650;
+  box-shadow: 0 1px 3px #1e233414, inset 0 0 0 1px var(--line)
 }
 
 /* ---- footer ---- */
@@ -932,7 +1178,8 @@
 
   .ts-body,
   .ts-head,
-  .ts-foot {
+  .ts-foot,
+  .ts-tabbar {
     padding-left: 16px;
     padding-right: 16px
   }
@@ -954,6 +1201,10 @@
     grid-template-columns: repeat(4, minmax(0, 1fr))
   }
 
+  .ts-palettes {
+    grid-template-columns: repeat(2, minmax(0, 1fr))
+  }
+
   .ts-foot {
     flex-direction: column;
     align-items: stretch
@@ -962,4 +1213,10 @@
   .ts-foot-actions .ts-btn {
     flex: 1
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-overlay,
+  .ts-panel,
+  .ts-pane { animation: none }
 }

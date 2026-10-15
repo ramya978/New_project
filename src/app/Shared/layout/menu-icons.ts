@@ -1,72 +1,115 @@
 /* =====================================================================================================
    MENU ICONS - SVG path data keyed by the API's `icon` name.
-   Feather-style line icons: 24x24 viewBox, drawn with stroke="currentColor" (no fill), stroke-width
-   1.55, round caps and joins - the sidebar's <svg> sets those, so each entry is only the `d` attribute.
-   Circles, rects and lines from the original icon sets are written as path commands, so every icon is
-   a single <path>.
+   OtoSolve line icons: 24x24 viewBox, drawn with stroke="currentColor" (no fill), stroke-width 1.5,
+   round caps and joins - the sidebar's <svg> sets those, so each entry is only the `d` attribute.
+   The geometry matches the OtoSolve navigation reference; circles, rects and ellipses are written as
+   path commands, so every icon is a single <path>.
 
-   Every icon name used by the menu JSON is here. To add one: copy its geometry from feathericons.com
-   (or lucide.dev), convert it to a single `d` string, and add it under the API name.
+   To add one: draw it on a 24x24 grid in the same thin-line style, convert it to a single `d` string,
+   and add it under the API name.
    ===================================================================================================== */
+
+/* rounded rectangle as a path: x, y, width, height, corner radius */
+const rect = (x: number, y: number, w: number, h: number, r: number): string =>
+  `M${x + r} ${y}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${h - 2 * r}a${r} ${r} 0 0 1-${r} ${r}` +
+  `h-${w - 2 * r}a${r} ${r} 0 0 1-${r}-${r}v-${h - 2 * r}a${r} ${r} 0 0 1 ${r}-${r}z`;
+
+/* circle / ellipse as a path: centre x, centre y, radius x (, radius y) */
+const ellipse = (cx: number, cy: number, rx: number, ry = rx): string =>
+  `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0 ${rx} ${ry} 0 1 0-${2 * rx} 0`;
+
+/* shared shapes */
+const QUEUE = `${rect(4, 3, 16, 18, 2)} M8 8h8 M8 12h8 M8 16h5`;
+const DOCUMENT = 'M5 3h9l5 5v13H5z M14 3v6h5 M8 13h8 M8 17h5';
+const BUILDING = 'M4 21V4h10v17 M14 9h6v12 M2 21h20 M7 8h4 M7 12h4 M8 21v-5h3v5 M17 12v2 M17 17v1';
+const FLAG = 'M4 22V3c5-4 11 4 16 0v11c-5 4-11-4-16 0';
+const PEOPLE = `${ellipse(9, 7, 3)} M3 21v-3a6 6 0 0 1 12 0v3 M16 4a3 3 0 0 1 0 6 M18 13a5 5 0 0 1 3 5v3`;
+const PIN = `M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0z ${ellipse(12, 10, 2.5)}`;
+
 export const MENU_ICONS: Record<string, string> = {
   // ---- used by the current menu JSON ------------------------------------------------------------
-  grid: 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z',
-  globe: 'M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0 M2 12h20 M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z',
-  building: 'M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18z M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2 M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2 M10 6h4 M10 10h4 M10 14h4 M10 18h4',
-  'plus-circle': 'M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0 M12 8v8 M8 12h8',
-  'check-circle': 'M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4 12 14.01l-3-3',
-  briefcase: 'M4 7h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
-  key: 'M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4',
-  list: 'M8 6h13 M8 12h13 M8 18h13 M3 6h.01 M3 12h.01 M3 18h.01',
-  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-  heart: 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z',
-  inbox: 'M22 12h-6l-2 3h-4l-2-3H2 M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z',
-  user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M8 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0',
-  clipboard: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M9 2h6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z',
-  'dollar-sign': 'M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
-  'message-circle': 'M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z',
+  /* Dashboard: four rounded squares */
+  grid: `${rect(3, 3, 6, 6, 1)} ${rect(15, 3, 6, 6, 1)} ${rect(3, 15, 6, 6, 1)} ${rect(15, 15, 6, 6, 1)}`,
+  /* Countries */
+  globe: `${ellipse(12, 12, 9)} ${ellipse(12, 12, 4, 9)} M3 12h18`,
+  /* Organisations / Organisation profile */
+  building: BUILDING,
+  /* Create organisation / Create campaign */
+  'plus-circle': `${ellipse(12, 12, 9)} M12 8v8 M8 12h8`,
+  /* Approval queue */
+  'check-circle': 'M21 11v1a9 9 0 1 1-5-8 M9 11l3 3 9-10',
+  /* Business unit / Departments */
+  briefcase: `${rect(3, 7, 18, 14, 2)} M8 7V3h8v4 M3 12c5 3 13 3 18 0 M10 13v3h4v-3`,
+  /* Permission catalogue / Access grants */
+  key: `${ellipse(7, 15, 4)} M10 12l9-9 3 3-3 3-2-2 M14 8l2 2`,
+  /* Menu catalogue / Donation register */
+  list: 'M8 6h13 M8 12h10 M8 18h13 M3 6h.01 M3 12h.01 M3 18h.01',
+  /* Platform audit / Access profiles */
+  shield: 'M12 3l8 3v6c0 5-8 9-8 9s-8-4-8-9V6z',
+  /* Donors & Leads / My donors */
+  heart: 'M20 5a5 5 0 0 0-8 1 5 5 0 0 0-8-1c-5 5 1 10 8 16 7-6 13-11 8-16z',
+  /* Lead work queue: a sheet with lines */
+  inbox: QUEUE,
+  clipboard: QUEUE,
+  queue: QUEUE,
+  /* My leads: one person */
+  user: `${ellipse(12, 7, 3.5)} M5 21v-3a7 7 0 0 1 14 0v3`,
+  /* Donations */
+  'dollar-sign': 'M12 1.5v20 M17.5 5H9.5a3.75 3.75 0 0 0 0 7.5h5a3.75 3.75 0 0 1 0 7.5H6',
+  /* Communications: speech bubble with two lines */
+  'message-circle': 'M21 11a9 9 0 0 1-9 9H3l1-6a9 9 0 1 1 17-3z M8 9h8 M8 13h5',
   send: 'M22 2 11 13 M22 2l-7 20-4-9-9-4 20-7z',
   home: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10',
-  info: 'M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0 M12 16v-4 M12 8h.01',
-  'git-branch': 'M6 3v12 M15 6a3 3 0 1 0 6 0 3 3 0 1 0-6 0 M3 18a3 3 0 1 0 6 0 3 3 0 1 0-6 0 M18 9a9 9 0 0 1-9 9',
-  'map-pin': 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M9 10a3 3 0 1 0 6 0 3 3 0 1 0-6 0',
-  sliders: 'M4 21v-7 M4 10V3 M12 21v-9 M12 8V3 M20 21v-5 M20 12V3 M1 14h6 M9 8h6 M17 16h6',
-  users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M5 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0 M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
-  'file-text': 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8',
-  database: 'M3 5a9 3 0 1 0 18 0 9 3 0 1 0-18 0 M21 12c0 1.66-4 3-9 3s-9-1.34-9-3 M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5',
-  flag: 'M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z M4 22v-7',
+  info: `${ellipse(12, 12, 9)} M12 16v-4 M12 8h.01`,
+  'git-branch': `M6 3v12 ${ellipse(18, 6, 3)} ${ellipse(6, 18, 3)} M18 9a9 9 0 0 1-9 9`,
+  /* States / Cities */
+  'map-pin': PIN,
+  pin: PIN,
+  sliders: 'M4 6h16 M4 12h16 M4 18h16 M9 4v4 M15 10v4 M8 16v4',
+  /* All donors / Employees / Users & Access */
+  users: PEOPLE,
+  people: PEOPLE,
+  /* Receipts */
+  'file-text': DOCUMENT,
+  /* Master data: stacked database */
+  database: `${ellipse(12, 5, 8, 3)} M4 5v14c0 4 16 4 16 0V5 M4 12c0 4 16 4 16 0`,
+  /* Campaigns / Organisation (admin) */
+  flag: FLAG,
   map: 'M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z M8 2v16 M16 6v16',
-  clock: 'M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0 M12 6v6l4 2',
+  /* Follow-ups / Communication history */
+  clock: `${ellipse(12, 12, 9)} M12 6v6l4 2`,
 
   // ---- other common menu icons, ready for new menu entries ----------------------------------------
-  settings: 'M9 12a3 3 0 1 0 6 0 3 3 0 1 0-6 0 M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z',
-  calendar: 'M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M16 2v4 M8 2v4 M3 10h18',
+  settings: `${ellipse(12, 12, 3)} M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z`,
+  /* Campaign calendar */
+  calendar: `${rect(3, 5, 18, 16, 2)} M7 2v6 M17 2v6 M3 10h18 M7 14h3 M14 14h3`,
   'bar-chart': 'M12 20V10 M18 20V4 M6 20v-4',
   'pie-chart': 'M21.21 15.89A10 10 0 1 1 8 2.83 M22 12A10 10 0 0 0 12 2v10z',
   'trending-up': 'M23 6l-9.5 9.5-5-5L1 18 M17 6h6v6',
   activity: 'M22 12h-4l-3 9L9 3l-3 9H2',
-  target: 'M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0 M6 12a6 6 0 1 0 12 0 6 6 0 1 0-12 0 M10 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0',
+  target: `${ellipse(12, 12, 9)} ${ellipse(12, 12, 5.5)} ${ellipse(12, 12, 2)}`,
   layers: 'M12 2 2 7l10 5 10-5-10-5z M2 17l10 5 10-5 M2 12l10 5 10-5',
-  bell: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0',
-  mail: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6',
+  bell: 'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9 M10 21h4',
+  /* Message templates */
+  mail: `${rect(3, 5, 18, 14, 2)} M3 6l9 7 9-7`,
   phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
-  'credit-card': 'M3 4h18a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M1 10h22',
+  'credit-card': `${rect(2, 5, 20, 14, 2)} M2 10h20`,
   gift: 'M20 12v10H4V12 M2 7h20v5H2z M12 22V7 M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z',
   tag: 'M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z M7 7h.01',
   folder: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z',
-  file: 'M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z M13 2v7h7',
-  search: 'M3 11a8 8 0 1 0 16 0 8 8 0 1 0-16 0 M21 21l-4.35-4.35',
-  lock: 'M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z M7 11V7a5 5 0 0 1 10 0v4',
-  'user-plus': 'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M4.5 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0 M20 8v6 M23 11h-6',
+  file: DOCUMENT,
+  search: `${ellipse(11, 11, 8)} M21 21l-4.35-4.35`,
+  lock: `${rect(3, 11, 18, 11, 2)} M7 11V7a5 5 0 0 1 10 0v4`,
+  'user-plus': `${ellipse(9, 7, 3.5)} M2 21v-3a7 7 0 0 1 14 0v3 M19 8v6 M22 11h-6`,
   star: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
   upload: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12',
   download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3',
   link: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71 M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
-  'log-out': 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9',
+  'log-out': 'M9 4H4v16h5 M9 12h12 M17 8l4 4-4 4',
   edit: 'M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z',
   plus: 'M12 5v14 M5 12h14',
-  check: 'M20 6 9 17l-5-5'
+  check: 'M5 12l4 4L19 6'
 };
 
 /** Used when the API sends an icon name that is not in the list (a plain circle). */
-export const MENU_ICON_FALLBACK = 'M3 12a9 9 0 1 0 18 0 9 9 0 1 0-18 0';
+export const MENU_ICON_FALLBACK = ellipse(12, 12, 9);

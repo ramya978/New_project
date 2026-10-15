@@ -16,8 +16,11 @@
   --nav-active-bg: color-mix(in srgb, var(--nav-primary) 14%, #fff);   /* current page pill */
   --nav-active-ink: color-mix(in srgb, var(--nav-primary) 50%, #000);  /* current page text + icon */
   --nav-open-bg: color-mix(in srgb, var(--nav-primary) 4%, #fff);      /* open / holding menu pill */
-  --nav-hover: color-mix(in srgb, var(--nav-primary) 11%, #fff);       /* hover */
-  --nav-press: color-mix(in srgb, var(--nav-primary) 20%, #fff);       /* pressed */
+  /* hover + pressed: an appearance palette (Theme Settings → Workspace) brings its own tones in
+     --theme-hover / --theme-press; without one they follow the primary colour */
+  --nav-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 12%, #fff);
+  --nav-hover-ink: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 50%, #000);
+  --nav-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 21%, #fff);
 
   /* text + lines */
   --nav-font: var(--font-menu, Inter, "Segoe UI", Arial, sans-serif); /* Theme Settings → Menu font */
@@ -29,6 +32,9 @@
   --nav-line: #e6ebef;
   --nav-icon: var(--icon-color, #24364a); /* Theme Settings → Icon Colors */
   --nav-sub-icon: #596b7b;
+
+  /* icon line thickness - lower = thinner (1.5 looked heavy) */
+  --nav-stroke: 1.9;
 
   display: block;
   min-width: 0
@@ -157,7 +163,8 @@
 }
 
 .nav-link:hover {
-  background: var(--nav-hover)
+  background: var(--nav-hover);
+  color: var(--nav-hover-ink)
 }
 
 .nav-link:active,
@@ -196,7 +203,7 @@
   height: 18px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.5;
+  stroke-width: var(--nav-stroke);
   stroke-linecap: round;
   stroke-linejoin: round
 }
@@ -246,7 +253,7 @@
 .nav-link.active:hover {
   background: var(--nav-active-bg);
   color: var(--nav-active-ink);
-  font-weight: 600
+  font-weight: 500
 }
 
 .nav-link.active .nav-ico {
@@ -258,20 +265,19 @@
   color: inherit
 }
 
-/* OPEN MENU / MENU HOLDING THE CURRENT PAGE: faint-primary pill, dark-primary text + icon */
-.nav-entry.is-open > .nav-link,
+/* MENU HOLDING THE CURRENT PAGE: faint-primary pill, dark-primary text + icon.
+   A menu that is only expanded (is-open) stays plain - just its chevron turns down - so it never
+   looks active while a page from another menu is on screen. */
 .nav-entry.has-current > .nav-link {
   background: var(--nav-open-bg);
   color: var(--nav-active-ink);
   font-weight: 550
 }
 
-.nav-entry.is-open > .nav-link:hover,
 .nav-entry.has-current > .nav-link:hover {
   background: var(--nav-hover)
 }
 
-.nav-entry.is-open > .nav-link .nav-ico,
 .nav-entry.has-current > .nav-link .nav-ico {
   color: var(--nav-active-ink)
 }
@@ -295,7 +301,6 @@
   transform: rotate(90deg)
 }
 
-.nav-entry.is-open > .nav-link .nav-chev,
 .nav-entry.has-current > .nav-link .nav-chev {
   stroke: currentColor
 }
@@ -345,7 +350,7 @@
 
 .nav-child:hover {
   background: var(--nav-hover);
-  color: var(--nav-active-ink)
+  color: var(--nav-hover-ink)
 }
 
 /* the child's line icon (falls back to a circle when the API sends none) */
@@ -363,7 +368,7 @@
   height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.5;
+  stroke-width: var(--nav-stroke);
   stroke-linecap: round;
   stroke-linejoin: round
 }
@@ -381,7 +386,7 @@
 .nav-child.active:hover {
   background: var(--nav-active-bg);
   color: var(--nav-active-ink);
-  font-weight: 600
+  font-weight: 500
 }
 
 .nav-child.active .nav-child-ico {
@@ -393,14 +398,12 @@
   padding-right: 38px
 }
 
-.nav-entry.sub.has-current > .nav-child.has-kids:not(.active),
-.nav-entry.sub.is-open > .nav-child.has-kids:not(.active) {
+.nav-entry.sub.has-current > .nav-child.has-kids:not(.active) {
   color: var(--nav-active-ink);
   font-weight: 550
 }
 
-.nav-entry.sub.has-current .nav-chev,
-.nav-entry.sub.is-open .nav-chev {
+.nav-entry.sub.has-current .nav-chev {
   stroke: var(--nav-active-ink)
 }
 
@@ -432,6 +435,27 @@
 
 .nav-children.deep .nav-child {
   font-size: 12px
+}
+
+/* ---- navigation spacing: Compact (Theme Settings → Workspace sets <html data-density>) ---- */
+:host-context(html[data-density="compact"]) .nav-link {
+  min-height: 36px;
+  padding-top: 7px;
+  padding-bottom: 7px
+}
+
+:host-context(html[data-density="compact"]) .nav-child {
+  min-height: 34px;
+  padding-top: 6px;
+  padding-bottom: 6px
+}
+
+:host-context(html[data-density="compact"]) .nav-heading {
+  margin-top: 14px
+}
+
+:host-context(html[data-density="compact"]) .nav-heading:first-child {
+  margin-top: 4px
 }
 
 /* touch screens: bigger rows */

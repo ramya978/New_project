@@ -1,19 +1,36 @@
-import { Component, HostListener, computed, inject, output } from '@angular/core';
+import { Component, HostListener, computed, inject, output, signal } from '@angular/core';
 import {
-  FONT_CHOICES, FONT_SIZES, FONT_WEIGHTS, HEADING_COLORS, ICON_COLORS, PROFILE_IMAGES,
-  SECONDARY_COLORS, SIDEBAR_BGS, THEME_COLORS, ThemePrefs, ThemeSettingsService, profileImageSrc
+  FONT_CHOICES, FONT_SIZES, FONT_WEIGHTS, HEADING_COLORS, ICON_COLORS, PALETTES, PROFILE_IMAGES,
+  SECONDARY_COLORS, SIDEBAR_BGS, THEME_COLORS, ThemePalette, ThemePrefs, ThemeSettingsService,
+  profileImageSrc, tint
 } from './theme-settings';
+import { ClockPresentation, ClockSettingsService } from '../../../Shared/studio/data/clock-settings';
 
 type SwatchKey = 'themeColor' | 'secondaryColor' | 'iconColor' | 'headingColor';
+
+/** The two tabs of the panel. */
+type SettingsTab = 'theme' | 'workspace';
 
 type IconName =
   | 'settings' | 'close' | 'palette' | 'droplet' | 'layout' | 'type' | 'size' | 'moon'
   | 'sidebar' | 'star' | 'heading' | 'shadow' | 'user' | 'upload' | 'check' | 'pen'
-  | 'reset' | 'save' | 'sun' | 'rows' | 'columns' | 'ban';
+  | 'reset' | 'save' | 'sun' | 'rows' | 'columns' | 'ban' | 'brush' | 'spacing' | 'clock' | 'workspace';
 
 interface FontGroup {
   key: 'menuFont' | 'headingFont' | 'numberFont' | 'bodyFont';
   label: string;
+}
+
+interface DensityOption {
+  id: ThemePrefs['navDensity'];
+  label: string;
+  note: string;
+}
+
+interface ClockOption {
+  id: ClockPresentation;
+  label: string;
+  note: string;
 }
 
 const ICONS: Record<IconName, string> = {
@@ -38,7 +55,11 @@ const ICONS: Record<IconName, string> = {
   save: 'M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4L12 14l-3-3',
   rows: 'M3 6h18M3 12h18M3 18h18',
   columns: 'M4 4h16v16H4zM9 4v16',
-  ban: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2'
+  ban: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2',
+  brush: 'M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z',
+  spacing: 'M3 5h18M3 19h18M8 9h8M8 15h8M12 9v6',
+  clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2',
+  workspace: 'M3 4h18v12H3zM8 20h8M12 16v4'
 };
 
 const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
@@ -50,8 +71,13 @@ const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
 })
 export class ThemeSettings {
   private readonly service = inject(ThemeSettingsService);
+  /** The header clock - its presentation is changed from the Workspace tab. */
+  protected readonly clock = inject(ClockSettingsService);
 
   readonly closed = output<void>();
+
+  /** Theme = colours, layout, fonts … · Workspace = palette, navigation spacing, clock. */
+  protected readonly tab = signal<SettingsTab>('theme');
 
   // ---- data from the store module ----
   // Base swatches + any custom colours the user picked (kept in prefs so they survive reload).
@@ -64,6 +90,7 @@ export class ThemeSettings {
   protected readonly weights = FONT_WEIGHTS;
   protected readonly sidebarBgs = SIDEBAR_BGS;
   protected readonly images = PROFILE_IMAGES;
+  protected readonly palettes = PALETTES;
 
   protected readonly fontGroups: FontGroup[] = [
     { key: 'menuFont', label: 'Menu font' },
@@ -71,6 +98,22 @@ export class ThemeSettings {
     { key: 'numberFont', label: 'Number font' },
     { key: 'bodyFont', label: 'Other font' }
   ];
+
+  protected readonly densities: DensityOption[] = [
+    { id: 'comfortable', label: 'Comfortable', note: 'Roomy menu rows' },
+    { id: 'compact', label: 'Compact', note: 'More menu on screen' }
+  ];
+
+  protected readonly clockOptions: ClockOption[] = [
+    { id: 'quiet', label: 'Quiet', note: 'Minute display' },
+    { id: 'detailed', label: 'Detailed', note: 'With seconds' },
+    { id: 'hidden', label: 'Hidden', note: 'No clock in the header' }
+  ];
+
+  /** One-line description of the current clock presentation. */
+  protected readonly clockNote = computed(
+    () => this.clockOptions.find((o) => o.id === this.clock.presentation())?.note ?? ''
+  );
 
   protected readonly prefs = this.service.prefs;
 
@@ -87,9 +130,17 @@ export class ThemeSettings {
   /** Selected avatar src for the live preview; null = initials. */
   protected readonly avatarSrc = computed(() => profileImageSrc(this.prefs().profileImage));
 
+  /** Name of the active palette, or null while a custom Theme Color is used. */
+  protected readonly paletteName = computed(() => PALETTES.find((p) => p.id === this.prefs().palette)?.name ?? null);
+
   // ---- helpers ----
   protected iconPath(name: IconName): string {
     return ICONS[name];
+  }
+
+  /** The palette's light selected tint, shown as the last stripe of its preview. */
+  protected selectedTint(p: ThemePalette): string {
+    return tint(p.accent, 0.86);
   }
 
   /** Base swatch list with the user's custom picks appended (newest last, de-duplicated). */
@@ -126,7 +177,25 @@ export class ThemeSettings {
       patch[customKey] = next;
     }
 
+    // a hand-picked theme colour replaces the appearance palette
+    if (key === 'themeColor') patch['palette'] = null;
+
     this.service.patch(patch as Partial<ThemePrefs>);
+  }
+
+  /** Appearance palette: sets the theme colour plus the palette's own hover and pressed tones. */
+  protected setPalette(p: ThemePalette): void {
+    this.service.patch({ palette: p.id, themeColor: p.accent });
+  }
+
+  /** Back to a plain Theme Color (keeps the current colour, drops the palette's hover / pressed tones). */
+  protected clearPalette(): void {
+    this.service.patch({ palette: null });
+  }
+
+  /** Clock presentation applies straight away (the clock keeps its own saved settings). */
+  protected setClock(value: ClockPresentation): void {
+    this.clock.setPresentation(value);
   }
 
   private baseFor(key: SwatchKey): string[] {

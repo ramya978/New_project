@@ -38,13 +38,26 @@
         </button>
 
         @if (orgListOpen()) {
-          <div class="hd-pop hd-org-pop" role="listbox" aria-label="Organisations">
-            <label class="hd-search">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
-              <input #orgSearch type="text" inputmode="search" placeholder="Search organisations" aria-label="Search organisations"
-                     autocomplete="off" [value]="orgQuery()" (input)="orgQuery.set(orgSearch.value)" (keydown.escape)="closeOrgList()">
-            </label>
-            <div class="hd-org-list">
+          <div class="hd-pop hd-org-pop" role="dialog" aria-labelledby="hd-org-title">
+            <!-- heading, then the search bar, then a hairline, then the list - all on the same left edge -->
+            <div class="hd-org-head">
+              <h2 id="hd-org-title">Your organisations</h2>
+              <p>Pick the one you want to work in.</p>
+            </div>
+            <div class="hd-org-search">
+              <label class="hd-search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
+                <input #orgSearch type="text" inputmode="search" placeholder="Search organisations" aria-label="Search organisations"
+                       autocomplete="off" [value]="orgQuery()" (input)="orgQuery.set(orgSearch.value)" (keydown.escape)="closeOrgList()">
+                @if (orgQuery()) {
+                  <button type="button" class="hd-search-clear" aria-label="Clear search"
+                          (click)="orgQuery.set(''); orgSearch.focus()">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18 M6 6l12 12" /></svg>
+                  </button>
+                }
+              </label>
+            </div>
+            <div class="hd-org-list" role="listbox" aria-label="Organisations">
               @for (org of filteredOrgs(); track org.id) {
                 <button type="button" class="hd-org-row" role="option" [class.is-current]="org.id === selectedOrg()?.id"
                         [attr.aria-selected]="org.id === selectedOrg()?.id" (click)="chooseOrg(org)">
@@ -60,6 +73,7 @@
                 <p class="hd-empty">No organisation matches “{{ orgQuery() }}”.</p>
               }
             </div>
+            <div class="hd-pop-foot">{{ filteredOrgs().length }} of {{ organisations().length }} organisations</div>
           </div>
         }
       </div>

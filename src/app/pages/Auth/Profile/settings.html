@@ -1,6 +1,8 @@
 <!-- =====================================================================================================
-     THEME SETTINGS OFFCANVAS - overlay + right-hand panel. Live preview at the top, section cards
-     below, Reset / Save footer. Selected states use the app accent (var(--accent)).
+     THEME SETTINGS OFFCANVAS - overlay + right-hand panel.
+     Two tabs:  Theme      colours, layout, sidebar background, fonts, mode, icons, headings, shape, avatar
+                Workspace  appearance palette, navigation spacing, clock presentation
+     Reset / Save footer. Selected states use the app accent (var(--accent)).
      ===================================================================================================== -->
 <div class="ts-overlay" (click)="close()" aria-hidden="true"></div>
 
@@ -8,7 +10,6 @@
 
   <!-- header -->
   <header class="ts-head">
-   
     <div class="ts-head-text">
       <h2 id="ts-title">Theme Settings</h2>
       <p>Personalise colours, layout and typography</p>
@@ -19,8 +20,31 @@
     </button>
   </header>
 
+  <!-- tabs -->
+  <div class="ts-tabbar">
+    <div class="ts-tabs" role="tablist" aria-label="Settings sections">
+      <button type="button" class="ts-tab" role="tab" id="ts-tab-theme" aria-controls="ts-pane-theme"
+              [class.is-on]="tab() === 'theme'" [attr.aria-selected]="tab() === 'theme'" (click)="tab.set('theme')">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('palette')" /></svg>
+        Theme
+      </button>
+      <button type="button" class="ts-tab" role="tab" id="ts-tab-workspace" aria-controls="ts-pane-workspace"
+              [class.is-on]="tab() === 'workspace'" [attr.aria-selected]="tab() === 'workspace'" (click)="tab.set('workspace')">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('workspace')" /></svg>
+        Workspace
+      </button>
+    </div>
+  </div>
+
   <div class="ts-body">
 
+    <!-- =================================================================================================
+         THEME TAB
+         ================================================================================================= -->
+    @if (tab() === 'theme') {
+    <div class="ts-pane" role="tabpanel" id="ts-pane-theme" aria-labelledby="ts-tab-theme">
 
     <!-- theme (primary) colours -->
     <section class="ts-card">
@@ -46,6 +70,9 @@
                  (input)="setSwatch('themeColor', $any($event.target).value)" />
         </label>
       </div>
+      @if (paletteName(); as name) {
+        <p class="ts-hint">Set by the <strong>{{ name }}</strong> palette (Workspace tab). Picking a colour here replaces it.</p>
+      }
     </section>
 
     <!-- secondary colours -->
@@ -353,8 +380,7 @@
       </div>
     </section>
 
-    <!-- profile image (avatars) -->
- <!-- profile image: None + avatars, same tile pattern as Sidebar Background -->
+    <!-- profile image: None + avatars, same tile pattern as Sidebar Background -->
     <section class="ts-card">
       <div class="ts-card-head">
         <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('user')" /></svg></span>
@@ -397,6 +423,94 @@
       </div>
     </section>
 
+    </div>
+    }
+
+    <!-- =================================================================================================
+         WORKSPACE TAB - appearance palette, navigation spacing, clock presentation
+         ================================================================================================= -->
+    @if (tab() === 'workspace') {
+    <div class="ts-pane" role="tabpanel" id="ts-pane-workspace" aria-labelledby="ts-tab-workspace">
+
+      <!-- appearance palette -->
+      <section class="ts-card">
+        <div class="ts-card-head">
+          <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('brush')" /></svg></span>
+          <div class="ts-sec-text"><h3>Appearance Palette</h3><p>Header, main menu and submenus - selected, hover and pressed</p></div>
+        </div>
+
+        <div class="ts-palettes">
+          @for (p of palettes; track p.id) {
+            <button type="button" class="ts-palette" [class.is-on]="prefs().palette === p.id"
+                    [attr.aria-pressed]="prefs().palette === p.id" [attr.aria-label]="'Palette ' + p.name"
+                    (click)="setPalette(p)">
+              <!-- accent · hover · pressed · selected tint -->
+              <span class="ts-palette-art" aria-hidden="true">
+                <span class="main" [style.background]="p.accent"></span>
+                <span [style.background]="p.hover"></span>
+                <span [style.background]="p.pressed"></span>
+                <span [style.background]="selectedTint(p)"></span>
+              </span>
+              <span class="ts-palette-name">{{ p.name }}</span>
+              @if (prefs().palette === p.id) {
+                <span class="ts-check" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6"
+                       stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath('check')" /></svg>
+                </span>
+              }
+            </button>
+          }
+        </div>
+
+        <div class="ts-palette-foot">
+          @if (paletteName(); as name) {
+            <span>Using <strong>{{ name }}</strong></span>
+            <button type="button" class="ts-text-btn" (click)="clearPalette()">Use my Theme Color instead</button>
+          } @else {
+            <span>Using your own Theme Color · pick a palette for matching hover and pressed tones</span>
+          }
+        </div>
+      </section>
+
+      <!-- navigation spacing -->
+      <section class="ts-card">
+        <div class="ts-card-head">
+          <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('spacing')" /></svg></span>
+          <div class="ts-sec-text"><h3>Navigation Spacing</h3><p>Height of the sidebar menu rows</p></div>
+        </div>
+        <div class="ts-modes">
+          @for (d of densities; track d.id) {
+            <button type="button" class="ts-mode" [class.is-on]="prefs().navDensity === d.id"
+                    [attr.aria-pressed]="prefs().navDensity === d.id" (click)="set('navDensity', d.id)">
+              <span class="ts-density-art" [class.compact]="d.id === 'compact'" aria-hidden="true">
+                <i class="on"></i><i></i><i></i><i></i>
+              </span>
+              <span class="ts-mode-label">{{ d.label }}</span>
+              <small class="ts-mode-note">{{ d.note }}</small>
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- clock presentation -->
+      <section class="ts-card">
+        <div class="ts-card-head">
+          <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('clock')" /></svg></span>
+          <div class="ts-sec-text"><h3>Clock Presentation</h3><p>How the workspace clock shows in the header</p></div>
+        </div>
+        <div class="ts-seg" role="group" aria-label="Clock presentation">
+          @for (o of clockOptions; track o.id) {
+            <button type="button" class="ts-seg-btn" [class.is-on]="clock.presentation() === o.id"
+                    [attr.aria-pressed]="clock.presentation() === o.id" (click)="setClock(o.id)">
+              {{ o.label }}
+            </button>
+          }
+        </div>
+        <p class="ts-hint">{{ clockNote() }} · applies straight away, the clock keeps its own settings.</p>
+      </section>
+
+    </div>
+    }
 
   </div><!-- /.ts-body -->
 

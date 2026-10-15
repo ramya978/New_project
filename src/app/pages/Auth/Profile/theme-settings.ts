@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 export interface ThemePrefs {
-  /** Primary accent -> --accent (+ derived --accentbg). */
+  /** Primary accent -> --accent / --primary (+ derived --accentbg). */
   themeColor: string;
   /** Secondary / success accent -> --teal. */
   secondaryColor: string;
@@ -39,6 +39,10 @@ export interface ThemePrefs {
   customSecondaryColors: string[];
   customIconColors: string[];
   customHeadingColors: string[];
+  /** Appearance palette id (PALETTES) - accent + hover + pressed tones; null = custom Theme Color. */
+  palette: string | null;
+  /** Sidebar row spacing - sets <html data-density>. */
+  navDensity: 'comfortable' | 'compact';
 }
 
 export interface SidebarBgOption {
@@ -55,6 +59,15 @@ export interface ProfileImageOption {
   src: string;
 }
 
+/** An appearance palette: one accent plus the hover and pressed tones used across header, menu and submenus. */
+export interface ThemePalette {
+  id: string;
+  name: string;
+  accent: string;
+  hover: string;
+  pressed: string;
+}
+
 /** Theme (primary) colours shown in the "Theme Colors" row - includes the current default maroon. */
 export const THEME_COLORS: string[] = ['#c78028', '#bd4d53', '#7c3348', '#8763bd', '#138879', '#e0559b'];
 
@@ -66,6 +79,22 @@ export const ICON_COLORS: string[] = ['#6a7083', '#c78028', '#bd4d53', '#138879'
 
 /** Heading colours - default ink. */
 export const HEADING_COLORS: string[] = ['#202333', '#7c3348', '#138879', '#4169c4', '#e0559b'];
+
+/** The nine OtoSolve appearance palettes. */
+export const PALETTES: ThemePalette[] = [
+  { id: 'classic', name: 'Original Navy & Teal', accent: '#087e8b', hover: '#066a75', pressed: '#075762' },
+  { id: 'ocean', name: 'Blueberry & Slate', accent: '#2f3a55', hover: '#5c6b8a', pressed: '#6e6f73' },
+  { id: 'sapphire', name: 'Lemon & Leaf', accent: '#2f4a1f', hover: '#f4c430', pressed: '#e0a91f' },
+  { id: 'forest', name: 'Citrus & Cocoa', accent: '#4f1d02', hover: '#f3c01e', pressed: '#c49f6c' },
+  { id: 'violet', name: 'Coastal Blue', accent: '#2f3d4d', hover: '#6d8fa3', pressed: '#93acaa' },
+  { id: 'mineral', name: 'Mineral & Cocoa', accent: '#5b6f7f', hover: '#3e2a23', pressed: '#d8c9b5' },
+  { id: 'scandinavian', name: 'Scandinavian Slate', accent: '#67707a', hover: '#7c7b72', pressed: '#2c2c2a' },
+  { id: 'earth', name: 'Earth & Ocean', accent: '#5b6a73', hover: '#ae6139', pressed: '#887668' },
+  { id: 'calm', name: 'Calm Forest', accent: '#15201c', hover: '#9a4e28', pressed: '#343635' }
+];
+
+export const paletteById = (id: string | null): ThemePalette | null =>
+  (id && PALETTES.find((p) => p.id === id)) || null;
 
 /** Font choices offered per surface (Google fonts + system serif / mono). */
 export const FONT_CHOICES: string[] = ['Inter', 'Roboto', 'Poppins', 'Nunito', 'Georgia', 'Times', 'Courier', 'Montserrat', 'Lato'];
@@ -219,7 +248,9 @@ export const THEME_DEFAULTS: ThemePrefs = {
   customThemeColors: [],
   customSecondaryColors: [],
   customIconColors: [],
-  customHeadingColors: []
+  customHeadingColors: [],
+  palette: null,
+  navDensity: 'comfortable'
 };
 
 /* ---------- colour helpers ---------- */
@@ -252,12 +283,34 @@ export function applyTheme(prefs: ThemePrefs): void {
   const el = document.documentElement;
   const set = (k: string, v: string): void => el.style.setProperty(k, v);
 
-  // colours
+  // colours - --primary drives the sidebar and header, --accent the rest of the app
   set('--accent', prefs.themeColor);
+  set('--primary', prefs.themeColor);
   set('--accentbg', prefs.mode === 'dark' ? tint(prefs.themeColor, 0.78) : tint(prefs.themeColor, 0.92));
   set('--teal', prefs.secondaryColor);
   set('--icon-color', prefs.iconColor);
   set('--heading-color', prefs.headingColor);
+
+  // favicon: the O follows the current primary colour (tile = its light tint), so the tab icon
+  // updates live whenever the theme colour changes. Written as an SVG data URI on <link rel="icon">.
+  const favTile = prefs.mode === 'dark' ? tint(prefs.themeColor, 0.78) : tint(prefs.themeColor, 0.92);
+  const favSvg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">` +
+    `<rect width="64" height="64" rx="15" fill="${favTile}"/>` +
+    `<circle cx="32" cy="32" r="15" fill="none" stroke="${prefs.themeColor}" stroke-width="9"/></svg>`;
+  const favLink = document.querySelector<HTMLLinkElement>('link[rel~="icon"]:not([rel~="alternate"])');
+  if (favLink) favLink.href = `data:image/svg+xml,${encodeURIComponent(favSvg)}`;
+
+  // appearance palette: its own hover + pressed tones (header, main menu and submenus).
+  // Without a palette the hover / pressed tones fall back to the theme colour.
+  const palette = paletteById(prefs.palette);
+  if (palette) {
+    set('--theme-hover', palette.hover);
+    set('--theme-press', palette.pressed);
+  } else {
+    el.style.removeProperty('--theme-hover');
+    el.style.removeProperty('--theme-press');
+  }
 
   // typography
   set('--font-body', fontStack(prefs.bodyFont));
@@ -285,9 +338,10 @@ export function applyTheme(prefs: ThemePrefs): void {
       ? 'dark'
       : 'light';
 
-  // mode + layout
+  // mode + layout + navigation spacing
   el.dataset['mode'] = prefs.mode;
   el.dataset['layout'] = prefs.layout;
+  el.dataset['density'] = prefs.navDensity;
 }
 
 /* ---------- persistence ---------- */
@@ -304,6 +358,9 @@ function migrate(prefs: ThemePrefs): ThemePrefs {
   next.customSecondaryColors = Array.isArray(next.customSecondaryColors) ? next.customSecondaryColors : [];
   next.customIconColors = Array.isArray(next.customIconColors) ? next.customIconColors : [];
   next.customHeadingColors = Array.isArray(next.customHeadingColors) ? next.customHeadingColors : [];
+  // unknown palette ids and spacing values fall back to the defaults
+  if (!paletteById(next.palette)) next.palette = null;
+  if (next.navDensity !== 'compact') next.navDensity = 'comfortable';
   return next;
 }
 
