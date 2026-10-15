@@ -1,0 +1,73 @@
+
+:root {
+  --btn-primary: var(--primary, var(--accent, #087e8b));
+  --btn-secondary: var(--teal, #138879);
+
+  /* derived interaction tones */
+  --btn-primary-hover: color-mix(in srgb, var(--btn-primary) 88%, #000);
+  --btn-primary-press: color-mix(in srgb, var(--btn-primary) 78%, #000);
+  --btn-secondary-hover: color-mix(in srgb, var(--btn-secondary) 88%, #000);
+  --btn-secondary-press: color-mix(in srgb, var(--btn-secondary) 78%, #000);
+}
+
+
+.pf-hbtn  {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 550;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease, border-color .15s ease
+}
+
+
+/* ---------- positive button (primary colour) ---------- */
+.btn-primary {
+  background: var(--btn-primary);
+  border: 1px solid var(--btn-primary);
+  color: #fff
+}
+
+.btn-primary:hover {
+  background: var(--btn-primary-hover);
+  border-color: var(--btn-primary-hover);
+  color: #fff
+}
+
+.btn-primary:active {
+  background: var(--btn-primary-press);
+  border-color: var(--btn-primary-press);
+  color: #fff
+}
+
+/* ---------- negative button (secondary colour) ---------- */
+.btn-secondary {
+  background: none;
+  border: 1px solid var(--btn-secondary);
+  color: var(--btn-secondary)
+}
+
+.btn-secondary:hover {
+  background: var(--btn-secondary-hover);
+  border-color: var(--btn-secondary-hover);
+  color: #fff
+}
+
+.btn-secondary:active {
+  background: var(--btn-secondary-press);
+  border-color: var(--btn-secondary-press);
+  color: #fff
+}
+
+/* ---------- shared disabled state for both variants ---------- */
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  pointer-events: none
+}

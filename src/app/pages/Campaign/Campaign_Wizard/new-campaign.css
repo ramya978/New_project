@@ -41,7 +41,15 @@
 
 :host button,
 :host input {
-  font: inherit;
+  font: inherit
+}
+
+/* Inputs keep inheriting the component ink colour. Buttons must NOT force
+   `color: inherit` here - this selector's [ngcontent]-boosted specificity would
+   override the white text colour of the shared .btn-primary / .btn-secondary
+   classes from common-buttons.css. Unstyled buttons still inherit the ink via
+   the global `button { color: inherit }` in styles.css. */
+:host input {
   color: inherit
 }
 
@@ -65,10 +73,7 @@
   margin: 0
 }
 
-:host :focus-visible {
-  outline: 2px solid var(--cp-primary);
-  outline-offset: 2px
-}
+
 
 .cp-ico {
   width: 16px;
@@ -85,7 +90,6 @@
   color: var(--cp-faint)
 }
 
-/* ---------- buttons ---------- */
 .cp-btn {
   display: inline-flex;
   align-items: center;
@@ -94,41 +98,25 @@
   min-height: 38px;
   padding: 8px 14px;
   border-radius: 8px;
-
-
-  border-color: var( --cp-primary);
-    background: var( --cp-primary);
-    color: white;
   font-size: 13px;
   font-weight: 550;
   white-space: nowrap;
   transition: background-color .15s, color .15s, border-color .15s
 }
 
-.cp-btn:hover {
+.cp-btn:not(.btn-primary):not(.btn-secondary) {
+  border: 1px solid var(--cp-line);
+  background: #fff;
+  color: var(--cp-ink)
+}
+
+.cp-btn:not(.btn-primary):not(.btn-secondary):hover {
   background: var(--cp-hover);
   border-color: color-mix(in srgb, var(--cp-primary) 20%, var(--cp-line))
 }
 
-.cp-btn:active {
+.cp-btn:not(.btn-primary):not(.btn-secondary):active {
   background: var(--cp-press)
-}
-
-.cp-btn-primary {
-  background: var(--cp-primary);
-  border-color: var(--cp-primary);
-  color: #fff
-}
-
-.cp-btn-primary:hover {
-  background: color-mix(in srgb, var(--cp-primary) 88%, #000);
-  border-color: color-mix(in srgb, var(--cp-primary) 88%, #000);
-  color: #fff
-}
-
-.cp-btn-primary:active {
-  background: color-mix(in srgb, var(--cp-primary) 78%, #000);
-  color: #fff
 }
 
 .cp-link {

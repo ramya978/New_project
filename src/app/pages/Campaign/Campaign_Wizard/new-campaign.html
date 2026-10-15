@@ -4,7 +4,7 @@
     <h1>Campaigns</h1>
     <p>A campaign groups donations under one fund or programme, with its own target, dates and public wording.</p>
   </div>
-  <button type="button" class="cp-btn" (click)="back.emit()">
+  <button type="button" class="cp-btn btn-secondary" (click)="back.emit()">
     <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('back')" /></svg>
   Back
   </button>
@@ -90,9 +90,9 @@
                  [class.is-invalid]="showError('name')" [value]="form().name"
                  (input)="setText('name', $event)" (blur)="touch('name')" />
           @if (showError('name'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error"  style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Up to 120 characters.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Up to 120 characters.</p>
           }
         </div>
 
@@ -106,9 +106,9 @@
                  [class.is-invalid]="showError('code')" [value]="form().code"
                  (input)="setCode($event)" (blur)="touch('code')" />
           @if (showError('code'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Capital letters, numbers and hyphens.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Capital letters, numbers and hyphens.</p>
           }
         </div>
 
@@ -130,9 +130,9 @@
             }
           </div>
           @if (showError('startDate'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Today or later.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Today or later.</p>
           }
         </div>
 
@@ -154,9 +154,9 @@
             }
           </div>
           @if (showError('endDate'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Must be after the start date.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Must be after the start date.</p>
           }
         </div>
 
@@ -172,9 +172,9 @@
                    [value]="form().amount" (input)="setMoney('amount', $event)" (blur)="touch('amount')" />
           </div>
           @if (showError('amount'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Up to two decimal places.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Up to two decimal places.</p>
           }
         </div>
 
@@ -190,9 +190,9 @@
                    [value]="form().target" (input)="setMoney('target', $event)" (blur)="touch('target')" />
           </div>
           @if (showError('target'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Not lower than the campaign amount.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Not lower than the campaign amount.</p>
           }
         </div>
 
@@ -206,9 +206,9 @@
                  [class.is-invalid]="showError('fund')" [value]="form().fund"
                  (input)="setText('fund', $event)" (blur)="touch('fund')" />
           @if (showError('fund'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Uses a linked fund record.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Uses a linked fund record.</p>
           }
         </div>
 
@@ -243,15 +243,15 @@
                     }
                   </li>
                 } @empty {
-                  <li class="cp-empty">No owner matches “{{ ownerQuery() }}”.</li>
+                  <li class="cp-empty" >No owner matches “{{ ownerQuery() }}”.</li>
                 }
               </ul>
             }
           </div>
           @if (showError('owner'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">{{ owner() ? owner()!.role : 'Uses a linked employee record.' }}</p>
+            <p class="cp-hint" style="margin-top: 10px;">{{ owner() ? owner()!.role : 'Uses a linked employee record.' }}</p>
           }
         </div>
 
@@ -309,9 +309,9 @@
             }
           </div>
           @if (showError('country'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Type to search.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Type to search.</p>
           }
         </div>
 
@@ -343,7 +343,7 @@
               </ul>
             }
           </div>
-          <p class="cp-hint">Optional.</p>
+          <p class="cp-hint" style="margin-top: 10px;">Optional.</p>
         </div>
 
         <!-- city -->
@@ -374,7 +374,7 @@
               </ul>
             }
           </div>
-          <p class="cp-hint">Optional.</p>
+          <p class="cp-hint" style="margin-top: 10px;">Optional.</p>
         </div>
 
         <!-- zip -->
@@ -389,7 +389,7 @@
           @if (showError('zip'); as err) {
             <p class="cp-error">{{ err }}</p>
           } @else {
-            <p class="cp-hint">3–10 characters.</p>
+            <p class="cp-hint" style="margin-top: 10px;">3–10 characters.</p>
           }
         </div>
 
@@ -433,9 +433,9 @@
             <span class="cp-suffix">days</span>
           </div>
           @if (showError('daysBefore'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">0 sends the reminder on the start date.</p>
+            <p class="cp-hint" style="margin-top: 10px;">0 sends the reminder on the start date.</p>
           }
         </div>
 
@@ -487,9 +487,9 @@
             </span>
           </div>
           @if (showError('reminder'); as err) {
-            <p class="cp-error">{{ err }}</p>
+            <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
           } @else {
-            <p class="cp-hint">Sent to the campaign owner.</p>
+            <p class="cp-hint" style="margin-top: 10px;">Sent to the campaign owner.</p>
           }
         </div>
       </div>
@@ -501,7 +501,7 @@
         <span class="cp-num">03</span>
         <div>
           <h3 id="cp-s3">Publication &amp; notice</h3>
-          <p>Public description and donor-facing terms.</p>
+          <p >Public description and donor-facing terms.</p>
         </div>
       </header>
 
@@ -520,11 +520,11 @@
     <footer class="cp-actionbar">
       <p>Check every detail above before you launch — launching schedules this campaign.</p>
       <div class="cp-actionbar-btns">
-        <button type="button" class="cp-btn" (click)="discard()">
+        <button type="button" class="cp-btn btn-secondary" (click)="discard()">
           <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('close')" /></svg>
           Discard
         </button>
-        <button type="button" class="cp-btn cp-btn-primary" (click)="launch()">
+        <button type="button" class="cp-btn btn-primary" (click)="launch()">
           <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
           Launch campaign
         </button>
@@ -549,7 +549,7 @@
 
     <section>
       <h4>Where it connects</h4>
-      <ul class="cp-connects">
+      <ul class="cp-connects" style="margin-top: 15px;">
         <li><svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('fund')" /></svg>Funds &amp; programmes</li>
         <li><svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('donor')" /></svg>Donors &amp; leads</li>
         <li><svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('receipt')" /></svg>Payments &amp; receipts</li>
@@ -706,9 +706,9 @@
 
   <div class="cp-rt-foot">
     @if (showError(cfg.key); as err) {
-      <p class="cp-error">{{ err }}</p>
+      <p class="cp-error" style="margin-top: 10px;">{{ err }}</p>
     } @else {
-      <p class="cp-hint">{{ cfg.hint }}</p>
+      <p class="cp-hint" style="margin-top: 10px;">{{ cfg.hint }}</p>
     }
     <span class="cp-count" [class.is-full]="charCount(cfg.key) >= cfg.max">
       {{ charCount(cfg.key).toLocaleString('en-IN') }} / {{ cfg.max.toLocaleString('en-IN') }} characters

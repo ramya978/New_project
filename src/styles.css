@@ -1,6 +1,11 @@
 /* YDot Hotel Sales Studio - global styles (original design). The sidebar's own styles are in
    src/app/Shared/layout/sidebar/sidebar.css. */
 
+/* Common button colour classes (.btn-primary = positive/primary colour,
+   .btn-secondary = negative/secondary colour) shared across all screens.
+   Imported here so the dev server picks it up through the watched styles.css. */
+@import './app/Shared/styles/common-buttons.css';
+
 
 :host button,
 :host input,

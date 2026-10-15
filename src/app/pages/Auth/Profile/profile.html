@@ -11,12 +11,12 @@
     <p class="pf-sub">Platform Operations Lead · PLT-001 · Profile, access and security for this account.</p>
   </div>
   <div class="pf-head-actions">
-    <button type="button" class="pf-hbtn" (click)="settingsOpen.set(true)">
+    <button type="button" class="pf-hbtn btn-secondary" (click)="settingsOpen.set(true)">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('settings')" /></svg>
       Settings
     </button>
-    <button type="button" class="pf-hbtn primary">
+    <button type="button" class="pf-hbtn btn-primary">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('edit')" /></svg>
       Edit
@@ -146,7 +146,7 @@
                   <option value="scope">Scope</option>
                 </select>
               </label>
-              <button type="button" class="pf-hbtn primary" (click)="setTab('access')">Open access
+              <button type="button" class="pf-hbtn btn-primary" (click)="setTab('access')">Open access
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('arrow')" /></svg>
               </button>
