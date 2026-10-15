@@ -1,0 +1,965 @@
+/* =====================================================================================================
+   THEME SETTINGS OFFCANVAS - page-scoped (.ts-*). Surfaces use the global tokens (--white, --line,
+   --ink, --muted, --accent, --accentbg, --teal) so the panel follows light/dark mode and theme colour.
+   ===================================================================================================== */
+
+/* ---- backdrop + sliding panel ---- */
+.ts-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: #141a2a73;
+  backdrop-filter: blur(3px);
+  animation: ts-fade .18s ease-out
+}
+
+@keyframes ts-fade {
+  from { opacity: 0 }
+}
+
+.ts-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 91;
+  display: flex;
+  flex-direction: column;
+  width: min(460px, 100vw);
+  background: var(--white);
+  border-left: 1px solid var(--line);
+  box-shadow: -28px 0 70px #1e233433;
+  animation: ts-slide .24s cubic-bezier(.22, .8, .3, 1)
+}
+
+@keyframes ts-slide {
+  from { transform: translateX(48px); opacity: 0 }
+}
+
+/* ---- header ---- */
+.ts-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+  background: var(--white)
+}
+
+.ts-head-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: #fff
+}
+
+.ts-head-text {
+  flex: 1;
+  min-width: 0
+}
+
+.ts-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  color: var(--heading-color, var(--ink))
+}
+
+.ts-head p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: var(--muted)
+}
+
+.ts-close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, transform .15s ease
+}
+
+.ts-close:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  transform: rotate(90deg)
+}
+
+/* ---- scrolling body ---- */
+.ts-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 22px 22px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  background: color-mix(in srgb, var(--line) 22%, var(--white));
+  scrollbar-width: thin
+}
+
+/* ---- live preview ---- */
+.ts-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--white)
+}
+
+.ts-pv-app {
+  display: flex;
+  flex: none;
+  width: 170px;
+  height: 104px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f4f6fa;
+  overflow: hidden
+}
+
+.ts-pv-app.dark {
+  background: #171c28;
+  border-color: #2a3142
+}
+
+.ts-pv-side {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 40px;
+  padding: 10px 7px;
+  background: #232b3e
+}
+
+.ts-pv-side i {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: #ffffff59
+}
+
+.ts-pv-main {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+  padding: 9px 10px
+}
+
+.ts-pv-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px
+}
+
+.ts-pv-title {
+  width: 52px;
+  height: 7px;
+  border-radius: 4px
+}
+
+.ts-pv-av {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover
+}
+
+.ts-pv-av.initials {
+  display: grid;
+  place-items: center;
+  font-size: 8px;
+  font-weight: 700;
+  color: #fff
+}
+
+.ts-pv-line {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: #d9dde6
+}
+
+.ts-pv-app.dark .ts-pv-line {
+  background: #343c4f
+}
+
+.ts-pv-line.w80 { width: 80% }
+.ts-pv-line.w60 { width: 60% }
+
+.ts-pv-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: auto
+}
+
+.ts-pv-btn {
+  width: 40px;
+  height: 14px
+}
+
+.ts-pv-btn.ghost {
+  border: 1.5px solid;
+  background: transparent
+}
+
+.ts-pv-meta {
+  min-width: 0
+}
+
+.ts-pv-meta strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--ink)
+}
+
+.ts-pv-meta small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.4
+}
+
+/* ---- section cards ---- */
+.ts-card {
+  padding: 16px 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--white)
+}
+
+.ts-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px
+}
+
+.ts-sec-ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--accentbg);
+  color: var(--accent)
+}
+
+.ts-sec-text {
+  min-width: 0
+}
+
+.ts-sec-text h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -.2px;
+  color: var(--heading-color, var(--ink))
+}
+
+.ts-sec-text p {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--muted)
+}
+
+/* ---- labels + groups ---- */
+.ts-label {
+  margin-bottom: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted)
+}
+
+.ts-label.plain {
+  margin-bottom: 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink)
+}
+
+.ts-fgroup + .ts-fgroup {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line)
+}
+
+/* shared check badge */
+.ts-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--white);
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 6px #0000002e
+}
+
+/* shared "None" art: striped surface + ban icon (sidebar + profile image) */
+.ts-bg-art.none,
+.ts-image-art.none {
+  background: repeating-linear-gradient(45deg, #f4f5f8 0 6px, #eceef3 6px 12px);
+  color: #9aa0af
+}
+
+/* ---- colour swatches ---- */
+.ts-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px
+}
+
+.ts-swatch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px #0000001a;
+  transition: transform .12s ease, box-shadow .12s ease
+}
+
+.ts-swatch:hover {
+  transform: translateY(-2px)
+}
+
+.ts-swatch.is-on {
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--accent)
+}
+
+.ts-swatch svg {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / .45))
+}
+
+.ts-picker {
+  background: var(--white);
+  box-shadow: none;
+  border: 1.5px dashed var(--line);
+  color: var(--accent)
+}
+
+.ts-picker:hover {
+  border-color: var(--accent);
+  background: var(--accentbg)
+}
+
+.ts-picker input[type=color] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer
+}
+
+/* ---- layouts ---- */
+.ts-layouts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px
+}
+
+.ts-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .12s ease
+}
+
+.ts-layout:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line))
+}
+
+.ts-layout.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accentbg) 50%, var(--white))
+}
+
+.ts-layout-art {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 76px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f2f4f8;
+  overflow: hidden
+}
+
+.ts-layout-art .art-bar {
+  height: 10px;
+  border-radius: 3px;
+  background: var(--accent)
+}
+
+.ts-layout-art .art-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1
+}
+
+.ts-layout-art .art-lines i {
+  display: block;
+  height: 7px;
+  border-radius: 3px;
+  background: #d9dde6
+}
+
+.ts-layout-art.side {
+  flex-direction: row;
+  gap: 8px;
+  padding: 0;
+  background: #eef0f4
+}
+
+.ts-layout-art .art-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 0 0 30px;
+  padding: 7px 6px;
+  background: #232b3e
+}
+
+.ts-layout-art .art-rail i {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: #495266
+}
+
+.ts-layout-art.side .art-lines {
+  padding: 9px 8px 0 0
+}
+
+.ts-layout-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink)
+}
+
+/* ---- sidebar background images ---- */
+.ts-bgs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px
+}
+
+.ts-bg {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer
+}
+
+.ts-bg-art {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  background: var(--white);
+  background-size: cover;
+  background-position: center;
+  box-shadow: inset 0 0 0 1px #00000014;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color .12s ease, transform .12s ease
+}
+
+.ts-bg-art.dashed {
+  border: 1.5px dashed var(--line);
+  box-shadow: none;
+  color: var(--accent)
+}
+
+.ts-bg:hover .ts-bg-art {
+  transform: translateY(-2px)
+}
+
+.ts-bg.is-on .ts-bg-art {
+  outline-color: var(--accent)
+}
+
+.ts-bg small {
+  font-size: 12px;
+  font-weight: 500
+}
+
+.ts-bg.is-on small {
+  color: var(--ink);
+  font-weight: 650
+}
+
+.ts-bg-upload input[type=file] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer
+}
+
+.ts-bg-upload:hover .ts-bg-art.dashed {
+  border-color: var(--accent);
+  background: var(--accentbg)
+}
+
+/* ---- font family chips ---- */
+.ts-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px
+}
+
+.ts-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--btn-radius, 8px);
+  background: var(--white);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .12s ease, background .12s ease
+}
+
+.ts-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent)
+}
+
+.ts-chip.is-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600
+}
+
+/* ---- font size tiles ---- */
+.ts-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px
+}
+
+.ts-size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid var(--line);
+  border-radius: var(--btn-radius, 8px);
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer
+}
+
+.ts-size:hover {
+  border-color: var(--accent)
+}
+
+.ts-size strong {
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.1
+}
+
+.ts-size small {
+  margin-top: 2px;
+  font-size: 10.5px;
+  color: var(--muted)
+}
+
+.ts-size.is-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff
+}
+
+.ts-size.is-on small {
+  color: #ffffffd9
+}
+
+/* ---- font weight tiles ---- */
+.ts-weights {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px
+}
+
+.ts-weight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 11px 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--btn-radius, 8px);
+  background: var(--white);
+  color: var(--ink);
+  cursor: pointer
+}
+
+.ts-weight:hover {
+  border-color: var(--accent)
+}
+
+.ts-weight strong {
+  font-size: 18px;
+  line-height: 1
+}
+
+.ts-weight small {
+  font-size: 10px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: var(--muted)
+}
+
+.ts-weight.is-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff
+}
+
+.ts-weight.is-on small {
+  color: #ffffffd9
+}
+
+/* ---- sliders ---- */
+.ts-slider-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px
+}
+
+.ts-bubble {
+  min-width: 56px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accentbg);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center
+}
+
+.ts-range {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer
+}
+
+.ts-range-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11.5px;
+  color: var(--muted)
+}
+
+/* ---- theme mode ---- */
+.ts-modes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px
+}
+
+.ts-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  cursor: pointer;
+  transition: border-color .12s ease
+}
+
+.ts-mode:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line))
+}
+
+.ts-mode.is-on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accentbg) 50%, var(--white))
+}
+
+.ts-mode-art {
+  height: 48px;
+  border-radius: 8px
+}
+
+.ts-mode-art.light {
+  background:
+    linear-gradient(#d9dde6, #d9dde6) 12px 12px / 50% 6px no-repeat,
+    linear-gradient(#e6e9ef, #e6e9ef) 12px 24px / 70% 6px no-repeat,
+    #f6f7fa;
+  box-shadow: inset 0 0 0 1px #e3e6ec
+}
+
+.ts-mode-art.dark {
+  background:
+    linear-gradient(#3a4256, #3a4256) 12px 12px / 50% 6px no-repeat,
+    linear-gradient(#2c3345, #2c3345) 12px 24px / 70% 6px no-repeat,
+    #171c28
+}
+
+.ts-mode-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink)
+}
+
+.ts-mode.is-on .ts-mode-label {
+  color: var(--accent)
+}
+
+/* ---- profile images (None + avatars, tile pattern like sidebar backgrounds) ---- */
+.ts-images {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px 10px
+}
+
+.ts-image {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer
+}
+
+.ts-image-art {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px #00000014;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color .12s ease, transform .12s ease
+}
+
+.ts-image-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover
+}
+
+.ts-image:hover .ts-image-art {
+  transform: translateY(-2px)
+}
+
+.ts-image.is-on .ts-image-art {
+  outline-color: var(--accent)
+}
+
+.ts-image small {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11.5px;
+  font-weight: 500
+}
+
+.ts-image.is-on small {
+  color: var(--ink);
+  font-weight: 650
+}
+
+.ts-image .ts-check {
+  top: -3px;
+  right: -1px;
+  width: 18px;
+  height: 18px
+}
+
+/* ---- footer ---- */
+.ts-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+  background: var(--white)
+}
+
+.ts-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--muted)
+}
+
+.ts-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal)
+}
+
+.ts-status.dirty {
+  color: var(--ink);
+  font-weight: 600
+}
+
+.ts-status.dirty .ts-status-dot {
+  background: var(--orange, #d9822b);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--orange, #d9822b) 22%, transparent)
+}
+
+.ts-foot-actions {
+  display: flex;
+  gap: 10px
+}
+
+.ts-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--btn-radius, 8px);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer
+}
+
+.ts-reset {
+  border: 1px solid var(--teal);
+  background: var(--white);
+  color: var(--teal)
+}
+
+.ts-reset:hover {
+  border-color: var(--teal);
+  color: #fff;
+  background: var(--teal)
+}
+
+.ts-save {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff
+}
+
+.ts-save:hover {
+  filter: brightness(.94)
+}
+
+/* ---- phone ---- */
+@media (max-width: 480px) {
+  .ts-panel {
+    width: 100vw
+  }
+
+  .ts-body,
+  .ts-head,
+  .ts-foot {
+    padding-left: 16px;
+    padding-right: 16px
+  }
+
+  .ts-preview {
+    flex-direction: column;
+    align-items: stretch
+  }
+
+  .ts-pv-app {
+    width: 100%
+  }
+
+  .ts-bgs {
+    grid-template-columns: repeat(3, minmax(0, 1fr))
+  }
+
+  .ts-images {
+    grid-template-columns: repeat(4, minmax(0, 1fr))
+  }
+
+  .ts-foot {
+    flex-direction: column;
+    align-items: stretch
+  }
+
+  .ts-foot-actions .ts-btn {
+    flex: 1
+  }
+}

@@ -6,6 +6,10 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Theme Settings font choices (fall back to the UI sans when offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Lato&family=Montserrat&family=Nunito&family=Poppins&family=Roboto&display=swap" rel="stylesheet">
 
     <style>
     :root {
@@ -31,9 +35,10 @@
 
     body {
       margin: 0;
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
-      font-size: 13px;
-      line-height: 1.5;
+      font-family: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
+      font-size: var(--font-size, 13px);
+      font-weight: var(--font-weight, 400);
+      line-height: var(--line-height, 1.5);
       color: var(--ink);
       background: var(--bg)
     }
@@ -86,18 +91,24 @@
     }
 
     h1 {
+      font-family: var(--font-heading, inherit);
+      color: var(--heading-color, inherit);
       font-size: 27px;
       letter-spacing: -.85px;
       font-weight: 650
     }
 
     h2 {
+      font-family: var(--font-heading, inherit);
+      color: var(--heading-color, inherit);
       font-size: 15px;
       font-weight: 650;
       letter-spacing: -.2px
     }
 
     h3 {
+      font-family: var(--font-heading, inherit);
+      color: var(--heading-color, inherit);
       font-size: 13px;
       font-weight: 650
     }
@@ -124,7 +135,8 @@
     }
 
     .num {
-      font-variant-numeric: tabular-nums
+      font-variant-numeric: tabular-nums;
+      font-family: var(--font-number, inherit)
     }
 
     .flex {
@@ -198,8 +210,8 @@
       width: 32px;
       height: 32px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff
+      border-radius: var(--btn-radius, 8px);
+      background: var(--white)
     }
 
     .btn {
@@ -207,9 +219,9 @@
       align-items: center;
       justify-content: center;
       gap: 7px;
-      background: white;
+      background: var(--white);
       border: 1px solid #dfe2e9;
-      border-radius: 7px;
+      border-radius: var(--btn-radius, 7px);
       padding: 8px 12px;
       font-weight: 550;
       font-size: 12px;
@@ -312,7 +324,7 @@
 
     .app {
       display: grid;
-      grid-template-columns: 224px 1fr;
+      grid-template-columns: 264px 1fr;
       min-height: 100vh
     }
 
@@ -450,7 +462,7 @@
 
     .topbar {
       height: 67px;
-      background: white;
+      background: var(--white);
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
@@ -581,7 +593,7 @@
     }
 
     .card {
-      background: white;
+      background: var(--panel);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -1548,7 +1560,7 @@
       }
 
       .app {
-        grid-template-columns: 242px 1fr
+        grid-template-columns: 285px 1fr
       }
 
       body {
@@ -1580,7 +1592,7 @@
 
     @media(max-width:1250px) {
       .app {
-        grid-template-columns: 195px 1fr
+        grid-template-columns: 230px 1fr
       }
 
       .sidebar {

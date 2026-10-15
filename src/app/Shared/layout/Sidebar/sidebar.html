@@ -1,7 +1,12 @@
 <!-- SIDEBAR - brand + menu. Logic: sidebar.ts · styles: sidebar.css -->
 <aside class="sidebar" id="sidebar">
-  <div class="brand"><span class="mark">Y</span>
-    <div><strong>YDot<span style="color:var(--accent)">.</span></strong><small>Hotel Sales Studio</small></div>
+  <!-- brand: soft primary tile + name over a small caption -->
+  <div class="brand">
+    <span class="mark" aria-hidden="true">O</span>
+    <div class="brand-text">
+      <strong>OtoSolve</strong>
+      <small>Workspace</small>
+    </div>
   </div>
 
   <!-- SIDEBAR MENU - built from the menu JSON (Shared/layout/menu.data.ts). Functions in sidebar.ts:
@@ -21,7 +26,7 @@
 
       @for (item of section.items; track item.id) {
         <div class="nav-entry" [class.is-open]="isExpanded(item)" [class.has-current]="hasActiveChild(item)">
-          <!-- top row: coloured icon + name (+ chevron when it has pages) -->
+          <!-- top row: icon + name (+ dot when it holds the current page, + chevron when it has pages) -->
           @if (item.route && !hasChildren(item)) {
             <a class="nav-link" [routerLink]="item.route" routerLinkActive="active" ariaCurrentWhenActive="page"
                [attr.target]="targetOf(item)" [attr.title]="collapsed() ? item.name : null" (click)="closeMobileMenu()">
@@ -43,12 +48,15 @@
               @if (item.badge) {
                 <span class="nav-badge">{{ item.badge }}</span>
               }
+              @if (hasActiveChild(item)) {
+                <span class="nav-dot" aria-hidden="true"></span>
+              }
               <svg class="nav-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
             </button>
           }
         </div>
 
-        <!-- its pages, under a thin guide line -->
+        <!-- its pages, indented under the menu -->
         @if (hasChildren(item) && isExpanded(item) && !collapsed()) {
           <div class="nav-children" [id]="'nav-sub-' + item.id">
             @for (child of childrenOf(item); track child.id) {
@@ -57,9 +65,15 @@
                 <div class="nav-entry sub" [class.is-open]="isExpanded(child)" [class.has-current]="hasActiveChild(child)">
                   @if (child.route) {
                     <a class="nav-child has-kids" [routerLink]="child.route" routerLinkActive="active" ariaCurrentWhenActive="page"
-                       [attr.target]="targetOf(child)" (click)="openOrGo(child, $event)">{{ child.name }}</a>
+                       [attr.target]="targetOf(child)" (click)="openOrGo(child, $event)">
+                      <span class="nav-child-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconPath(child.icon)" /></svg></span>
+                      <span class="nav-text">{{ child.name }}</span>
+                    </a>
                   } @else {
-                    <button type="button" class="nav-child has-kids" [attr.aria-expanded]="isExpanded(child)" (click)="toggle(child)">{{ child.name }}</button>
+                    <button type="button" class="nav-child has-kids" [attr.aria-expanded]="isExpanded(child)" (click)="toggle(child)">
+                      <span class="nav-child-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconPath(child.icon)" /></svg></span>
+                      <span class="nav-text">{{ child.name }}</span>
+                    </button>
                   }
                   <button type="button" class="nav-toggle" [attr.aria-expanded]="isExpanded(child)"
                           [attr.aria-label]="(isExpanded(child) ? 'Hide ' : 'Show ') + child.name + ' pages'" (click)="toggle(child, $event)">
@@ -70,13 +84,18 @@
                   <div class="nav-children deep">
                     @for (grand of childrenOf(child); track grand.id) {
                       <a class="nav-child" [routerLink]="grand.route" routerLinkActive="active" ariaCurrentWhenActive="page"
-                         [attr.target]="targetOf(grand)" (click)="closeMobileMenu()">{{ grand.name }}</a>
+                         [attr.target]="targetOf(grand)" (click)="closeMobileMenu()">
+                        <span class="nav-child-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconPath(grand.icon)" /></svg></span>
+                        <span class="nav-text">{{ grand.name }}</span>
+                      </a>
                     }
                   </div>
                 }
               } @else {
                 <a class="nav-child" [routerLink]="child.route" routerLinkActive="active" ariaCurrentWhenActive="page"
-                   [attr.target]="targetOf(child)" (click)="closeMobileMenu()">{{ child.name }}
+                   [attr.target]="targetOf(child)" (click)="closeMobileMenu()">
+                  <span class="nav-child-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconPath(child.icon)" /></svg></span>
+                  <span class="nav-text">{{ child.name }}</span>
                   @if (child.badge) {
                     <span class="nav-badge sm">{{ child.badge }}</span>
                   }

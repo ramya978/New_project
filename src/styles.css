@@ -14,7 +14,24 @@
   --purple: #8763bd;
   --red: #bd4d53;
   --radius: 13px;
-  --shadow: 0 4px 18px #22283f04
+  --shadow: 0 4px 18px #22283f04;
+
+  /* surfaces used by the theme settings (dark mode redefines them) */
+  --panel: #fff;
+  --panel2: #fdfdfe;
+  --chip: #f0f2f6;
+
+  /* theme settings - defaults; Theme SettingsService overrides these on <html> */
+  --font-body: Inter, "Segoe UI", Arial, sans-serif;
+  --font-menu: Inter, "Segoe UI", Arial, sans-serif;
+  --font-heading: Inter, "Segoe UI", Arial, sans-serif;
+  --font-number: Inter, "Segoe UI", Arial, sans-serif;
+  --font-size: 13px;
+  --font-weight: 400;
+  --line-height: 1.5;
+  --btn-radius: 8px;
+  --icon-color: #6a7083;
+  --heading-color: #202333
 }
 
 * {
@@ -23,9 +40,10 @@
 
 body {
   margin: 0;
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
+  font-family: var(--font-body);
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
+  line-height: var(--line-height);
   color: var(--ink);
   background: var(--bg)
 }
@@ -78,18 +96,24 @@ p {
 }
 
 h1 {
+  font-family: var(--font-heading);
+  color: var(--heading-color);
   font-size: 27px;
   letter-spacing: -.85px;
   font-weight: 650
 }
 
 h2 {
+  font-family: var(--font-heading);
+  color: var(--heading-color);
   font-size: 15px;
   font-weight: 650;
   letter-spacing: -.2px
 }
 
 h3 {
+  font-family: var(--font-heading);
+  color: var(--heading-color);
   font-size: 13px;
   font-weight: 650
 }
@@ -116,7 +140,8 @@ small {
 }
 
 .num {
-  font-variant-numeric: tabular-nums
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-number)
 }
 
 .flex {
@@ -190,8 +215,8 @@ small {
   width: 32px;
   height: 32px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff
+  border-radius: var(--btn-radius, 8px);
+  background: var(--white)
 }
 
 .btn {
@@ -199,9 +224,9 @@ small {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  background: white;
+  background: var(--white);
   border: 1px solid #dfe2e9;
-  border-radius: 7px;
+  border-radius: var(--btn-radius, 7px);
   padding: 8px 12px;
   font-weight: 550;
   font-size: 12px;
@@ -243,7 +268,7 @@ small {
   font-size: 10px;
   font-weight: 600;
   white-space: nowrap;
-  background: #f0f2f6;
+  background: var(--chip);
   color: #606b7d
 }
 
@@ -304,7 +329,7 @@ small {
 
 .app {
   display: grid;
-  grid-template-columns: 224px 1fr;
+  grid-template-columns: 264px 1fr;
   min-height: 100vh;
   transition: grid-template-columns .2s ease
 }
@@ -325,7 +350,7 @@ small {
 .topbar {
   position: relative;
   height: 67px;
-  background: white;
+  background: var(--white);
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
@@ -979,7 +1004,7 @@ small {
 }
 
 .card {
-  background: white;
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -1010,7 +1035,7 @@ small {
   border-top: 1px solid var(--line);
   font-size: 11px;
   color: var(--muted);
-  background: #fdfdfe
+  background: var(--panel2)
 }
 
 .grid {
@@ -1158,7 +1183,7 @@ th {
   letter-spacing: .65px;
   color: #9297a5;
   font-weight: 600;
-  background: #fcfcfd;
+  background: var(--panel2);
   white-space: nowrap;
   padding: 11px 15px;
   border-bottom: 1px solid var(--line)
@@ -1946,7 +1971,7 @@ dialog::backdrop {
   }
 
   .app {
-    grid-template-columns: 242px 1fr
+    grid-template-columns: 285px 1fr
   }
 
   .app.sidebar-collapsed {
@@ -1977,7 +2002,7 @@ dialog::backdrop {
 
 @media(max-width:1250px) {
   .app {
-    grid-template-columns: 195px 1fr
+    grid-template-columns: 230px 1fr
   }
 
   .app.sidebar-collapsed {
@@ -2303,4 +2328,234 @@ th {
 
 .route-page {
   padding-bottom: 0
+}
+
+/* =====================================================================================================
+   THEME SETTINGS - DARK MODE
+   Redefined tokens + the few light surfaces that are not tokenised yet. Selectors are html-prefixed
+   so they win over the legacy inline copy in index.html regardless of cascade order.
+   ===================================================================================================== */
+html[data-mode="dark"] {
+  --ink: #e8eaf2;
+  --muted: #9aa1b4;
+  --line: #2c3240;
+  --bg: #14171f;
+  --white: #1b1f2a;
+  --panel: #1b1f2a;
+  --panel2: #171b24;
+  --chip: #262c3a;
+  color-scheme: dark
+}
+
+html[data-mode="dark"] body {
+  background: var(--bg);
+  color: var(--ink)
+}
+
+html[data-mode="dark"] .icon-btn,
+html[data-mode="dark"] .btn,
+html[data-mode="dark"] .tb-menu,
+html[data-mode="dark"] .tb-modal-card,
+html[data-mode="dark"] .tb-search,
+html[data-mode="dark"] .scopebar select,
+html[data-mode="dark"] .scopebar input,
+html[data-mode="dark"] .filter-input {
+  background: var(--white);
+  border-color: var(--line);
+  color: var(--ink)
+}
+
+html[data-mode="dark"] .btn:hover,
+html[data-mode="dark"] .icon-btn:hover {
+  background: #232936
+}
+
+html[data-mode="dark"] .btn.primary:hover {
+  filter: brightness(1.12)
+}
+
+html[data-mode="dark"] tbody tr:hover {
+  background: #191e29
+}
+
+html[data-mode="dark"] .card-foot,
+html[data-mode="dark"] th {
+  background: var(--panel2)
+}
+
+html[data-mode="dark"] .badge {
+  background: var(--chip);
+  color: #b3bacd
+}
+
+html[data-mode="dark"] .avatar {
+  background: #2a3040;
+  border-color: var(--panel)
+}
+
+html[data-mode="dark"] .tb-org,
+html[data-mode="dark"] .panel-note,
+html[data-mode="dark"] .stat .stat-icon {
+  background: var(--panel2)
+}
+
+html[data-mode="dark"] .tb-org-row:hover,
+html[data-mode="dark"] .tb-menu-row:hover {
+  background: #232936
+}
+
+html[data-mode="dark"] .ts-none.is-on {
+  background: #12312b;
+  border-color: var(--teal);
+  color: #4ecdb8
+}
+
+/* =====================================================================================================
+   SIDEBAR TEXT TONE (html[data-sidebar="dark" | "light"], set by applyTheme)
+   The nav tokens live on :host in sidebar.css; re-declaring them here on the <app-sidebar> host
+   overrides them so menu text stays readable over a dark image (or the dark plain sidebar) and over
+   a light image. Specificity of `html[..] app-sidebar` beats the component's :host.
+   ===================================================================================================== */
+html[data-sidebar="dark"] app-sidebar {
+  --nav-ink: #f4f6fb;
+  --nav-sub: #dfe3ee;
+  --nav-muted: #a6adbe;
+  --nav-line: #ffffff2e;
+  --nav-hover: #ffffff17;
+  --nav-active: #9fd6c4
+}
+
+html[data-sidebar="dark"] app-sidebar .sidebar {
+  color: #f4f6fb
+}
+
+html[data-sidebar="light"] app-sidebar {
+  --nav-ink: #2c3140;
+  --nav-sub: #3a3f4d;
+  --nav-muted: #8a909c;
+  --nav-line: #dde0e5;
+  --nav-hover: #f5f6f8;
+  --nav-active: #2f5a49
+}
+
+/* keep the brand wordmark readable on a dark sidebar too */
+html[data-sidebar="dark"] app-sidebar .brand small {
+  color: #b7bdcc
+}
+
+/* horizontal layout: the strip takes the same sidebar surface + tone */
+html[data-layout="horizontal"][data-sidebar="dark"] .sidebar {
+  border-bottom-color: #ffffff24
+}
+
+
+/* =====================================================================================================
+   THEME SETTINGS - HORIZONTAL LAYOUT
+   <html data-layout="horizontal"> turns the sidebar into a top menu strip; sub-pages drop down.
+   ===================================================================================================== */
+html[data-layout="horizontal"] .app {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr
+}
+
+html[data-layout="horizontal"] .app.sidebar-collapsed {
+  grid-template-columns: 1fr
+}
+
+html[data-layout="horizontal"] .sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  height: auto;
+  padding: 9px 16px;
+  border-right: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--sidebar-bg, var(--white));
+  /* visible (not auto) so the absolute dropdowns are not clipped by the strip */
+  overflow: visible
+}
+
+html[data-layout="horizontal"] .brand {
+  flex: 0 0 auto;
+  padding: 0
+}
+
+html[data-layout="horizontal"] .nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+  overflow: visible;
+  padding: 0
+}
+
+html[data-layout="horizontal"] .nav-heading {
+  display: none
+}
+
+html[data-layout="horizontal"] .nav-entry {
+  position: relative;
+  flex: 0 0 auto
+}
+
+html[data-layout="horizontal"] .nav-link {
+  width: auto;
+  margin: 0;
+  padding: 9px 11px;
+  white-space: nowrap
+}
+
+/* sub-pages become a dropdown under their menu item */
+html[data-layout="horizontal"] .nav-children {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 70;
+  min-width: 230px;
+  margin: 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  box-shadow: 0 16px 40px #1e233426
+}
+
+/* the last menu item's dropdown stays inside the viewport */
+html[data-layout="horizontal"] .nav-entry:last-child .nav-children {
+  left: auto;
+  right: 0
+}
+
+html[data-layout="horizontal"] .nav-child {
+  width: 100%;
+  margin: 1px 0;
+  padding: 8px 10px;
+  border-radius: 7px
+}
+
+html[data-layout="horizontal"] .nav-child:hover,
+html[data-layout="horizontal"] .nav-child.active {
+  background: var(--accentbg)
+}
+
+html[data-layout="horizontal"] .nav-child.active:after {
+  display: none
+}
+
+html[data-layout="horizontal"] .nav-children.deep {
+  margin: 0;
+  padding: 4px;
+  border-left: 0;
+  border-top: 1px dashed var(--line);
+  border-radius: 0
+}
+
+html[data-layout="horizontal"] .nav-children.deep .nav-child {
+  padding-left: 16px
 }

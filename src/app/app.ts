@@ -1,8 +1,8 @@
-import { AfterViewInit, Component, HostListener, NgZone, OnDestroy, ViewEncapsulation, computed, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, DestroyRef, HostListener, ViewEncapsulation, computed, effect, inject, signal } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { Sidebar } from './Shared/layout/Sidebar/sidebar';
+import { ThemeSettingsService, profileImageSrc } from './pages/Auth/Profile/theme-settings';
 
-/** An organisation the user can act in (replace ORGANISATIONS with the API list). */
 export interface Organisation {
   id: string;
   name: string;
@@ -11,16 +11,19 @@ export interface Organisation {
   mark: string;
 }
 
-/** A notification in the bell modal. */
+type HeaderIcon =
+  | 'building' | 'search' | 'clock' | 'bell' | 'user' | 'shield' | 'sliders'
+  | 'logout' | 'devices' | 'doc' | 'users' | 'check';
+
 interface Note {
   id: string;
-  kind: 'Approvals' | 'Donations' | 'System';
   title: string;
   detail: string;
+  /** Where it came from, shown under the text ("Approval queue"). */
+  source: string;
   time: string;
   unread: boolean;
-  tone: 'teal' | 'amber' | 'purple' | 'blue';
-  glyph: string;
+  icon: HeaderIcon;
 }
 
 const ORGANISATIONS: Organisation[] = [
@@ -31,42 +34,95 @@ const ORGANISATIONS: Organisation[] = [
 ];
 
 const NOTES: Note[] = [
-  { id: 'n1', kind: 'Approvals', title: 'HelpAge India activated', detail: 'Organisation moved to Active · just now', time: 'now', unread: true, tone: 'teal', glyph: '✓' },
-  { id: 'n2', kind: 'Approvals', title: '2 organisations await review', detail: 'Global Relief Foundation · Unity for Change', time: '1h', unread: true, tone: 'amber', glyph: '◷' },
-  { id: 'n3', kind: 'Donations', title: 'Onboarding updated', detail: 'Smile Foundation documents verified', time: '2h', unread: false, tone: 'purple', glyph: '✎' },
-  { id: 'n4', kind: 'System', title: 'Nightly audit finished', detail: 'No failures across 4 organisations', time: '1d', unread: false, tone: 'blue', glyph: '◈' }
+  { id: 'n1', title: 'Approval queue updated', detail: 'A request is ready for your review.', source: 'Approval queue', time: 'just now', unread: true, icon: 'doc' },
+  { id: 'n2', title: 'Team membership updated', detail: 'A new employee has joined the sales team.', source: 'Employees', time: '1h ago', unread: true, icon: 'users' },
+  { id: 'n3', title: 'Follow-up reminder', detail: 'An enquiry has a follow-up due today.', source: 'Lead work queue', time: '2h ago', unread: true, icon: 'clock' },
+  { id: 'n4', title: 'Nightly audit finished', detail: 'No failures across 4 organisations.', source: 'Platform audit', time: '1d ago', unread: false, icon: 'check' }
 ];
 
+/** Line icons used in the top bar, its menu and the notifications panel (24×24, stroke). */
+const ICONS: Record<HeaderIcon, string> = {
+  building: 'M4 21V5l8-3 8 3v16 M2 21h20 M8 8h1 M15 8h1 M8 12h1 M15 12h1 M10 21v-5h4v5',
+  search: 'M3 11a8 8 0 1 0 16 0 8 8 0 1 0-16 0 M21 21l-4.35-4.35',
+  clock: 'M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0 M12 6v6l4 2',
+  bell: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0',
+  user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M9 12l2 2 4-4',
+  sliders: 'M21 5h-7 M10 5H3 M21 12h-9 M8 12H3 M21 19h-5 M12 19H3 M14 3v4 M8 10v4 M16 17v4',
+  logout: 'M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5 M21 12H9 M17 8l4 4-4 4',
+  devices: 'M3 4h13a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z M6 18h7 M9.5 14v4 M18 9h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z',
+  doc: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 13h8 M8 17h5',
+  users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
+  check: 'M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4 12 14.01l-3-3'
+};
+
+/** A timezone the workspace clock can show. */
+export interface ClockZone {
+  /** IANA id, e.g. "Asia/Kolkata". */
+  id: string;
+  /** What the dropdown shows, e.g. "India · Kolkata". */
+  label: string;
+}
+
+const CLOCK_ZONES: ClockZone[] = [
+  { id: 'Asia/Kolkata', label: 'India · Kolkata' },
+  { id: 'Asia/Dubai', label: 'United Arab Emirates · Dubai' },
+  { id: 'Asia/Singapore', label: 'Singapore · Singapore' },
+  { id: 'Asia/Tokyo', label: 'Japan · Tokyo' },
+  { id: 'Australia/Sydney', label: 'Australia · Sydney' },
+  { id: 'Europe/London', label: 'United Kingdom · London' },
+  { id: 'Europe/Berlin', label: 'Germany · Berlin' },
+  { id: 'America/New_York', label: 'United States · New York' },
+  { id: 'America/Los_Angeles', label: 'United States · Los Angeles' },
+  { id: 'UTC', label: 'Coordinated Universal Time · UTC' }
+];
+
+/** The city part of an IANA id ("America/New_York" -> "New York"). */
+const cityOf = (id: string): string => (id.split('/').pop() ?? id).replace(/_/g, ' ');
+
+/** A zone the browser accepts, or null. */
+const validZone = (id: string | null | undefined): string | null => {
+  if (!id) return null;
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: id });
+    return id;
+  } catch {
+    return null;
+  }
+};
+
+interface ClockPrefs {
+  zone: string;
+  h12: boolean;
+  seconds: boolean;
+  paused: boolean;
+  inHeader: boolean;
+}
+
 const SIDEBAR_KEY = 'ydot-sidebar-collapsed';
+const CLOCK_KEY = 'ydot-clock';
 
-const NOTE_FILTERS = ['All', 'Approvals', 'Donations', 'System'] as const;
-type NoteFilter = (typeof NOTE_FILTERS)[number];
-
-/**
- * App shell: the sidebar component, the top bar, the routed page and the studio.
- *
- * TOP BAR functions (used by app.html):
- *   toggleSidebar()            collapse / expand the sidebar (phone: open / close the menu overlay)
- *   toggleFullscreen()         enter / leave browser fullscreen
- *   toggleUserMenu()           open / close the account menu (closes on outside click and Esc)
- *   toggleOrgList()            open / close the organisation dropdown inside the account menu
- *   chooseOrg(org)             pick the organisation to act in
- *   openNotifications()        the bell modal; closeNotifications(), markAllRead()
- *
- * The studio engine renders the demonstration pages, modal and toast into the shell; it runs outside the
- * Angular zone because it owns its own DOM.
- */
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Sidebar],
   templateUrl: './app.html',
-  styleUrl: './app.css',
+  styleUrls: ['./app.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class App {
-  protected readonly title = signal('YDot Hotel Sales Studio');
+  protected readonly title = signal('OtoSolve');
 
-  private readonly zone = inject(NgZone);
+  private readonly router = inject(Router);
+  private readonly theme = inject(ThemeSettingsService);
+
+  protected readonly avatarSrc = computed<string | null>(
+    () => profileImageSrc(this.theme.prefs().profileImage)
+  );
+
+  protected readonly avatarBg = computed<string | null>(() => {
+    const src = this.avatarSrc();
+    return src ? `url("${src}") center / cover no-repeat` : null;
+  });
 
   // ---- sidebar ----------------------------------------------------------------------------------
   protected readonly sidebarCollapsed = signal(this.readCollapsed());
@@ -86,23 +142,101 @@ export class App {
   // ---- notifications ----------------------------------------------------------------------------
   protected readonly notificationsOpen = signal(false);
   protected readonly notes = signal<Note[]>(NOTES);
-  protected readonly noteFilters = NOTE_FILTERS;
-  protected readonly noteFilter = signal<NoteFilter>('All');
-  protected readonly visibleNotes = computed(() => {
-    const f = this.noteFilter();
-    return f === 'All' ? this.notes() : this.notes().filter((n) => n.kind === f);
-  });
   protected readonly unreadCount = computed(() => this.notes().filter((n) => n.unread).length);
 
-  // ---- fullscreen -------------------------------------------------------------------------------
+  // ---- workspace clock --------------------------------------------------------------------------
+  private readonly clockPrefs = this.readClockPrefs();
+
+  /** Timezones in the dropdown (the device's own zone is added when it is not in the list). */
+  protected readonly zones: ClockZone[] = this.buildZones();
+
+  protected readonly now = signal(new Date());
+  protected readonly clockOpen = signal(false);
+  protected readonly zoneListOpen = signal(false);
+  protected readonly clockZone = signal<ClockZone>(this.zoneById(this.clockPrefs.zone));
+  protected readonly clock12h = signal(this.clockPrefs.h12);
+  protected readonly clockSeconds = signal(this.clockPrefs.seconds);
+  protected readonly clockPaused = signal(this.clockPrefs.paused);
+  protected readonly showClockInHeader = signal(this.clockPrefs.inHeader);
+
+  /** City shown under the header time ("London"). */
+  protected readonly clockCity = computed(() => cityOf(this.clockZone().id));
+
+  /** "08:23 AM", "08:23:05 AM" or "20:23" - in the selected timezone. */
+  protected readonly clockTime = computed(() => {
+    const h12 = this.clock12h();
+    const seconds = this.clockSeconds();
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: this.clockZone().id,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: seconds ? '2-digit' : undefined,
+      hourCycle: h12 ? 'h12' : 'h23'
+    }).formatToParts(this.now());
+    const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? '';
+    const time = `${get('hour')}:${get('minute')}${seconds ? ':' + get('second') : ''}`;
+    return h12 ? `${time} ${get('dayPeriod').toUpperCase()}` : time;
+  });
+
+  /** "Thu, 15 Oct 2026" - in the selected timezone. */
+  protected readonly clockDate = computed(() => {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: this.clockZone().id,
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }).formatToParts(this.now());
+    const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? '';
+    return `${get('weekday')}, ${get('day')} ${get('month')} ${get('year')}`;
+  });
+
+  /** "UTC+05:30" for the selected timezone. */
+  protected readonly clockOffset = computed(() => {
+    try {
+      const value = new Intl.DateTimeFormat('en-US', { timeZone: this.clockZone().id, timeZoneName: 'longOffset' })
+        .formatToParts(this.now())
+        .find((p) => p.type === 'timeZoneName')?.value ?? 'GMT';
+      return value === 'GMT' ? 'UTC+00:00' : value.replace('GMT', 'UTC');
+    } catch {
+      return '';
+    }
+  });
+
   protected readonly isFullscreen = signal(false);
 
- 
+  constructor() {
+    const timer = setInterval(() => {
+      if (!this.clockPaused()) this.now.set(new Date());
+    }, 1000);
+    inject(DestroyRef).onDestroy(() => clearInterval(timer));
+
+    // keep the clock settings between visits
+    effect(() => {
+      const prefs: ClockPrefs = {
+        zone: this.clockZone().id,
+        h12: this.clock12h(),
+        seconds: this.clockSeconds(),
+        paused: this.clockPaused(),
+        inHeader: this.showClockInHeader()
+      };
+      try {
+        localStorage.setItem(CLOCK_KEY, JSON.stringify(prefs));
+      } catch {
+        // storage blocked - keep the in-memory settings
+      }
+    });
+  }
+
+  /** The SVG path for a top-bar icon. */
+  protected icon(name: HeaderIcon): string {
+    return ICONS[name];
+  }
+
   // ---------------------------------------------------------------------------------------------
   // Sidebar
   // ---------------------------------------------------------------------------------------------
 
-  /** Desktop: collapse to an icon rail / expand again. Phone (≤ 800px): open / close the overlay. */
   protected toggleSidebar(): void {
     if (window.matchMedia('(max-width: 800px)').matches) {
       document.getElementById('sidebar')?.classList.toggle('open');
@@ -116,7 +250,7 @@ export class App {
     try {
       localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0');
     } catch {
-      /* storage unavailable - the choice lasts for this visit */
+      // storage blocked - keep the in-memory state
     }
   }
 
@@ -125,6 +259,72 @@ export class App {
       return localStorage.getItem(SIDEBAR_KEY) === '1';
     } catch {
       return false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------------------------
+  // Workspace clock
+  // ---------------------------------------------------------------------------------------------
+
+  /** The clock button: opens / closes the clock settings dropdown. */
+  protected toggleClockPanel(event: Event): void {
+    event.stopPropagation();
+    const open = !this.clockOpen();
+    this.closeAll();
+    this.clockOpen.set(open);
+  }
+
+  protected closeClockPanel(): void {
+    this.clockOpen.set(false);
+    this.zoneListOpen.set(false);
+  }
+
+  /** The timezone field: opens / closes its option list. */
+  protected toggleZoneList(event: Event): void {
+    event.stopPropagation();
+    this.zoneListOpen.update((open) => !open);
+  }
+
+  protected chooseZone(zone: ClockZone): void {
+    this.clockZone.set(zone);
+    this.zoneListOpen.set(false);
+  }
+
+  /** Pause freezes the shown time; resuming jumps back to now. */
+  protected setPaused(paused: boolean): void {
+    this.clockPaused.set(paused);
+    if (!paused) this.now.set(new Date());
+  }
+
+  private buildZones(): ClockZone[] {
+    const device = validZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    const list = [...CLOCK_ZONES];
+    // "Asia/Calcutta" is the older name of "Asia/Kolkata"
+    const known = (id: string) => list.some((z) => z.id === id) || (id === 'Asia/Calcutta' && list.some((z) => z.id === 'Asia/Kolkata'));
+    if (device && !known(device)) list.unshift({ id: device, label: 'This device · ' + cityOf(device) });
+    return list;
+  }
+
+  private zoneById(id: string): ClockZone {
+    const wanted = id === 'Asia/Calcutta' ? 'Asia/Kolkata' : id;
+    return this.zones.find((z) => z.id === wanted) ?? this.zones[0];
+  }
+
+  private readClockPrefs(): ClockPrefs {
+    const device = validZone(Intl.DateTimeFormat().resolvedOptions().timeZone) ?? 'UTC';
+    const fallback: ClockPrefs = { zone: device, h12: true, seconds: false, paused: false, inHeader: true };
+    try {
+      const saved = JSON.parse(localStorage.getItem(CLOCK_KEY) ?? 'null') as Partial<ClockPrefs> | null;
+      if (!saved) return fallback;
+      return {
+        zone: validZone(saved.zone) ?? fallback.zone,
+        h12: saved.h12 ?? fallback.h12,
+        seconds: saved.seconds ?? fallback.seconds,
+        paused: saved.paused ?? fallback.paused,
+        inHeader: saved.inHeader ?? fallback.inHeader
+      };
+    } catch {
+      return fallback;
     }
   }
 
@@ -149,25 +349,35 @@ export class App {
   protected toggleUserMenu(event: Event): void {
     event.stopPropagation();
     const open = !this.userMenuOpen();
+    this.closeAll();
     this.userMenuOpen.set(open);
-    if (!open) this.closeOrgList();
   }
 
   protected closeUserMenu(): void {
     this.userMenuOpen.set(false);
-    this.closeOrgList();
   }
 
-  /** The organisation box: opens a floating list under it (search on top), or closes it. */
+  /** Account menu → My profile: opens the Auth · Profile screen. */
+  protected openProfile(): void {
+    this.closeUserMenu();
+    void this.router.navigateByUrl('/app/auth/profile');
+  }
+
+  /** The organisation button in the top bar: opens a floating list under it (search on top), or closes it. */
   protected toggleOrgList(event: Event): void {
     event.stopPropagation();
     const open = !this.orgListOpen();
+    this.closeAll();
     this.orgListOpen.set(open);
-    this.orgQuery.set('');
-    if (open) {
-      // focus the search once the list is drawn
-      setTimeout(() => document.querySelector<HTMLInputElement>('.tb-org-pop input')?.focus());
-    }
+    if (open) this.focusOrgSearch();
+  }
+
+  /** Account menu → Current organisation: closes the menu and opens the organisation list. */
+  protected openOrgFromMenu(event: Event): void {
+    event.stopPropagation();
+    this.closeAll();
+    this.orgListOpen.set(true);
+    this.focusOrgSearch();
   }
 
   protected closeOrgList(): void {
@@ -181,18 +391,29 @@ export class App {
     this.closeOrgList();
   }
 
+  private focusOrgSearch(): void {
+    this.orgQuery.set('');
+    // focus the search once the list is drawn
+    setTimeout(() => document.querySelector<HTMLInputElement>('.hd-org-pop input')?.focus());
+  }
+
   // ---------------------------------------------------------------------------------------------
   // Notifications
   // ---------------------------------------------------------------------------------------------
 
-  protected openNotifications(event: Event): void {
+  protected toggleNotifications(event: Event): void {
     event.stopPropagation();
-    this.closeUserMenu();
-    this.notificationsOpen.set(true);
+    const open = !this.notificationsOpen();
+    this.closeAll();
+    this.notificationsOpen.set(open);
   }
 
   protected closeNotifications(): void {
     this.notificationsOpen.set(false);
+  }
+
+  protected markRead(id: string): void {
+    this.notes.update((list) => list.map((n) => (n.id === id ? { ...n, unread: false } : n)));
   }
 
   protected markAllRead(): void {
@@ -203,17 +424,27 @@ export class App {
   // Outside click / Esc
   // ---------------------------------------------------------------------------------------------
 
+  private closeAll(): void {
+    this.closeUserMenu();
+    this.closeOrgList();
+    this.closeNotifications();
+    this.closeClockPanel();
+  }
+
   @HostListener('document:click', ['$event'])
   protected onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement | null;
-    if (this.orgListOpen() && !target?.closest('.tb-org-wrap')) this.closeOrgList();
-    if (this.userMenuOpen() && !target?.closest('.tb-account')) this.closeUserMenu();
+    if (this.zoneListOpen() && !target?.closest('.hd-select-wrap')) this.zoneListOpen.set(false);
+    if (this.clockOpen() && !target?.closest('.hd-clock-wrap')) this.closeClockPanel();
+    if (this.orgListOpen() && !target?.closest('.hd-org-wrap')) this.closeOrgList();
+    if (this.userMenuOpen() && !target?.closest('.hd-account')) this.closeUserMenu();
+    if (this.notificationsOpen() && !target?.closest('.hd-bell-wrap')) this.closeNotifications();
   }
 
+  /** Esc closes the timezone list first, then any open dropdown. */
   @HostListener('document:keydown.escape')
   protected onEscape(): void {
-    if (this.orgListOpen()) this.closeOrgList();
-    else if (this.notificationsOpen()) this.closeNotifications();
-    else this.closeUserMenu();
+    if (this.zoneListOpen()) this.zoneListOpen.set(false);
+    else this.closeAll();
   }
 }

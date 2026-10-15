@@ -1,0 +1,253 @@
+<!-- =====================================================================================================
+     AUTH · PROFILE - page header, status strip, tabs, identity panels, roles table, security rail.
+     Page classes are .pf-*; card section is scaled to match the page header.
+     ===================================================================================================== -->
+
+<!-- page header -->
+<header class="pf-pagehead">
+  <div class="pf-pagehead-text">
+    <span class="pf-kicker">User account · Platform operations</span>
+    <h1>Vikram Anand</h1>
+    <p class="pf-sub">Platform Operations Lead · PLT-001 · Profile, access and security for this account.</p>
+  </div>
+  <div class="pf-head-actions">
+    <button type="button" class="pf-hbtn" (click)="settingsOpen.set(true)">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('settings')" /></svg>
+      Settings
+    </button>
+    <button type="button" class="pf-hbtn primary">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('edit')" /></svg>
+      Edit
+    </button>
+  </div>
+</header>
+
+<section class="pf-card">
+
+  <!-- status strip: six cells divided by hairlines -->
+  <div class="pf-strip">
+    @for (s of stats; track s.label) {
+      <div class="pf-cell">
+        <span class="eyebrow">{{ s.label }}</span>
+        @if (s.pill) {
+          <span class="badge teal pf-pill">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('check')" /></svg>
+            {{ s.value }}
+          </span>
+        } @else {
+          <strong [class.pf-warn]="s.tone === 'amber'">{{ s.value }}</strong>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- body: main column (tabs + content) and the right rail -->
+  <div class="pf-body">
+    <div class="pf-main">
+
+      <!-- Overview / Access / Security -->
+      <nav class="pf-tabs" aria-label="Profile sections">
+        @for (t of tabs; track t.id) {
+          <button type="button" [class.active]="tab() === t.id"
+                  [attr.aria-current]="tab() === t.id ? 'page' : null" (click)="setTab(t.id)">
+            {{ t.label }} <span class="pf-tab-meta num">{{ t.meta }}</span>
+          </button>
+        }
+      </nav>
+
+      @if (tab() === 'overview') {
+        <h2 class="pf-title">Identity &amp; organisation</h2>
+
+        <!-- identity + organisation panels -->
+        <div class="pf-panels">
+          <section class="pf-panel">
+            <h3 class="pf-panel-head">
+              <span class="pf-panel-ico">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('user')" /></svg>
+              </span>
+              Identity
+            </h3>
+            @for (r of identity; track r.label) {
+              <div class="pf-row">
+                <span class="pf-row-ico">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(r.icon)" /></svg>
+                </span>
+                <span class="pf-row-label">{{ r.label }}</span>
+                <span [class]="'pf-row-value' + (r.value === null ? ' notset' : '')">{{ r.value ?? 'Not set' }}</span>
+              </div>
+            }
+          </section>
+          <section class="pf-panel">
+            <h3 class="pf-panel-head">
+              <span class="pf-panel-ico">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('grid')" /></svg>
+              </span>
+              Organisation
+            </h3>
+            @for (r of organisation; track r.label) {
+              <div class="pf-row">
+                <span class="pf-row-ico">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(r.icon)" /></svg>
+                </span>
+                <span class="pf-row-label">{{ r.label }}</span>
+                <span [class]="'pf-row-value' + (r.value === null ? ' notset' : '')">{{ r.value ?? 'Not set' }}</span>
+              </div>
+            }
+          </section>
+        </div>
+      } @else if (tab() === 'security') {
+        <h2 class="pf-title">Security</h2>
+        <section class="pf-panel pf-panel-wide">
+          <h3 class="pf-panel-head">
+            <span class="pf-panel-ico">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('shield')" /></svg>
+            </span>
+            Security checks
+          </h3>
+          @for (s of security; track s.label) {
+            <div class="pf-row">
+              <span class="pf-row-ico">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(s.icon)" /></svg>
+              </span>
+              <span class="pf-row-label">{{ s.label }} <small class="muted">{{ s.detail }}</small></span>
+              <span [class]="'pf-state ' + s.tone">{{ s.status }}</span>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- assigned roles: shown on Overview and Access -->
+      @if (tab() !== 'security') {
+        <section class="pf-roles">
+          <div class="pf-roles-head">
+            <h2 class="pf-title plain">Assigned roles <span class="pf-count num">{{ visibleRoles().length }}</span></h2>
+            <div class="pf-tools">
+              <label class="pf-search">
+                <input type="search" placeholder="Search roles..." [value]="roleQuery()"
+                       (input)="setRoleQuery($any($event.target).value)" aria-label="Search roles" />
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('search')" /></svg>
+              </label>
+              <label class="pf-sort">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('sort')" /></svg>
+                <span>Sort by</span>
+                <select [value]="roleSort()" (change)="setRoleSort($any($event.target).value)" aria-label="Sort roles">
+                  <option value="role">Role</option>
+                  <option value="scope">Scope</option>
+                </select>
+              </label>
+              <button type="button" class="pf-hbtn primary" (click)="setTab('access')">Open access
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('arrow')" /></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="pf-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Role</th>
+                  <th>Scope</th>
+                  <th>Permissions</th>
+                  <th>Term</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of visibleRoles(); track r.name) {
+                  <tr>
+                    <td>
+                      <span class="pf-role">
+                        <span class="pf-role-mark" aria-hidden="true">{{ r.mark }}</span>
+                        <span><strong>{{ r.name }}</strong><small>{{ r.note }}</small></span>
+                      </span>
+                    </td>
+                    <td>
+                      <span class="pf-inline">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('layers')" /></svg>
+                        {{ r.scope }}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="pf-inline">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('key')" /></svg>
+                        {{ r.permissions }} permissions
+                      </span>
+                    </td>
+                    <td><span class="pf-term">{{ r.term }}</span></td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="4" class="empty">No roles match this search.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+    </div><!-- /.pf-main -->
+
+    <!-- right rail: security posture, sessions, record completeness -->
+    <aside class="pf-rail" aria-label="Security and record summary">
+      <div class="pf-rail-block">
+        <div class="pf-rail-head">
+          <span class="eyebrow">Security posture</span>
+          <span class="pf-ring" role="img" aria-label="2 of 3 complete"
+                [style.background]="postureArc(2, 3)">
+            <span class="pf-ring-num num">2<small>/3</small></span>
+          </span>
+        </div>
+        <ul class="pf-checks">
+          @for (s of security; track s.label) {
+            <li>
+              <span class="pf-check-ico">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(s.icon)" /></svg>
+              </span>
+              <span class="pf-check-text"><strong>{{ s.label }}</strong><small>{{ s.detail }}</small></span>
+              <span [class]="'pf-state ' + s.tone">{{ s.status }}</span>
+            </li>
+          }
+        </ul>
+        <button type="button" class="pf-link" (click)="setTab('security')">Review security
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('arrow')" /></svg>
+        </button>
+      </div>
+
+      <div class="pf-rail-block">
+        <span class="eyebrow">Sessions</span>
+        <p class="pf-sessions">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('monitor')" /></svg>
+          <strong class="num">2</strong> active on 1 device
+        </p>
+      </div>
+
+      <div class="pf-rail-block">
+        <div class="pf-rail-head">
+          <span class="eyebrow">Record completeness</span>
+          <span class="num pf-score">{{ completeness.filled }}<small>/{{ completeness.total }}</small></span>
+        </div>
+        <div class="pf-progress"><span [style.width.%]="completeness.percent"></span></div>
+        <p class="pf-rail-note">{{ completeness.percent }}% of the personnel record is filled in.</p>
+      </div>
+    </aside>
+  </div><!-- /.pf-body -->
+</section>
+
+<!-- theme settings offcanvas: opens from the header Settings button -->
+@if (settingsOpen()) {
+  <app-theme-settings (closed)="settingsOpen.set(false)" />
+}

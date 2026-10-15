@@ -1,38 +1,160 @@
 <!-- The application shell: sidebar component, top bar, routed page, and the studio content.
      The studio engine renders the page content, the modal and the toast into the ids below.
-     Top bar functions are in app.ts. -->
+     Top bar functions are in app.ts · top bar styles in header.css. -->
 <div class="app" [class.sidebar-collapsed]="sidebarCollapsed()">
   <!-- the sidebar: Shared/layout/Sidebar (sidebar.html / sidebar.css / sidebar.ts) -->
   <app-sidebar [collapsed]="sidebarCollapsed()" (expandRequest)="setSidebarCollapsed(false)" />
 
   <div class="main">
-    <!-- TOP HEADER - studio theme. #property, #role and #top-avatar are read / filled by the studio
-         engine - keep the ids. -->
-    <header class="topbar">
+    <!-- TOP HEADER. #crumb and #top-avatar are read / filled by the studio engine - keep the ids. -->
+    <header class="topbar hd-bar">
+
       <!-- sidebar expand / collapse (on a phone: opens the menu overlay) -->
-        <button type="button" class="tb-icon-btn tb-sidebar-btn" (click)="toggleSidebar()"
-        [attr.aria-label]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-        [attr.title]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-        [attr.aria-expanded]="!sidebarCollapsed()" aria-controls="sidebar">
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    @if (sidebarCollapsed()) {
-      <!-- collapsed: » = open the menu -->
-      <path d="M6 17l5-5-5-5 M13 17l5-5-5-5" />
-    } @else {
-      <!-- expanded: « = fold the menu -->
-      <path d="M18 17l-5-5 5-5 M11 17l-5-5 5-5" />
-    }
-  </svg>
-</button>
+      <button type="button" class="hd-toggle" (click)="toggleSidebar()"
+              [attr.aria-label]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+              [attr.title]="sidebarCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+              [attr.aria-expanded]="!sidebarCollapsed()" aria-controls="sidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M9 4v16" />
+          <path [attr.d]="sidebarCollapsed() ? 'M13 9.5l2.5 2.5-2.5 2.5' : 'M15.5 9.5L13 12l2.5 2.5'" />
+        </svg>
+      </button>
+
       <!-- the engine writes the page name here; kept for screen readers only -->
       <strong class="sr-only" id="crumb" aria-live="polite">Commercial overview</strong>
 
+      <!-- organisation switcher -->
+      <div class="hd-org-wrap">
+        <button type="button" class="hd-org" [class.is-open]="orgListOpen()" aria-haspopup="listbox"
+                [attr.aria-expanded]="orgListOpen()" (click)="toggleOrgList($event)">
+          <span class="hd-org-ico">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('building')" /></svg>
+          </span>
+          <span class="hd-org-meta">
+            <small>Organisation</small>
+            <strong>{{ selectedOrg()?.name ?? 'Choose an organisation' }}</strong>
+          </span>
+          <svg class="hd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </button>
+
+        @if (orgListOpen()) {
+          <div class="hd-pop hd-org-pop" role="listbox" aria-label="Organisations">
+            <label class="hd-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
+              <input #orgSearch type="text" inputmode="search" placeholder="Search organisations" aria-label="Search organisations"
+                     autocomplete="off" [value]="orgQuery()" (input)="orgQuery.set(orgSearch.value)" (keydown.escape)="closeOrgList()">
+            </label>
+            <div class="hd-org-list">
+              @for (org of filteredOrgs(); track org.id) {
+                <button type="button" class="hd-org-row" role="option" [class.is-current]="org.id === selectedOrg()?.id"
+                        [attr.aria-selected]="org.id === selectedOrg()?.id" (click)="chooseOrg(org)">
+                  <span class="hd-org-glyph">{{ org.mark }}</span>
+                  <span class="hd-org-name"><strong>{{ org.name }}</strong><small>{{ org.subdomain }}</small></span>
+                  @if (org.id === selectedOrg()?.id) {
+                    <svg class="hd-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                  } @else {
+                    <span class="hd-status" [class.is-active]="org.status === 'Active'">{{ org.status }}</span>
+                  }
+                </button>
+              } @empty {
+                <p class="hd-empty">No organisation matches “{{ orgQuery() }}”.</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
       <div class="spacer"></div>
 
-   
+      <!-- workspace clock: time in the header + a settings dropdown on the clock button -->
+      <div class="hd-clock-wrap">
+        @if (showClockInHeader()) {
+          <div class="hd-clock">
+            <div class="hd-clock-top">
+              <strong class="num">{{ clockTime() }}</strong>
+              <span class="hd-clock-state" [class.is-paused]="clockPaused()">{{ clockPaused() ? 'Paused' : 'Live' }}</span>
+            </div>
+            <small>{{ clockDate() }} · {{ clockCity() }}</small>
+          </div>
+        }
+        <button type="button" class="hd-icon hd-clock-btn" [class.is-open]="clockOpen()" aria-haspopup="dialog"
+                [attr.aria-expanded]="clockOpen()" aria-label="Workspace clock" title="Workspace clock"
+                (click)="toggleClockPanel($event)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('clock')" /></svg>
+        </button>
 
-      <!-- quiet icon actions -->
-      <button type="button" class="tb-icon-btn tb-full" (click)="toggleFullscreen()"
+        @if (clockOpen()) {
+          <div class="hd-pop hd-clock-pop" role="dialog" aria-labelledby="hd-clock-title">
+            <div class="hd-pop-head">
+              <h2 id="hd-clock-title">Your workspace clock</h2>
+              <button type="button" class="hd-x" aria-label="Close clock settings" (click)="closeClockPanel()">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18 M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div class="hd-clock-body">
+              <!-- big time card -->
+              <div class="hd-clock-face">
+                <strong class="num">{{ clockTime() }}</strong>
+                <span>{{ clockDate() }}</span>
+                <span>{{ clockZone().id }} · {{ clockOffset() }}</span>
+              </div>
+
+              <!-- timezone: custom dropdown -->
+              <div class="hd-field">
+                <span class="hd-label" id="hd-tz-label">Timezone</span>
+                <div class="hd-select-wrap">
+                  <button type="button" class="hd-select" [class.is-open]="zoneListOpen()" aria-haspopup="listbox"
+                          [attr.aria-expanded]="zoneListOpen()" aria-labelledby="hd-tz-label hd-tz-value"
+                          (click)="toggleZoneList($event)">
+                    <span id="hd-tz-value">{{ clockZone().label }}</span>
+                    <svg class="hd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                  </button>
+
+                  @if (zoneListOpen()) {
+                    <div class="hd-options" role="listbox" aria-labelledby="hd-tz-label">
+                      @for (z of zones; track z.id) {
+                        <button type="button" class="hd-option" role="option" [class.is-current]="z.id === clockZone().id"
+                                [attr.aria-selected]="z.id === clockZone().id" (click)="chooseZone(z)">
+                          <span class="hd-option-text"><strong>{{ z.label }}</strong><small>{{ z.id }}</small></span>
+                          @if (z.id === clockZone().id) {
+                            <svg class="hd-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- options -->
+              <div class="hd-checks">
+                <label class="hd-check-row">
+                  <input type="checkbox" [checked]="clock12h()" (change)="clock12h.set($any($event.target).checked)" />
+                  <span><strong>12-hour format</strong><small>Turn off to use the 24-hour clock.</small></span>
+                </label>
+                <label class="hd-check-row">
+                  <input type="checkbox" [checked]="clockSeconds()" (change)="clockSeconds.set($any($event.target).checked)" />
+                  <span><strong>Show seconds</strong><small>A quieter minute display is the default.</small></span>
+                </label>
+                <label class="hd-check-row">
+                  <input type="checkbox" [checked]="clockPaused()" (change)="setPaused($any($event.target).checked)" />
+                  <span><strong>Pause the clock</strong><small>Freeze the displayed time until resumed.</small></span>
+                </label>
+                <label class="hd-check-row">
+                  <input type="checkbox" [checked]="showClockInHeader()" (change)="showClockInHeader.set($any($event.target).checked)" />
+                  <span><strong>Show clock in header</strong><small>When off, only this clock button stays in the header.</small></span>
+                </label>
+              </div>
+
+              <p class="hd-clock-note">Uses your device time in the selected timezone.</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- fullscreen -->
+      <button type="button" class="hd-icon hd-full" (click)="toggleFullscreen()"
               [attr.aria-label]="isFullscreen() ? 'Exit fullscreen' : 'Fullscreen'" [attr.title]="isFullscreen() ? 'Exit fullscreen' : 'Fullscreen'">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           @if (isFullscreen()) {
@@ -42,127 +164,143 @@
           }
         </svg>
       </button>
-      <button type="button" class="tb-icon-btn" aria-label="Notifications" title="Notifications" aria-haspopup="dialog"
-              (click)="openNotifications($event)">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0" /></svg>
-        @if (unreadCount()) { <span class="tb-dot" aria-hidden="true"></span> }
-      </button>
 
-      <!-- account: avatar + its menu -->
-      <div class="tb-account">
-        <!-- user chip: avatar · name over role · chevron -->
-        <button type="button" class="tb-user" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()"
+      <!-- notifications: bell with a count, dropdown panel -->
+      <div class="hd-bell-wrap">
+        <button type="button" class="hd-icon" [class.is-open]="notificationsOpen()" aria-haspopup="dialog"
+                [attr.aria-expanded]="notificationsOpen()"
+                [attr.aria-label]="unreadCount() ? 'Notifications, ' + unreadCount() + ' unread' : 'Notifications'"
+                title="Notifications" (click)="toggleNotifications($event)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('bell')" /></svg>
+          @if (unreadCount()) {
+            <span class="hd-count" aria-hidden="true">{{ unreadCount() }}</span>
+          }
+        </button>
+
+        @if (notificationsOpen()) {
+          <div class="hd-pop hd-notes" role="dialog" aria-labelledby="hd-notes-title">
+            <div class="hd-notes-head">
+              <h2 id="hd-notes-title">Notifications</h2>
+              <button type="button" class="hd-x" aria-label="Close notifications" (click)="closeNotifications()">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18 M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div class="hd-notes-sub">
+              <span>{{ unreadCount() }} unread · {{ notes().length }} notifications</span>
+              <button type="button" class="hd-link" [disabled]="!unreadCount()" (click)="markAllRead()">Mark all as read</button>
+            </div>
+
+            <div class="hd-notes-list">
+              @for (n of notes(); track n.id) {
+                <article class="hd-note" [class.is-unread]="n.unread">
+                  <span class="hd-note-ico">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(n.icon)" /></svg>
+                  </span>
+                  <div class="hd-note-body">
+                    <strong>{{ n.title }}</strong>
+                    <p>{{ n.detail }}</p>
+                    <div class="hd-note-foot">
+                      <small>{{ n.source }} · {{ n.time }}</small>
+                      @if (n.unread) {
+                        <button type="button" class="hd-link" (click)="markRead(n.id)">Mark as read</button>
+                      } @else {
+                        <span class="hd-read">Read</span>
+                      }
+                    </div>
+                  </div>
+                </article>
+              } @empty {
+                <p class="hd-empty">You're all caught up.</p>
+              }
+            </div>
+
+            <div class="hd-pop-foot">Read states reset when you reload this page.</div>
+          </div>
+        }
+      </div>
+
+      <span class="hd-sep" aria-hidden="true"></span>
+
+      <!-- account: avatar chip + its menu -->
+      <div class="hd-account">
+        <button type="button" class="hd-user" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()"
                 (click)="toggleUserMenu($event)">
-          <span class="tb-avatar" aria-hidden="true">VA</span>
-          <span class="tb-user-meta"><strong>Vikram Anand</strong><small>Super admin</small></span>
-          <svg class="tb-user-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+          <span class="hd-avatar" [style.background]="avatarBg() ?? ''" aria-hidden="true">{{ avatarBg() ? '' : 'VA' }}</span>
+          <span class="hd-user-meta"><strong>Vikram Anand</strong><small>Super admin</small></span>
+          <svg class="hd-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
         </button>
         <!-- the studio engine writes the preview-role initials here; kept out of sight -->
         <span class="sr-only" id="top-avatar"></span>
 
         @if (userMenuOpen()) {
-          <div class="tb-menu" role="menu">
-            <div class="tb-menu-head">
-              <span class="tb-avatar lg">VA</span>
-              <div class="tb-head-text"><strong>Vikram Anand</strong><small>vikram.anand&#64;ngoplanet.test · Super admin</small></div>
+          <div class="hd-pop hd-menu" role="menu">
+            <!-- who is signed in -->
+            <div class="hd-menu-head">
+              <span class="hd-avatar xl" [style.background]="avatarBg() ?? ''" aria-hidden="true">{{ avatarBg() ? '' : 'VA' }}</span>
+              <div class="hd-menu-who">
+                <strong>Vikram Anand</strong>
+                <span>vikram.anand&#64;ngoplanet.test</span>
+                <em class="hd-role">Super admin</em>
+              </div>
             </div>
 
-            <!-- organisation: a button that opens a floating dropdown (it does not push the menu down) -->
-            <div class="tb-org-wrap">
-              <button type="button" class="tb-org" [class.is-open]="orgListOpen()" aria-haspopup="listbox"
-                      [attr.aria-expanded]="orgListOpen()" (click)="toggleOrgList($event)">
-                @if (selectedOrg(); as org) {
-                  <span class="tb-org-glyph">{{ org.mark }}</span>
-                  <span class="tb-org-meta"><small>ORGANISATION</small><strong>{{ org.name }}</strong></span>
-                } @else {
-                  <span class="tb-org-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5l8-3 8 3v16 M2 21h20 M8 8h1 M15 8h1 M8 12h1 M15 12h1 M10 21v-5h4v5" /></svg>
-                  </span>
-                  <span class="tb-org-meta"><small>ORGANISATION</small><strong>Choose an organisation</strong></span>
-                }
-                <svg class="tb-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            <!-- current organisation -->
+            <button type="button" class="hd-menu-org" role="menuitem" (click)="openOrgFromMenu($event)">
+              <span class="hd-menu-org-ico">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('building')" /></svg>
+              </span>
+              <span class="hd-menu-org-meta">
+                <small>Current organisation</small>
+                <strong>{{ selectedOrg()?.name ?? 'Choose an organisation' }}</strong>
+              </span>
+              <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+            </button>
+
+            <div class="hd-menu-sep"></div>
+
+            <div class="hd-menu-group">
+              <button type="button" class="hd-menu-row" role="menuitem" (click)="openProfile()">
+                <svg class="hd-row-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('user')" /></svg>
+                <span class="hd-row-text"><strong>My profile</strong><small>Your name and account details</small></span>
+                <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
               </button>
-
-              @if (orgListOpen()) {
-                <div class="tb-org-pop" role="listbox" aria-label="Organisations">
-                  <label class="tb-search">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11a8 8 0 1 0 16 0 8 8 0 1 0-16 0 M21 21l-4.35-4.35" /></svg>
-                    <input #orgSearch type="text" inputmode="search" placeholder="Search organisations" aria-label="Search organisations"
-                           autocomplete="off" [value]="orgQuery()" (input)="orgQuery.set(orgSearch.value)" (keydown.escape)="closeOrgList()">
-                  </label>
-                  <div class="tb-org-list">
-                    @for (org of filteredOrgs(); track org.id) {
-                      <button type="button" class="tb-org-row" role="option" [class.is-current]="org.id === selectedOrg()?.id"
-                              [attr.aria-selected]="org.id === selectedOrg()?.id" (click)="chooseOrg(org)">
-                        <span class="tb-org-glyph">{{ org.mark }}</span>
-                        <span class="tb-org-name"><strong>{{ org.name }}</strong><small>{{ org.subdomain }}</small></span>
-                        @if (org.id === selectedOrg()?.id) {
-                          <svg class="tb-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
-                        } @else {
-                          <span class="badge" [class.teal]="org.status === 'Active'" [class.amber]="org.status !== 'Active'">{{ org.status }}</span>
-                        }
-                      </button>
-                    } @empty {
-                      <p class="tb-org-empty">No organisation matches “{{ orgQuery() }}”.</p>
-                    }
-                  </div>
-                </div>
-              }
+              <button type="button" class="hd-menu-row" role="menuitem" (click)="closeUserMenu()">
+                <svg class="hd-row-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('shield')" /></svg>
+                <span class="hd-row-text"><strong>My security</strong><small>Password and account protection</small></span>
+                <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+              <button type="button" class="hd-menu-row" role="menuitem" (click)="closeUserMenu()">
+                <svg class="hd-row-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sliders')" /></svg>
+                <span class="hd-row-text"><strong>Preferences</strong><small>Appearance and workspace clock</small></span>
+                <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
             </div>
 
-            <div class="tb-menu-sep"></div>
-            <button type="button" class="tb-menu-row" (click)="closeUserMenu()">Profile</button>
-            <button type="button" class="tb-menu-row" (click)="closeUserMenu()">My Security</button>
-            <div class="tb-menu-sep"></div>
-            <button type="button" class="tb-menu-row danger" (click)="closeUserMenu()">Sign out</button>
-            <button type="button" class="tb-menu-row danger" (click)="closeUserMenu()">Sign out everywhere</button>
+            <div class="hd-menu-sep"></div>
+
+            <div class="hd-menu-group">
+              <button type="button" class="hd-menu-row danger" role="menuitem" (click)="closeUserMenu()">
+                <svg class="hd-row-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('logout')" /></svg>
+                <span class="hd-row-text"><strong>Sign out</strong><small>This device only</small></span>
+                <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+              <button type="button" class="hd-menu-row danger" role="menuitem" (click)="closeUserMenu()">
+                <svg class="hd-row-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('devices')" /></svg>
+                <span class="hd-row-text"><strong>Sign out everywhere</strong><small>All devices and active sessions</small></span>
+                <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+            </div>
+
+            <div class="hd-pop-foot">OtoSolve · Sample account</div>
           </div>
         }
       </div>
     </header>
 
-    <!-- notifications modal -->
-    @if (notificationsOpen()) {
-      <div class="tb-modal" role="dialog" aria-modal="true" aria-labelledby="bellTitle" (click)="closeNotifications()">
-        <div class="tb-modal-card" (click)="$event.stopPropagation()">
-          <div class="modal-head">
-            <div><h2 id="bellTitle">Notifications</h2><p class="muted">Latest alerts across the platform</p></div>
-            <button type="button" class="icon-btn" aria-label="Close notifications" (click)="closeNotifications()">
-              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12 M18 6 6 18" /></svg>
-            </button>
-          </div>
-          <div class="tb-modal-body">
-            <div class="switcher tb-filters">
-              @for (f of noteFilters; track f) {
-                <button type="button" [class.active]="noteFilter() === f" (click)="noteFilter.set(f)">{{ f }}</button>
-              }
-            </div>
-            <div class="tb-modal-list">
-              @for (n of visibleNotes(); track n.id) {
-                <div class="tb-note" [class.unread]="n.unread">
-                  <span class="n-ico" [class]="'n-ico ' + n.tone">{{ n.glyph }}</span>
-                  <div><strong>{{ n.title }}</strong><small>{{ n.detail }}</small></div>
-                  @if (n.unread) { <span class="badge rose">New</span> } @else { <span class="n-time">{{ n.time }}</span> }
-                </div>
-              } @empty {
-                <p class="tb-org-empty">Nothing here.</p>
-              }
-            </div>
-          </div>
-          <div class="modal-actions">
-            <button type="button" class="btn" (click)="closeNotifications()">Notification settings</button>
-            <button type="button" class="btn primary" [disabled]="!unreadCount()" (click)="markAllRead()">Mark all as read</button>
-          </div>
-        </div>
-      </div>
-    }
-
- 
     <div class="content route-page"><router-outlet /></div>
     <main class="content" id="content" tabindex="-1"></main>
   </div>
 </div>
 <dialog id="modal" aria-labelledby="modal-title"></dialog>
 <div class="toast" role="status" id="toast" hidden></div>
-
-

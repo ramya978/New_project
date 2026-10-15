@@ -1,20 +1,10 @@
 import { Component, HostListener, computed, signal } from '@angular/core';
 
-/* =====================================================================================================
-   DONATIONS · PAYMENTS & RECEIPTS
-   Sample screen for the MN_PAYMENT_QUEUE menu route (/app/donations/payment-event-queue).
-   Content mirrors the product design capture: summary stats, a receipt-history table with search /
-   status filter, pagination and a view-receipt dialog. Styling reuses the project card & table system
-   (.card / .stat / .tablewrap / .badge) with page-scoped extras only where the capture needs them.
-   Data below is illustrative - no live payment gateway is connected.
-   ===================================================================================================== */
-
 export type PaymentStatus = 'successful' | 'pending' | 'failed';
 
 export interface ReceiptRow {
-  /** Primary reference: issued receipt number, or the payment event id while a receipt is not issued. */
+
   ref: string;
-  /** Secondary line: receipt number again, or the underlying intent reference. */
   subRef: string | null;
   donor: string | null;
   email: string | null;
@@ -26,22 +16,18 @@ export interface ReceiptRow {
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-/** "14 Oct 2026, 21:45" (UTC - the sample dates are constructed as UTC). */
 export const fmtDate = (d: Date): string => {
   const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
 };
 
-/** "INR 12,000.00" - Indian digit grouping, two decimals, as in the capture. */
 export const inr = (n: number): string =>
   'INR ' + new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 
-/** "₹22,79,400" - Indian grouping, no decimals (summary card). */
 export const inrCompact = (n: number): string => '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n);
 
 const utc = (y: number, m: number, d: number, hh: number, mm: number) => Date.UTC(y, m - 1, d, hh, mm);
 
-/** The first ten rows exactly as the design capture shows them. */
 const FIRST_ROWS: ReceiptRow[] = [
   { ref: 'evt_CPLj3ZZ3Nsm8lV', subRef: 'INT-5BHBfHDB8EFR', donor: 'Sharmila Dipankar', email: 'sharmila.dipankar@mail.test', amount: 2000, status: 'pending', receivedAt: new Date(utc(2026, 10, 14, 21, 45)) },
   { ref: 'evt_zJo8CNh3fAXODy', subRef: 'INT-J9WXR9A5DAX4', donor: 'Kiran Manoj', email: 'kiran.manoj@mail.test', amount: 4500, status: 'pending', receivedAt: new Date(utc(2026, 10, 14, 21, 25)) },
@@ -67,11 +53,9 @@ const NAMES = [
 
 const AMOUNT_POOL = [5000, 7500, 10000, 12000, 1500, 2100, 25000, 3000, 8000, 4500, 6000, 11000, 20000, 2500, 9000, 15000, 3500, 5000, 13000, 2000];
 
-/** Summary figures from the capture; the dataset below is built to match them exactly. */
 const TARGET_TOTAL = 2279400;
 const COUNTS: Record<PaymentStatus, number> = { successful: 72, pending: 12, failed: 14 };
 
-/* Deterministic pseudo-random so the page renders identically every time. */
 const seeded = (seed: number) => {
   let s = (seed * 2654435761) % 4294967296;
   return () => (s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296;
@@ -80,7 +64,6 @@ const seeded = (seed: number) => {
 const slug = (rnd: () => number, len: number, abc: string): string =>
   Array.from({ length: len }, () => abc[Math.floor(rnd() * abc.length)]).join('');
 
-/** 98 rows total: 72 successful / 12 pending / 14 failed, summing to exactly ₹22,79,400. */
 const buildRows = (): ReceiptRow[] => {
   const rows: ReceiptRow[] = [...FIRST_ROWS];
   const rnd = seeded(42);
@@ -89,7 +72,6 @@ const buildRows = (): ReceiptRow[] => {
     ...Array<PaymentStatus>(COUNTS.pending - 4).fill('pending'),
     ...Array<PaymentStatus>(COUNTS.failed).fill('failed')
   ];
-  /* deterministic shuffle */
   for (let i = statuses.length - 1; i > 0; i--) {
     const j = Math.floor(rnd() * (i + 1));
     [statuses[i], statuses[j]] = [statuses[j], statuses[i]];
@@ -98,7 +80,7 @@ const buildRows = (): ReceiptRow[] => {
   const base = utc(2026, 10, 13, 19, 0);
   statuses.forEach((status, i) => {
     const name = NAMES[i % NAMES.length];
-    const donor = i % 23 === 7 ? null : name; /* a few anonymous donations, like evt_Nvx3... */
+    const donor = i % 23 === 7 ? null : name;
     const amount = AMOUNT_POOL[i % AMOUNT_POOL.length];
     const receivedAt = new Date(base - (i + 1) * 3.1 * 3600 * 1000);
     if (status === 'successful') {
@@ -116,7 +98,6 @@ const buildRows = (): ReceiptRow[] => {
       });
     }
   });
-  /* Scale the generated amounts so the 98-row total is exactly the capture's ₹22,79,400. */
   const generated = rows.slice(FIRST_ROWS.length);
   const diff = TARGET_TOTAL - rows.reduce((sum, r) => sum + r.amount, 0);
   const add = Math.floor(diff / generated.length / 100) * 100;
@@ -127,7 +108,6 @@ const buildRows = (): ReceiptRow[] => {
 
 export const RECEIPTS: ReceiptRow[] = buildRows();
 
-/* Summary cards - values the capture shows, computed from the dataset above. */
 export interface StatCard {
   label: string;
   value: string;
@@ -144,7 +124,6 @@ export const STATS: StatCard[] = [
   { label: 'Failed', value: String(RECEIPTS.filter((r) => r.status === 'failed').length), note: 'Needs retry', tone: 'red', icon: 'x' }
 ];
 
-/* Inline SVG paths (feather-style, single path each) used by this page. */
 const ICON_PATHS: Record<string, string> = {
   calendar: 'M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z M16 2v4 M8 2v4 M3 10h18',
   check: 'M20 6 9 17l-5-5',
@@ -170,11 +149,8 @@ const TONE_COLORS: Record<string, string> = {
   styleUrl: './payments-receipts.css'
 })
 export class PaymentsReceipts {
-  /** Formatters used by the template (module-level functions are not visible to templates). */
   protected readonly inr = inr;
   protected readonly fmtDate = fmtDate;
-
-  /** Page state - query text, status filter, page number, page size, open dialog row. */
   readonly query = signal('');
   readonly statusFilter = signal<'all' | PaymentStatus>('all');
   readonly page = signal(1);
@@ -182,8 +158,8 @@ export class PaymentsReceipts {
   readonly selected = signal<ReceiptRow | null>(null);
 
   readonly stats = STATS;
+  readonly total = RECEIPTS.length;
 
-  /** Rows matching the current search + status filter (search covers ref, sub-ref, donor, e-mail). */
   readonly filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
     const status = this.statusFilter();
@@ -242,6 +218,29 @@ export class PaymentsReceipts {
     return TONE_COLORS[tone] ?? TONE_COLORS['ink'];
   }
 
+  /** Two-letter initials for the donor avatar ("Meera Iyer" -> "MI"). */
+  initials(name: string | null): string {
+    if (!name) return '—';
+    const parts = name.trim().split(/\s+/);
+    const first = parts[0]?.[0] ?? '';
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    return (first + last).toUpperCase();
+  }
+
+  /** Stable avatar colour per donor name. */
+  avatarTone(name: string | null): string {
+    if (!name) return 'av-none';
+    let h = 0;
+    for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 997;
+    return 'av-' + (h % 4);
+  }
+
+  /** Small grey line under the reference. */
+  refNote(r: ReceiptRow): string {
+    if (r.status === 'successful') return 'Receipt number';
+    return r.subRef ? 'Intent · ' + r.subRef : 'No intent reference';
+  }
+
   statusLabel(status: PaymentStatus): string {
     return status.charAt(0).toUpperCase() + status.slice(1);
   }
@@ -252,6 +251,18 @@ export class PaymentsReceipts {
 
   badgeTone(status: PaymentStatus): string {
     return status === 'successful' ? 'teal' : status === 'pending' ? 'amber' : 'red';
+  }
+
+  receiptTitle(status: PaymentStatus): string {
+    return status === 'successful' ? 'Receipt issued' : 'Not issued';
+  }
+
+  receiptSub(status: PaymentStatus): string {
+    return status === 'successful'
+      ? 'Sent to the donor e-mail'
+      : status === 'pending'
+        ? 'Awaiting payment confirmation'
+        : 'Payment failed · retry required';
   }
 
   receiptNote(status: PaymentStatus): string {
