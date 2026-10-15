@@ -2,6 +2,7 @@ import {
   Component, DestroyRef, ElementRef, HostListener, afterNextRender, computed, inject, output, signal, viewChildren
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { Footer } from '../../../Shared/layout/Footer/footer';
 
 
 type SectionId = 'basic' | 'location' | 'publication' | 'review';
@@ -201,7 +202,7 @@ const fromIso = (iso: string): Date => {
 
 @Component({
   selector: 'app-new-campaign',
-  imports: [NgTemplateOutlet],
+  imports: [NgTemplateOutlet, Footer],
   templateUrl: './new-campaign.html',
   styleUrl: './new-campaign.css'
 })

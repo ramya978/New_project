@@ -1,0 +1,27 @@
+/* =====================================================================================================
+   SHARED FOOTER - page bottom bar. Layout mirrors the global .footer token so the bar
+   reads the same on every screen (muted caption, split to the two ends).
+   ===================================================================================================== */
+:host {
+  display: block
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: #969cac;
+  font-size: 10px;
+  margin-top: 25px
+}
+
+@media (max-width: 640px) {
+  .footer {
+    justify-content: center;
+    text-align: center;
+    gap: 4px;
+    font-size: 9px
+  }
+}

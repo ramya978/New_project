@@ -4,6 +4,7 @@ import { MenuPage } from './Shared/layout/menu-page';
 import { PaymentsReceipts } from './pages/Donations/Payment_History/payments-receipts';
 import { Profile } from './pages/Auth/Profile/profile';
 import { NewCampaign } from './pages/Campaign/Campaign_Wizard/new-campaign';
+import { LeadProfile } from './pages/Donor & Leads/Lead_Work_Queue/Lead_Profile/lead-profile';
 
 const flatten = (items: readonly MenuItem[]): MenuItem[] => items.flatMap((item) => [item, ...flatten(item.children)]);
 
@@ -25,5 +26,6 @@ const menuRoutes: Routes = flatten(MENU_DATA)
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'app/dashboard' },
   { path: 'app/auth/profile', component: Profile, title: 'Profile', data: { name: 'Profile', route: '/app/auth/profile' } },
+   { path: 'app/fundraising/Lead/Lead-view', component: LeadProfile, title: 'Lead_Profile', data: { name: 'Lead_Profile', route: '/app/fundraising/Lead/Lead-view' } },
   ...menuRoutes
 ];

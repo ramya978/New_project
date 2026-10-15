@@ -1,0 +1,444 @@
+<!-- ============================== PAGE HEAD ============================== -->
+<header class="lp-head">
+  <div class="lp-head-copy">
+    <span class="lp-eyebrow">Lead work queue · Lead profile</span>
+    <h1>{{ lead().fullName }}</h1>
+    <p class="lp-head-sub">
+      <span class="lp-ref">
+        {{ lead().reference }}
+        <button type="button" class="lp-copy" [attr.aria-label]="'Copy ' + lead().reference" title="Copy reference"
+                (click)="copy('ref', lead().reference)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(copied() === 'ref' ? 'check' : 'copy')" /></svg>
+        </button>
+      </span>
+      <span>· {{ lead().campaign }}</span>
+      <span>· {{ orDash(lead().city) }}</span>
+    </p>
+  </div>
+
+  <div class="lp-head-actions">
+    <button type="button" class="lp-text-link" (click)="back.emit()">
+      All leads
+      <svg class="lp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('arrow')" /></svg>
+    </button>
+    <button type="button" class="pf-hbtn btn-secondary" [disabled]="isClosed()" (click)="onSchedule()">
+      <svg class="lp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('calendar')" /></svg>
+      Schedule follow-up
+    </button>
+    <button type="button" class="pf-hbtn btn-primary" [disabled]="isClosed()" (click)="onCommunicate()">
+      <svg class="lp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chat')" /></svg>
+      Communicate
+    </button>
+  </div>
+</header>
+
+<!-- ============================== SUMMARY CARD ============================== -->
+<!-- identity row · lifecycle progress · key figures strip - one flat card, no empty areas -->
+<section class="lp-hero" aria-label="Lead summary">
+  <!-- identity + owner -->
+  <div class="lp-hero-top">
+    <div class="lp-hero-id">
+      <span class="lp-avatar xl" aria-hidden="true">{{ initials() }}</span>
+      <div class="lp-hero-id-copy">
+        <div class="lp-chips">
+          <span [class]="'lp-chip is-status tone-' + statusTone()">
+            <span class="lp-dot"></span>{{ status() }}
+          </span>
+          <span class="lp-chip" [class.is-cold]="lead().temperature === 'Cold'"
+                [class.is-warm]="lead().temperature === 'Warm'" [class.is-hot]="lead().temperature === 'Hot'">
+            {{ lead().temperature }}
+          </span>
+          <span class="lp-chip is-plain">{{ lead().potential }} potential</span>
+          <span class="lp-chip is-plain">{{ lead().leadSource }}</span>
+        </div>
+        <p class="lp-hero-meta" style="margin-top: 6px;">
+          Captured {{ dateTime(lead().captured) }} <span aria-hidden="true">·</span> Last updated {{ dateTime(lead().lastUpdated) }}
+        </p>
+      </div>
+    </div>
+
+    <!-- owner + reassign -->
+    <div class="lp-owner">
+      <span class="lp-owner-label">Owner</span>
+      <span class="lp-avatar">{{ ownerInitials() }}</span>
+      <span class="lp-owner-copy">
+        <span class="lp-owner-name">{{ owner() }}</span>
+        <small>Team {{ ownerTeam() }}</small>
+      </span>
+      <div class="lp-reassign">
+        <button type="button" class="lp-btn lp-btn-sm" [class.is-open]="reassignOpen()" aria-haspopup="listbox"
+                [attr.aria-expanded]="reassignOpen()" [disabled]="isClosed()" (click)="toggleReassign($event)">
+          <svg class="lp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('user')" /></svg>
+          Reassign
+        </button>
+
+        @if (reassignOpen()) {
+          <div class="lp-pop" role="dialog" aria-labelledby="lp-reassign-title">
+            <div class="lp-pop-head">
+              <h3 id="lp-reassign-title">Reassign lead</h3>
+              <p>Pick the owner who takes this lead next.</p>
+            </div>
+            <label class="lp-owner-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
+              <input type="text" placeholder="Search owners" aria-label="Search owners" autocomplete="off"
+                     [value]="ownerQuery()" (input)="searchOwners($event)" (keydown)="ownerKey($event)" />
+            </label>
+            <ul class="lp-pop-list" role="listbox" aria-label="Owners">
+              @for (o of filteredOwners(); track o.name; let i = $index) {
+                <li role="option" [attr.aria-selected]="o.name === owner()"
+                    [class.is-active]="i === activeIndex()" [class.is-current]="o.name === owner()"
+                    (mouseenter)="activeIndex.set(i)" (click)="pickOwner(o)">
+                  <span class="lp-avatar sm">{{ o.name.charAt(0) }}</span>
+                  <span class="lp-pop-copy"><b>{{ o.name }}</b><small>Team {{ o.team }}</small></span>
+                  @if (o.name === owner()) {
+                    <svg class="lp-tick" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+                  }
+                </li>
+              } @empty {
+                <li class="lp-empty">No owner matches “{{ ownerQuery() }}”.</li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- lifecycle progress: one segment per stage, filled up to the current one -->
+  <div class="lp-progress">
+    <div class="lp-progress-head">
+      <span class="lp-progress-title">Lifecycle</span>
+      @if (isClosed()) {
+        <span class="lp-progress-state tone-closed">Closed · {{ status() }}</span>
+      } @else if (stageIndex() >= 0) {
+        <span [class]="'lp-progress-state tone-' + statusTone()">Stage {{ stageIndex() + 1 }} of {{ stages.length }} · {{ status() }}</span>
+      } @else {
+        <span class="lp-progress-state">{{ status() }}</span>
+      }
+    </div>
+    <ol [class]="'lp-steps tone-' + statusTone()" [class.is-closed]="isClosed()" aria-label="Lead lifecycle">
+      @for (s of stages; track s; let i = $index) {
+        <li [class.is-done]="!isClosed() && i < stageIndex()" [class.is-current]="!isClosed() && i === stageIndex()"
+            [attr.aria-current]="!isClosed() && i === stageIndex() ? 'step' : null">
+          <span class="lp-step-bar" aria-hidden="true"></span>
+          <span class="lp-step-label">{{ s }}</span>
+        </li>
+      }
+    </ol>
+  </div>
+
+  <!-- key figures strip -->
+  <dl class="lp-kpis">
+    <div class="lp-kpi">
+      <svg class="lp-ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle class="lp-ring-bg" cx="22" cy="22" r="18" />
+        <circle [class]="'lp-ring-val is-' + healthTone()" cx="22" cy="22" r="18"
+                [attr.stroke-dasharray]="healthDash()" />
+      </svg>
+      <span class="lp-ring-num" aria-hidden="true">{{ lead().health }}</span>
+      <div>
+        <dt>Health</dt>
+        <dd [class]="'is-' + healthTone()">{{ lead().healthLabel }}</dd>
+      </div>
+    </div>
+
+    <div class="lp-kpi" [class.is-alert]="lead().responseClock === 'Breached'">
+      <span class="lp-kpi-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('clock')" /></svg></span>
+      <div>
+        <dt>Response clock</dt>
+        <dd>{{ lead().responseClock }}</dd>
+        @if (lead().responseClock === 'Breached') {
+          <small>First response overdue</small>
+        }
+      </div>
+    </div>
+
+    <div class="lp-kpi">
+      <span class="lp-kpi-ico" [class.is-cold]="lead().temperature === 'Cold'"
+            [class.is-warm]="lead().temperature === 'Warm'" [class.is-hot]="lead().temperature === 'Hot'">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('thermo')" /></svg>
+      </span>
+      <div>
+        <dt>Temperature</dt>
+        <dd>{{ lead().temperature }}</dd>
+      </div>
+    </div>
+
+    <div class="lp-kpi">
+      <span class="lp-kpi-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('bars')" /></svg></span>
+      <div>
+        <dt>Potential</dt>
+        <dd>{{ lead().potential }}</dd>
+      </div>
+    </div>
+
+    <div class="lp-kpi lp-kpi-wide" [class.is-due]="followUpDue()">
+      <span class="lp-kpi-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('calendar')" /></svg></span>
+      <div>
+        <dt>Next follow-up</dt>
+        <dd>{{ date(lead().nextFollowUp) }}@if (followUpDue()) { <span class="lp-tag is-due">Due</span> }</dd>
+        <small>{{ lead().plannedAction }}</small>
+      </div>
+    </div>
+  </dl>
+</section>
+
+<!-- ============================== BODY ============================== -->
+<div class="lp-body">
+  <!-- ---------- LEFT ---------- -->
+  <div class="lp-col">
+    <!-- identity & contact -->
+    <section class="lp-card" aria-labelledby="lp-identity">
+      <header class="lp-card-head">
+        <span class="lp-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('contact')" /></svg></span>
+        <div>
+          <h2 id="lp-identity">Identity &amp; contact</h2>
+          <p>Who the lead is and how to reach them</p>
+        </div>
+      </header>
+
+      <dl class="lp-grid3">
+        <div><dt>Full name</dt><dd>{{ lead().fullName }}</dd></div>
+        <div><dt>Display name</dt><dd>{{ lead().displayName }}</dd></div>
+        <div><dt>Language</dt><dd>{{ lead().language }}</dd></div>
+        <div>
+          <dt>Phone</dt>
+          <dd class="lp-with-copy">
+            <span class="lp-num">{{ lead().phone }}</span>
+            <button type="button" class="lp-copy" aria-label="Copy phone number" title="Copy" (click)="copy('phone', lead().phone)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(copied() === 'phone' ? 'check' : 'copy')" /></svg>
+            </button>
+          </dd>
+        </div>
+        <div>
+          <dt>E-mail</dt>
+          <dd class="lp-with-copy">
+            <span class="lp-ellipsis">{{ lead().email }}</span>
+            <button type="button" class="lp-copy" aria-label="Copy e-mail" title="Copy" (click)="copy('email', lead().email)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(copied() === 'email' ? 'check' : 'copy')" /></svg>
+            </button>
+          </dd>
+        </div>
+        <div><dt>Other numbers</dt><dd>{{ lead().otherNumbers.length ? lead().otherNumbers.join(', ') : '—' }}</dd></div>
+        <div><dt>Best time to call</dt><dd>{{ orDash(lead().bestTimeToCall) }}</dd></div>
+        <div><dt>Captured</dt><dd>{{ dateTime(lead().captured) }}</dd></div>
+        <div><dt>Lead reference</dt><dd class="lp-num">{{ lead().reference }}</dd></div>
+      </dl>
+    </section>
+
+    <!-- engagement -->
+    <section class="lp-card" aria-labelledby="lp-engagement">
+      <header class="lp-card-head">
+        <span class="lp-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('pulse')" /></svg></span>
+        <div>
+          <h2 id="lp-engagement">Engagement &amp; follow-up</h2>
+          <p>Every contact attempt links the owner, the lead and the outcome</p>
+        </div>
+        <!-- <button type="button" class="lp-btn lp-btn-sm lp-head-btn" [disabled]="isClosed()" (click)="onSchedule()">+ Follow-up</button> -->
+      </header>
+
+      <dl class="lp-grid3">
+        <div><dt>Last outcome</dt><dd>{{ lead().lastOutcome }}</dd></div>
+        <div><dt>Last contacted</dt><dd>{{ dateTime(lead().lastContacted) }}</dd></div>
+        <div><dt>Next follow-up</dt><dd [class.is-due]="followUpDue()">{{ date(lead().nextFollowUp) }}</dd></div>
+      </dl>
+
+      <div class="lp-activity">
+        <span class="lp-activity-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('calendar')" /></svg></span>
+        <div class="lp-activity-copy">
+          <strong>{{ lead().plannedAction }}</strong>
+          <small>{{ date(lead().nextFollowUp) }} · {{ owner() }}</small>
+        </div>
+        <span class="lp-tag" [class.is-due]="followUpDue()">{{ followUpDue() ? 'Due' : 'Open' }}</span>
+        <!-- <button type="button" class="lp-btn lp-btn-sm" [disabled]="isClosed()" (click)="onLogOutcome()">Log outcome</button> -->
+      </div>
+    </section>
+
+    <!-- consent -->
+    <section class="lp-card" aria-labelledby="lp-consent">
+      <header class="lp-card-head">
+        <span class="lp-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('shield')" /></svg></span>
+        <div>
+          <h2 id="lp-consent">
+            Consent given
+            <span class="lp-chip lp-chip-inline" [class.is-ok]="consentGranted()">
+              <span class="lp-dot"></span>{{ consentGranted() ? 'Granted' : 'Not granted' }}
+            </span>
+          </h2>
+          <p>{{ optedIn() }} of {{ lead().consent.length }} channels opted in</p>
+        </div>
+        <span class="lp-evidence">
+          <small>Evidence</small>
+          <b class="lp-num">{{ lead().consentEvidence }}</b>
+          <button type="button" class="lp-copy" aria-label="Copy evidence reference" title="Copy"
+                  (click)="copy('evidence', lead().consentEvidence)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(copied() === 'evidence' ? 'check' : 'copy')" /></svg>
+          </button>
+        </span>
+      </header>
+
+      <div class="lp-table-wrap">
+        <table class="lp-table">
+          <thead>
+            <tr>
+              <th>Channel</th>
+              <th>Decision</th>
+              <th>Status</th>
+              <th>Notice version</th>
+              <th>Effective</th>
+              <th>Expires</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of lead().consent; track c.channel) {
+              <tr [class.is-muted]="c.decision !== 'Opted in'">
+                <td>
+                  <span class="lp-channel">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(channelIcon(c.channel))" /></svg>
+                    {{ c.channel }}
+                  </span>
+                </td>
+                <td>
+                  <span class="lp-decision" [class.is-in]="c.decision === 'Opted in'" [class.is-out]="c.decision === 'Opted out'">
+                    <span class="lp-dot"></span>{{ c.decision }}
+                  </span>
+                </td>
+                <td>{{ c.status }}</td>
+                <td class="lp-num">{{ c.noticeVersion }}</td>
+                <td>{{ date(c.effective) }}</td>
+                <td>{{ c.decision === 'Opted in' ? (c.expires ? date(c.expires) : 'No expiry') : '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <!-- <p class="lp-foot-note">Contact the lead only on channels that are opted in and active.</p> -->
+    </section>
+  </div>
+
+  <!-- ---------- RIGHT ---------- -->
+  <aside class="lp-col">
+    <!-- origin & ownership -->
+    <section class="lp-card" aria-labelledby="lp-origin">
+      <header class="lp-card-head">
+        <span class="lp-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('origin')" /></svg></span>
+        <div>
+          <h2 id="lp-origin">Origin &amp; ownership</h2>
+          <p>Where the lead came from and who owns it</p>
+        </div>
+      </header>
+
+      <div class="lp-person">
+        <span class="lp-avatar lg">{{ ownerInitials() }}</span>
+        <div>
+          <strong>{{ owner() }}</strong>
+          <small>Lead owner · Team {{ ownerTeam() }}</small>
+        </div>
+      </div>
+
+      <dl class="lp-rows">
+        <div><dt>Campaign</dt><dd>{{ lead().campaign }}</dd></div>
+        <div><dt>Lead source</dt><dd>{{ lead().leadSource }}</dd></div>
+        <div><dt>Team</dt><dd>{{ ownerTeam() }}</dd></div>
+        <div>
+          <dt>Donation link</dt>
+          <dd class="lp-with-copy">
+            <span class="lp-ellipsis lp-link" [title]="lead().donationLink">{{ lead().donationLink }}</span>
+            <button type="button" class="lp-copy" aria-label="Copy donation link" title="Copy" (click)="copy('link', lead().donationLink)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(copied() === 'link' ? 'check' : 'copy')" /></svg>
+            </button>
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- location -->
+    <section class="lp-card" aria-labelledby="lp-location">
+      <header class="lp-card-head">
+        <span class="lp-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('pin')" /></svg></span>
+        <div>
+          <h2 id="lp-location">Location</h2>
+          <p>Address details captured with the lead</p>
+        </div>
+      </header>
+      <dl class="lp-rows">
+        <div><dt>Country</dt><dd>{{ orDash(lead().country) }}</dd></div>
+        <div><dt>City</dt><dd>{{ orDash(lead().city) }}</dd></div>
+        <div><dt>Region code</dt><dd>{{ orDash(lead().regionCode) }}</dd></div>
+        <div><dt>Address</dt><dd>{{ orDash(lead().address) }}</dd></div>
+      </dl>
+    </section>
+
+    <!-- lifecycle -->
+    <section class="lp-card" aria-labelledby="lp-lifecycle">
+      <header class="lp-card-head">
+        <span class="lp-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('flag')" /></svg></span>
+        <div>
+          <h2 id="lp-lifecycle">Lifecycle</h2>
+          <p>Separate dates for separate milestones</p>
+        </div>
+      </header>
+      <dl class="lp-rows">
+        <div><dt>Captured</dt><dd>{{ dateTime(lead().captured) }}</dd></div>
+        <div>
+          <dt>Accepted</dt>
+          <dd>
+            @if (lead().accepted) { {{ dateTime(lead().accepted) }} } @else { <span class="lp-tag">Pending</span> }
+          </dd>
+        </div>
+        <div>
+          <dt>Qualified</dt>
+          <dd>
+            @if (lead().qualified) { {{ dateTime(lead().qualified) }} } @else { <span class="lp-tag">Not yet</span> }
+          </dd>
+        </div>
+        <div>
+          <dt>Converted</dt>
+          <dd>
+            @if (lead().converted) { {{ dateTime(lead().converted) }} } @else { <span class="lp-tag">Not yet</span> }
+          </dd>
+        </div>
+        <div>
+          <dt>Current status</dt>
+          <dd><span [class]="'lp-tag tone-' + statusTone()"><span class="lp-dot"></span>{{ status() }}</span></dd>
+        </div>
+      </dl>
+
+      <div class="lp-card-actions">
+        @if (isClosed()) {
+          <button type="button" class="lp-btn lp-btn-sm" (click)="reopen()">Reopen lead</button>
+        } @else {
+          <span class="lp-actions-label">Close lead</span>
+          <button type="button" class="lp-btn lp-btn-sm" (click)="close('Lost')">Mark lost</button>
+          <button type="button" class="lp-btn lp-btn-sm" (click)="close('Dormant')">Mark dormant</button>
+        }
+      </div>
+    </section>
+
+    <!-- notes -->
+    <section class="lp-card" aria-labelledby="lp-notes">
+      <header class="lp-card-head">
+        <span class="lp-card-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('note')" /></svg></span>
+        <div>
+          <h2 id="lp-notes">Notes from capture</h2>
+          <p>Useful context for the next conversation</p>
+        </div>
+      </header>
+      @if (lead().notes) {
+        <p class="lp-notes">{{ lead().notes }}</p>
+      } @else {
+        <p class="lp-notes is-empty">No notes were entered.</p>
+      }
+    </section>
+  </aside>
+</div>
+
+<!-- ============================== FOOTER ============================== -->
+<app-footer />
+
+@if (toast(); as t) {
+  <div class="lp-toast" role="status">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+    {{ t }}
+  </div>
+}
