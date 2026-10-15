@@ -1,0 +1,717 @@
+<!-- ============================== PAGE HEAD ============================== -->
+<header class="cp-pagehead">
+  <div>
+    <h1>Campaigns</h1>
+    <p>A campaign groups donations under one fund or programme, with its own target, dates and public wording.</p>
+  </div>
+  <button type="button" class="cp-btn" (click)="back.emit()">
+    <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('back')" /></svg>
+  Back
+  </button>
+</header>
+
+<!-- ============================== CREATE CARD ============================== -->
+<section class="cp-create">
+  <div>
+    <span class="cp-eyebrow">Add campaign record</span>
+    <h2>Create campaign</h2>
+    <p>A permanent campaign ID is generated when you launch. The campaign code is locked after launch.</p>
+  </div>
+  <div class="cp-create-actions">
+    <span class="cp-pill">New record</span>
+    <!-- <button type="button" class="cp-btn" (click)="back.emit()">Back to records</button> -->
+  </div>
+</section>
+
+<!-- ============================== LAYOUT ============================== -->
+<div class="cp-layout">
+  <!-- ---------- left: section index ---------- -->
+  <aside class="cp-index" aria-label="Campaign sections">
+    <span class="cp-index-title">Campaign sections</span>
+    <nav class="cp-index-list">
+      @for (s of sections; track s.id) {
+        <button
+          type="button"
+          class="cp-index-item"
+          [class.is-current]="currentSection() === s.id"
+          [class.is-done]="sectionDone(s)"
+          [class.has-error]="sectionHasError(s)"
+          [attr.aria-current]="currentSection() === s.id ? 'step' : null"
+          (click)="goTo(s.id)">
+          <span class="cp-index-no">
+            @if (sectionDone(s)) {
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+            } @else {
+              {{ s.no }}
+            }
+          </span>
+          <span class="cp-index-copy">
+            <span class="cp-index-name">{{ s.title }}</span>
+            @if (s.fields.length) {
+              <small>{{ sectionFilled(s) }} / {{ s.fields.length }} complete</small>
+            } @else {
+              <small>{{ ready() ? 'Ready to launch' : 'Waiting for details' }}</small>
+            }
+          </span>
+        </button>
+      }
+    </nav>
+
+    <div class="cp-required">
+      <span class="cp-index-title">Required inputs</span>
+      <strong class="cp-required-count">{{ filledCount() }} / {{ requiredTotal }}</strong>
+      <span class="cp-progress" aria-hidden="true">
+        <span [style.width.%]="(filledCount() / requiredTotal) * 100"></span>
+      </span>
+      <p>Presence only. Validation runs when you launch.</p>
+    </div>
+  </aside>
+
+  <!-- ---------- centre: form ---------- -->
+  <div class="cp-main">
+    <!-- ===== 01 BASIC INFORMATION ===== -->
+    <section class="cp-card" data-section="basic" aria-labelledby="cp-s1">
+      <header class="cp-card-head">
+        <span class="cp-num">01</span>
+        <div>
+          <h3 id="cp-s1">Basic information</h3>
+          <p>Campaign identity, dates, amounts and the accountable owner.</p>
+        </div>
+      </header>
+
+      <div class="cp-grid">
+        <!-- campaign name -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-name">Campaign name <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="The name staff and donors will recognise.">?</span>
+          </div>
+          <input id="cp-name" class="cp-input" type="text" maxlength="120" placeholder="Enter the campaign name…"
+                 [class.is-invalid]="showError('name')" [value]="form().name"
+                 (input)="setText('name', $event)" (blur)="touch('name')" />
+          @if (showError('name'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Up to 120 characters.</p>
+          }
+        </div>
+
+        <!-- campaign code -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-code">Campaign code <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="Short unique code used on receipts. Locked after launch.">?</span>
+          </div>
+          <input id="cp-code" class="cp-input cp-mono" type="text" placeholder="e.g. EDU2025"
+                 [class.is-invalid]="showError('code')" [value]="form().code"
+                 (input)="setCode($event)" (blur)="touch('code')" />
+          @if (showError('code'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Capital letters, numbers and hyphens.</p>
+          }
+        </div>
+
+        <!-- start date -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" id="cp-start-label">Start date <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="The day the campaign can start collecting.">?</span>
+          </div>
+          <div class="cp-dd" data-menu>
+            <button type="button" class="cp-input cp-trigger" aria-labelledby="cp-start-label"
+                    [class.is-open]="openMenu() === 'start-date'" [class.is-invalid]="showError('startDate')"
+                    [attr.aria-expanded]="openMenu() === 'start-date'" (click)="toggleMenu('start-date', $event)">
+              <span [class.cp-placeholder]="!form().startDate">{{ form().startDate ? displayDate(form().startDate) : 'dd-mm-yyyy' }}</span>
+              <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('calendar')" /></svg>
+            </button>
+            @if (openMenu() === 'start-date') {
+              <ng-container *ngTemplateOutlet="calendar; context: { $implicit: 'start' }" />
+            }
+          </div>
+          @if (showError('startDate'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Today or later.</p>
+          }
+        </div>
+
+        <!-- end date -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" id="cp-end-label">End date <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="Collections close at the end of this day.">?</span>
+          </div>
+          <div class="cp-dd" data-menu>
+            <button type="button" class="cp-input cp-trigger" aria-labelledby="cp-end-label"
+                    [class.is-open]="openMenu() === 'end-date'" [class.is-invalid]="showError('endDate')"
+                    [attr.aria-expanded]="openMenu() === 'end-date'" (click)="toggleMenu('end-date', $event)">
+              <span [class.cp-placeholder]="!form().endDate">{{ form().endDate ? displayDate(form().endDate) : 'dd-mm-yyyy' }}</span>
+              <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('calendar')" /></svg>
+            </button>
+            @if (openMenu() === 'end-date') {
+              <ng-container *ngTemplateOutlet="calendar; context: { $implicit: 'end' }" />
+            }
+          </div>
+          @if (showError('endDate'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Must be after the start date.</p>
+          }
+        </div>
+
+        <!-- campaign amount -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-amount">Campaign amount <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="The standard contribution amount for this campaign.">?</span>
+          </div>
+          <div class="cp-affix" [class.is-invalid]="showError('amount')">
+            <span class="cp-prefix">INR</span>
+            <input id="cp-amount" type="text" inputmode="decimal" placeholder="e.g. 5000.00"
+                   [value]="form().amount" (input)="setMoney('amount', $event)" (blur)="touch('amount')" />
+          </div>
+          @if (showError('amount'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Up to two decimal places.</p>
+          }
+        </div>
+
+        <!-- target amount -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-target">Target amount <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="The total the campaign aims to raise.">?</span>
+          </div>
+          <div class="cp-affix" [class.is-invalid]="showError('target')">
+            <span class="cp-prefix">INR</span>
+            <input id="cp-target" type="text" inputmode="decimal" placeholder="e.g. 1000000.00"
+                   [value]="form().target" (input)="setMoney('target', $event)" (blur)="touch('target')" />
+          </div>
+          @if (showError('target'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Not lower than the campaign amount.</p>
+          }
+        </div>
+
+        <!-- fund or programme -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-fund">Fund or programme <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="Donations are booked against this fund.">?</span>
+          </div>
+          <input id="cp-fund" class="cp-input" type="text" placeholder="e.g. Education Fund 2025"
+                 [class.is-invalid]="showError('fund')" [value]="form().fund"
+                 (input)="setText('fund', $event)" (blur)="touch('fund')" />
+          @if (showError('fund'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Uses a linked fund record.</p>
+          }
+        </div>
+
+        <!-- owner (searchable) -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-owner">Owner <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="The employee accountable for this campaign.">?</span>
+          </div>
+          <div class="cp-dd" data-menu>
+            <div class="cp-input cp-combo" [class.is-open]="openMenu() === 'owner'" [class.is-invalid]="showError('owner')">
+              <svg class="cp-ico cp-ico-muted" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
+              <input id="cp-owner" type="text" autocomplete="off" role="combobox" aria-controls="cp-owner-list"
+                     [attr.aria-expanded]="openMenu() === 'owner'"
+                     [placeholder]="owner() ? owner()!.name : 'Search eligible owners in scope…'"
+                     [class.has-value]="owner()"
+                     [value]="openMenu() === 'owner' ? ownerQuery() : (owner()?.name ?? '')"
+                     (focus)="openCombo('owner')" (click)="openCombo('owner')"
+                     (input)="search('owner', $event)" (keydown)="menuKey($event, 'owner')" />
+              <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+            </div>
+            @if (openMenu() === 'owner') {
+              <ul class="cp-menu" id="cp-owner-list" role="listbox">
+                @for (o of filteredOwners(); track o.id; let i = $index) {
+                  <li role="option" [attr.aria-selected]="o.id === form().ownerId"
+                      [class.is-active]="i === activeIndex()" [class.is-selected]="o.id === form().ownerId"
+                      (mouseenter)="activeIndex.set(i)" (mousedown)="$event.preventDefault()" (click)="pickOwner(o)">
+                    <span class="cp-avatar">{{ o.name.charAt(0) }}</span>
+                    <span class="cp-opt-copy"><b>{{ o.name }}</b><small>{{ o.role }}</small></span>
+                    @if (o.id === form().ownerId) {
+                      <svg class="cp-ico cp-tick" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+                    }
+                  </li>
+                } @empty {
+                  <li class="cp-empty">No owner matches “{{ ownerQuery() }}”.</li>
+                }
+              </ul>
+            }
+          </div>
+          @if (showError('owner'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">{{ owner() ? owner()!.role : 'Uses a linked employee record.' }}</p>
+          }
+        </div>
+
+        <!-- purpose -->
+        <div class="cp-field cp-span">
+          <ng-container *ngTemplateOutlet="editor; context: { $implicit: editors.purpose }" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 02 LOCATION & REMINDER ===== -->
+    <section class="cp-card" data-section="location" aria-labelledby="cp-s2">
+      <header class="cp-card-head">
+        <span class="cp-num">02</span>
+        <div>
+          <h3 id="cp-s2">Location &amp; reminder</h3>
+          <p>Where the campaign runs and the pre-launch reminder.</p>
+        </div>
+      </header>
+
+      <div class="cp-grid">
+        <!-- country (searchable) -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-country">Country <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="Country where the campaign collects donations.">?</span>
+          </div>
+          <div class="cp-dd" data-menu>
+            <div class="cp-input cp-combo" [class.is-open]="openMenu() === 'country'" [class.is-invalid]="showError('country')">
+              <svg class="cp-ico cp-ico-muted" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
+              <input id="cp-country" type="text" autocomplete="off" role="combobox" aria-controls="cp-country-list"
+                     [attr.aria-expanded]="openMenu() === 'country'"
+                     [placeholder]="form().country ?? 'Search and select a country…'"
+                     [class.has-value]="form().country"
+                     [value]="openMenu() === 'country' ? countryQuery() : (form().country ?? '')"
+                     (focus)="openCombo('country')" (click)="openCombo('country')"
+                     (input)="search('country', $event)" (keydown)="menuKey($event, 'country')" />
+              <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+            </div>
+            @if (openMenu() === 'country') {
+              <ul class="cp-menu" id="cp-country-list" role="listbox">
+                @for (c of filteredCountries(); track c; let i = $index) {
+                  <li role="option" [attr.aria-selected]="c === form().country"
+                      [class.is-active]="i === activeIndex()" [class.is-selected]="c === form().country"
+                      (mouseenter)="activeIndex.set(i)" (mousedown)="$event.preventDefault()" (click)="pickCountry(c)">
+                    <span class="cp-opt-copy">{{ c }}</span>
+                    @if (c === form().country) {
+                      <svg class="cp-ico cp-tick" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+                    }
+                  </li>
+                } @empty {
+                  <li class="cp-empty">No country matches “{{ countryQuery() }}”.</li>
+                }
+              </ul>
+            }
+          </div>
+          @if (showError('country'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Type to search.</p>
+          }
+        </div>
+
+        <!-- state -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" id="cp-state-label">State</label>
+          </div>
+          <div class="cp-dd" data-menu>
+            <button type="button" class="cp-input cp-trigger" aria-labelledby="cp-state-label" aria-haspopup="listbox"
+                    [disabled]="!form().country" [class.is-open]="openMenu() === 'state'"
+                    [attr.aria-expanded]="openMenu() === 'state'"
+                    (click)="toggleMenu('state', $event)" (keydown)="menuKey($event, 'state')">
+              <span [class.cp-placeholder]="!form().state">{{ form().state ?? (form().country ? 'Choose…' : 'Select a country first') }}</span>
+              <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+            </button>
+            @if (openMenu() === 'state') {
+              <ul class="cp-menu" role="listbox">
+                @for (s of states(); track s; let i = $index) {
+                  <li role="option" [attr.aria-selected]="s === form().state"
+                      [class.is-active]="i === activeIndex()" [class.is-selected]="s === form().state"
+                      (mouseenter)="activeIndex.set(i)" (click)="pickState(s)">
+                    <span class="cp-opt-copy">{{ s }}</span>
+                    @if (s === form().state) {
+                      <svg class="cp-ico cp-tick" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <p class="cp-hint">Optional.</p>
+        </div>
+
+        <!-- city -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" id="cp-city-label">City</label>
+          </div>
+          <div class="cp-dd" data-menu>
+            <button type="button" class="cp-input cp-trigger" aria-labelledby="cp-city-label" aria-haspopup="listbox"
+                    [disabled]="!form().state" [class.is-open]="openMenu() === 'city'"
+                    [attr.aria-expanded]="openMenu() === 'city'"
+                    (click)="toggleMenu('city', $event)" (keydown)="menuKey($event, 'city')">
+              <span [class.cp-placeholder]="!form().city">{{ form().city ?? (form().state ? 'Choose…' : 'Select a state first') }}</span>
+              <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+            </button>
+            @if (openMenu() === 'city') {
+              <ul class="cp-menu" role="listbox">
+                @for (c of cities(); track c; let i = $index) {
+                  <li role="option" [attr.aria-selected]="c === form().city"
+                      [class.is-active]="i === activeIndex()" [class.is-selected]="c === form().city"
+                      (mouseenter)="activeIndex.set(i)" (click)="pickCity(c)">
+                    <span class="cp-opt-copy">{{ c }}</span>
+                    @if (c === form().city) {
+                      <svg class="cp-ico cp-tick" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <p class="cp-hint">Optional.</p>
+        </div>
+
+        <!-- zip -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-zip">Zip code <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="Postal code of the campaign location.">?</span>
+          </div>
+          <input id="cp-zip" class="cp-input" type="text" maxlength="10" placeholder="e.g. 600001"
+                 [class.is-invalid]="showError('zip')" [value]="form().zip"
+                 (input)="setText('zip', $event)" (blur)="touch('zip')" />
+          @if (showError('zip'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">3–10 characters.</p>
+          }
+        </div>
+
+        <!-- lifecycle activation -->
+        <div class="cp-field cp-span">
+          <div class="cp-label-row">
+            <span class="cp-label" id="cp-activation-label">Lifecycle activation</span>
+            <span class="cp-help" tabindex="0" data-tip="Decides how a Scheduled campaign becomes Active.">?</span>
+          </div>
+          <div class="cp-choices" role="radiogroup" aria-labelledby="cp-activation-label">
+            <button type="button" role="radio" class="cp-choice"
+                    [class.is-selected]="form().activation === 'auto'" [attr.aria-checked]="form().activation === 'auto'"
+                    (click)="setActivation('auto')">
+              <span class="cp-radio" aria-hidden="true"></span>
+              <span class="cp-choice-copy">
+                <b>Auto-activate</b>
+                <small>Automatically becomes Active on the start date once Scheduled.</small>
+              </span>
+            </button>
+            <button type="button" role="radio" class="cp-choice"
+                    [class.is-selected]="form().activation === 'manual'" [attr.aria-checked]="form().activation === 'manual'"
+                    (click)="setActivation('manual')">
+              <span class="cp-radio" aria-hidden="true"></span>
+              <span class="cp-choice-copy">
+                <b>Manual activate</b>
+                <small>Stays Scheduled until someone explicitly activates it.</small>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- days before start -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <label class="cp-label" for="cp-days">Days before start date <span class="cp-req">*</span></label>
+            <span class="cp-help" tabindex="0" data-tip="How many days before the start the owner is reminded.">?</span>
+          </div>
+          <div class="cp-affix" [class.is-invalid]="showError('daysBefore')">
+            <input id="cp-days" type="text" inputmode="numeric" placeholder="e.g. 3"
+                   [value]="form().daysBefore" (input)="setDays($event)" (blur)="touch('daysBefore')" />
+            <span class="cp-suffix">days</span>
+          </div>
+          @if (showError('daysBefore'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">0 sends the reminder on the start date.</p>
+          }
+        </div>
+
+        <!-- reminder time -->
+        <div class="cp-field">
+          <div class="cp-label-row">
+            <span class="cp-label" id="cp-time-label">Reminder time <span class="cp-req">*</span></span>
+            <span class="cp-help" tabindex="0" data-tip="Time of day the reminder is sent.">?</span>
+          </div>
+          <div class="cp-time" role="group" aria-labelledby="cp-time-label" [class.is-invalid]="showError('reminder')">
+            <div class="cp-dd" data-menu>
+              <button type="button" class="cp-time-part" aria-label="Hour" aria-haspopup="listbox"
+                      [class.is-open]="openMenu() === 'hour'" [attr.aria-expanded]="openMenu() === 'hour'"
+                      (click)="toggleMenu('hour', $event)" (keydown)="menuKey($event, 'hour')">
+                <span [class.cp-placeholder]="!form().remHour">{{ form().remHour ?? 'HH' }}</span>
+                <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+              </button>
+              @if (openMenu() === 'hour') {
+                <ul class="cp-menu cp-menu-narrow" role="listbox">
+                  @for (h of hours; track h; let i = $index) {
+                    <li role="option" [attr.aria-selected]="h === form().remHour"
+                        [class.is-active]="i === activeIndex()" [class.is-selected]="h === form().remHour"
+                        (mouseenter)="activeIndex.set(i)" (click)="pickHour(h)">{{ h }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <span class="cp-time-colon">:</span>
+            <div class="cp-dd" data-menu>
+              <button type="button" class="cp-time-part" aria-label="Minute" aria-haspopup="listbox"
+                      [class.is-open]="openMenu() === 'minute'" [attr.aria-expanded]="openMenu() === 'minute'"
+                      (click)="toggleMenu('minute', $event)" (keydown)="menuKey($event, 'minute')">
+                <span [class.cp-placeholder]="!form().remMinute">{{ form().remMinute ?? 'MM' }}</span>
+                <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+              </button>
+              @if (openMenu() === 'minute') {
+                <ul class="cp-menu cp-menu-narrow" role="listbox">
+                  @for (m of minutes; track m; let i = $index) {
+                    <li role="option" [attr.aria-selected]="m === form().remMinute"
+                        [class.is-active]="i === activeIndex()" [class.is-selected]="m === form().remMinute"
+                        (mouseenter)="activeIndex.set(i)" (click)="pickMinute(m)">{{ m }}</li>
+                  }
+                </ul>
+              }
+            </div>
+            <span class="cp-seg" role="group" aria-label="AM or PM">
+              <button type="button" [class.is-on]="form().remPeriod === 'AM'" [attr.aria-pressed]="form().remPeriod === 'AM'" (click)="setPeriod('AM')">AM</button>
+              <button type="button" [class.is-on]="form().remPeriod === 'PM'" [attr.aria-pressed]="form().remPeriod === 'PM'" (click)="setPeriod('PM')">PM</button>
+            </span>
+          </div>
+          @if (showError('reminder'); as err) {
+            <p class="cp-error">{{ err }}</p>
+          } @else {
+            <p class="cp-hint">Sent to the campaign owner.</p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 03 PUBLICATION & NOTICE ===== -->
+    <section class="cp-card" data-section="publication" aria-labelledby="cp-s3">
+      <header class="cp-card-head">
+        <span class="cp-num">03</span>
+        <div>
+          <h3 id="cp-s3">Publication &amp; notice</h3>
+          <p>Public description and donor-facing terms.</p>
+        </div>
+      </header>
+
+      <div class="cp-grid">
+        <div class="cp-field cp-span">
+          <ng-container *ngTemplateOutlet="editor; context: { $implicit: editors.publicDescription }" />
+        </div>
+        <div class="cp-field cp-span">
+          <ng-container *ngTemplateOutlet="editor; context: { $implicit: editors.terms }" />
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===== ACTION BAR ===== -->
+    <footer class="cp-actionbar">
+      <p>Check every detail above before you launch — launching schedules this campaign.</p>
+      <div class="cp-actionbar-btns">
+        <button type="button" class="cp-btn" (click)="discard()">
+          <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('close')" /></svg>
+          Discard
+        </button>
+        <button type="button" class="cp-btn cp-btn-primary" (click)="launch()">
+          <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+          Launch campaign
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ---------- right: info ---------- -->
+  <aside class="cp-info" aria-label="About this record">
+    <section>
+      <h4>
+        <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('info')" /></svg>
+        Why this record exists
+      </h4>
+      <p>A campaign ties every donation to one fund or programme, with a target, a time window and the wording donors see. Receipts and reports follow the campaign code.</p>
+    </section>
+
+    <section>
+      <h4>Protected core</h4>
+      <p>The campaign ID stays permanent and the code is locked after launch. Dates, amounts and wording can change later with a recorded reason.</p>
+    </section>
+
+    <section>
+      <h4>Where it connects</h4>
+      <ul class="cp-connects">
+        <li><svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('fund')" /></svg>Funds &amp; programmes</li>
+        <li><svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('donor')" /></svg>Donors &amp; leads</li>
+        <li><svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('receipt')" /></svg>Payments &amp; receipts</li>
+        <li><svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('user')" /></svg>Employees</li>
+      </ul>
+    </section>
+
+    <div class="cp-note">
+      <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('clock')" /></svg>
+      @if (form().activation === 'auto') {
+        <p>Auto-activate is on — the campaign becomes Active on its start date once it is Scheduled.</p>
+      } @else {
+        <p>Manual activate is on — the campaign stays Scheduled until someone explicitly activates it.</p>
+      }
+    </div>
+  </aside>
+</div>
+
+@if (toast(); as t) {
+  <div class="cp-toast" [class.is-warn]="t.tone === 'warn'" role="status">
+    <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(t.tone === 'ok' ? 'check' : 'alert')" /></svg>
+    {{ t.text }}
+  </div>
+}
+
+<!-- ============================== TEMPLATES ============================== -->
+
+<!-- custom date picker (shared by start / end) -->
+<ng-template #calendar let-which>
+  <div class="cp-cal" role="dialog" [attr.aria-label]="which === 'start' ? 'Choose start date' : 'Choose end date'">
+    <div class="cp-cal-head">
+      <button type="button" class="cp-cal-nav" aria-label="Previous month" (click)="shiftMonth(-1, $event)">
+        <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('left')" /></svg>
+      </button>
+      <strong>{{ calTitle() }}</strong>
+      <button type="button" class="cp-cal-nav" aria-label="Next month" (click)="shiftMonth(1, $event)">
+        <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('right')" /></svg>
+      </button>
+    </div>
+    <div class="cp-cal-grid">
+      @for (w of weekdays; track w) {
+        <span class="cp-cal-wd">{{ w }}</span>
+      }
+      @for (d of calDays(); track d.iso) {
+        <button type="button" class="cp-cal-day"
+                [class.is-out]="!d.inMonth" [class.is-today]="d.today" [class.is-selected]="d.selected"
+                [disabled]="d.disabled" [attr.aria-pressed]="d.selected" [attr.aria-label]="shortDate(d.iso)"
+                (click)="pickDate(d)">{{ d.day }}</button>
+      }
+    </div>
+    <div class="cp-cal-foot">
+      <button type="button" class="cp-link" (click)="clearDate()">Clear</button>
+      @if (which === 'start') {
+        <button type="button" class="cp-link" (click)="pickToday()">Today</button>
+      }
+    </div>
+  </div>
+</ng-template>
+
+<!-- rich text editor (purpose / public description / terms) -->
+<ng-template #editor let-cfg>
+  <div class="cp-label-row">
+    <span class="cp-label" [id]="'cp-' + cfg.key + '-label'">{{ cfg.label }} <span class="cp-req">*</span></span>
+    <span class="cp-label-tools">
+      <span class="cp-help" tabindex="0" [attr.data-tip]="cfg.help">?</span>
+      <button type="button" class="cp-preview-btn" [class.is-on]="isPreview(cfg.key)"
+              [attr.aria-pressed]="isPreview(cfg.key)" (click)="togglePreview(cfg.key)">
+        <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(isPreview(cfg.key) ? 'pen' : 'eye')" /></svg>
+        {{ isPreview(cfg.key) ? 'Edit' : 'Preview' }}
+      </button>
+    </span>
+  </div>
+
+  <div class="cp-rt" [class.is-invalid]="showError(cfg.key)" [class.is-preview]="isPreview(cfg.key)">
+    @if (!isPreview(cfg.key)) {
+      <div class="cp-rt-bar" role="toolbar" [attr.aria-label]="cfg.label + ' formatting'" (mousedown)="$event.preventDefault()">
+        <button type="button" class="cp-tb" title="Bold" aria-label="Bold" [class.is-on]="isMarked(cfg.key, 'b')" (click)="exec(cfg.key, ed, 'bold')"><b>B</b></button>
+        <button type="button" class="cp-tb" title="Italic" aria-label="Italic" [class.is-on]="isMarked(cfg.key, 'i')" (click)="exec(cfg.key, ed, 'italic')"><i>I</i></button>
+        <button type="button" class="cp-tb" title="Underline" aria-label="Underline" [class.is-on]="isMarked(cfg.key, 'u')" (click)="exec(cfg.key, ed, 'underline')"><u>U</u></button>
+        <span class="cp-tb-sep"></span>
+        <button type="button" class="cp-tb cp-tb-text" title="Bulleted list" (click)="exec(cfg.key, ed, 'insertUnorderedList')">• List</button>
+        <button type="button" class="cp-tb cp-tb-text" title="Numbered list" (click)="exec(cfg.key, ed, 'insertOrderedList')">1. List</button>
+        <span class="cp-tb-sep"></span>
+        <button type="button" class="cp-tb" title="Align left" aria-label="Align left" (click)="exec(cfg.key, ed, 'justifyLeft')">
+          <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('alignLeft')" /></svg>
+        </button>
+        <button type="button" class="cp-tb" title="Align centre" aria-label="Align centre" (click)="exec(cfg.key, ed, 'justifyCenter')">
+          <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('alignCenter')" /></svg>
+        </button>
+        <button type="button" class="cp-tb" title="Align right" aria-label="Align right" (click)="exec(cfg.key, ed, 'justifyRight')">
+          <svg class="cp-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('alignRight')" /></svg>
+        </button>
+        <span class="cp-tb-sep"></span>
+
+        <!-- size -->
+        <div class="cp-dd" data-menu>
+          <button type="button" class="cp-tb cp-tb-text cp-tb-menu" [class.is-open]="openMenu() === 'size-' + cfg.key"
+                  (click)="toggleMenu('size-' + cfg.key, $event)">
+            Size <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+          </button>
+          @if (openMenu() === 'size-' + cfg.key) {
+            <ul class="cp-menu cp-menu-tool" role="menu">
+              @for (c of sizeChoices; track c.value) {
+                <li role="menuitem" (click)="pickEditorChoice(cfg.key, ed, 'fontSize', c)">{{ c.label }}</li>
+              }
+            </ul>
+          }
+        </div>
+
+        <!-- font -->
+        <div class="cp-dd" data-menu>
+          <button type="button" class="cp-tb cp-tb-text cp-tb-menu" [class.is-open]="openMenu() === 'font-' + cfg.key"
+                  (click)="toggleMenu('font-' + cfg.key, $event)">
+            Font <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+          </button>
+          @if (openMenu() === 'font-' + cfg.key) {
+            <ul class="cp-menu cp-menu-tool" role="menu">
+              @for (c of fontChoices; track c.value) {
+                <li role="menuitem" [style.font-family]="c.value" (click)="pickEditorChoice(cfg.key, ed, 'fontName', c)">{{ c.label }}</li>
+              }
+            </ul>
+          }
+        </div>
+
+        <!-- block style -->
+        <div class="cp-dd" data-menu>
+          <button type="button" class="cp-tb cp-tb-text cp-tb-menu" [class.is-open]="openMenu() === 'block-' + cfg.key"
+                  (click)="toggleMenu('block-' + cfg.key, $event)">
+            {{ blockOf(cfg.key) }} <svg class="cp-ico cp-chev" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron')" /></svg>
+          </button>
+          @if (openMenu() === 'block-' + cfg.key) {
+            <ul class="cp-menu cp-menu-tool" role="menu">
+              @for (c of blockChoices; track c.value) {
+                <li role="menuitem" [class.is-selected]="blockOf(cfg.key) === c.label" (click)="pickBlock(cfg.key, ed, c)">{{ c.label }}</li>
+              }
+            </ul>
+          }
+        </div>
+
+        <button type="button" class="cp-tb cp-tb-text" title="Clear formatting" (click)="exec(cfg.key, ed, 'removeFormat')">Clear</button>
+      </div>
+    }
+
+    <div #ed class="cp-rt-area" role="textbox" aria-multiline="true"
+         [attr.aria-labelledby]="'cp-' + cfg.key + '-label'"
+         [attr.contenteditable]="isPreview(cfg.key) ? 'false' : 'true'"
+         [attr.data-placeholder]="cfg.placeholder"
+         (input)="onEditorInput(cfg.key, ed)"
+         (beforeinput)="onBeforeInput(cfg.key, $event)"
+         (paste)="onPaste(cfg.key, $event)"
+         (keyup)="readMarks(cfg.key)" (mouseup)="readMarks(cfg.key)"
+         (blur)="editorBlur(cfg.key)"></div>
+  </div>
+
+  <div class="cp-rt-foot">
+    @if (showError(cfg.key); as err) {
+      <p class="cp-error">{{ err }}</p>
+    } @else {
+      <p class="cp-hint">{{ cfg.hint }}</p>
+    }
+    <span class="cp-count" [class.is-full]="charCount(cfg.key) >= cfg.max">
+      {{ charCount(cfg.key).toLocaleString('en-IN') }} / {{ cfg.max.toLocaleString('en-IN') }} characters
+    </span>
+  </div>
+</ng-template>

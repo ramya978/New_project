@@ -160,11 +160,22 @@ export class ThemeSettings {
   }
 
   // ---- edits ----
-  protected set<K extends keyof ThemePrefs>(key: K, value: ThemePrefs[K]): void {
-    this.service.patch({ [key]: value } as Partial<ThemePrefs>);
+  /**
+   * Apply a change, persist it straight away and refresh the snapshot the footer compares against.
+   * Theme edits therefore stick the moment they are picked - no Save required - and closing the
+   * panel never rolls them back (the old preview-only flow silently reverted every change).
+   */
+  private apply(partial: Partial<ThemePrefs>): void {
+    this.service.patch(partial);
+    this.service.save();
+    this.saved = { ...this.service.prefs() };
   }
 
-  /** Apply the colour; a non-preset pick is remembered in the custom swatch list (saved on Save). */
+  protected set<K extends keyof ThemePrefs>(key: K, value: ThemePrefs[K]): void {
+    this.apply({ [key]: value } as Partial<ThemePrefs>);
+  }
+
+  /** Apply the colour; a non-preset pick is remembered in the custom swatch list (persisted immediately). */
   protected setSwatch(key: SwatchKey, value: string): void {
     const base = this.baseFor(key);
     const patch: Record<string, unknown> = { [key]: value };
@@ -180,17 +191,17 @@ export class ThemeSettings {
     // a hand-picked theme colour replaces the appearance palette
     if (key === 'themeColor') patch['palette'] = null;
 
-    this.service.patch(patch as Partial<ThemePrefs>);
+    this.apply(patch as Partial<ThemePrefs>);
   }
 
   /** Appearance palette: sets the theme colour plus the palette's own hover and pressed tones. */
   protected setPalette(p: ThemePalette): void {
-    this.service.patch({ palette: p.id, themeColor: p.accent });
+    this.apply({ palette: p.id, themeColor: p.accent });
   }
 
   /** Back to a plain Theme Color (keeps the current colour, drops the palette's hover / pressed tones). */
   protected clearPalette(): void {
-    this.service.patch({ palette: null });
+    this.apply({ palette: null });
   }
 
   /** Clock presentation applies straight away (the clock keeps its own saved settings). */
@@ -235,6 +246,8 @@ export class ThemeSettings {
 
   protected reset(): void {
     this.service.reset();
+    this.service.save();
+    this.saved = { ...this.service.prefs() };
   }
 
   protected close(): void {

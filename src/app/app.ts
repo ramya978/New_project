@@ -10,6 +10,8 @@ export interface Organisation {
   subdomain: string;
   status: 'Active' | 'Review only';
   mark: string;
+  /** Shown under the name with the subdomain ("globalrelief · Chennai, India"). */
+  location: string;
 }
 
 type HeaderIcon =
@@ -28,10 +30,10 @@ interface Note {
 }
 
 const ORGANISATIONS: Organisation[] = [
-  { id: 'globalrelief', name: 'Global Relief Foundation', subdomain: 'globalrelief', status: 'Review only', mark: 'G' },
-  { id: 'helpageindia', name: 'HelpAge India', subdomain: 'helpageindia', status: 'Active', mark: 'H' },
-  { id: 'smilefoundation', name: 'Smile Foundation', subdomain: 'smilefoundation', status: 'Active', mark: 'S' },
-  { id: 'unityforchange', name: 'Unity for Change', subdomain: 'unityforchange', status: 'Review only', mark: 'U' }
+  { id: 'globalrelief', name: 'Global Relief Foundation', subdomain: 'globalrelief', status: 'Review only', mark: 'G', location: 'Chennai, India' },
+  { id: 'helpageindia', name: 'HelpAge India', subdomain: 'helpageindia', status: 'Active', mark: 'H', location: 'New Delhi, India' },
+  { id: 'smilefoundation', name: 'Smile Foundation', subdomain: 'smilefoundation', status: 'Active', mark: 'S', location: 'New Delhi, India' },
+  { id: 'unityforchange', name: 'Unity for Change', subdomain: 'unityforchange', status: 'Review only', mark: 'U', location: 'Mumbai, India' }
 ];
 
 const NOTES: Note[] = [
@@ -95,7 +97,9 @@ export class App {
   protected readonly filteredOrgs = computed(() => {
     const q = this.orgQuery().trim().toLowerCase();
     const list = this.organisations();
-    return q ? list.filter((o) => o.name.toLowerCase().includes(q) || o.subdomain.toLowerCase().includes(q)) : list;
+    return q
+      ? list.filter((o) => [o.name, o.subdomain, o.location].some((v) => v.toLowerCase().includes(q)))
+      : list;
   });
 
   // ---- notifications ----------------------------------------------------------------------------

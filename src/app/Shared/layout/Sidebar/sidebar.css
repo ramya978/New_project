@@ -17,10 +17,15 @@
   --nav-active-ink: color-mix(in srgb, var(--nav-primary) 50%, #000);  /* current page text + icon */
   --nav-open-bg: color-mix(in srgb, var(--nav-primary) 4%, #fff);      /* open / holding menu pill */
   /* hover + pressed: an appearance palette (Theme Settings → Workspace) brings its own tones in
-     --theme-hover / --theme-press; without one they follow the primary colour */
+     --theme-hover / --theme-press; without one they follow the primary colour.
+     Derivations mirror the OtoSolve reference: hover 12%, selected-hover 19%, press 21%,
+     selected-press 26%; the *-ink tones darken the same colour for readable text. */
   --nav-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 12%, #fff);
   --nav-hover-ink: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 50%, #000);
   --nav-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 21%, #fff);
+  --nav-press-ink: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 50%, #000);
+  --nav-selected-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 19%, #fff);
+  --nav-selected-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 26%, #fff);
 
   /* text + lines */
   --nav-font: var(--font-menu, Inter, "Segoe UI", Arial, sans-serif); /* Theme Settings → Menu font */
@@ -162,14 +167,18 @@
   transition: background-color .16s ease, color .16s ease
 }
 
-.nav-link:hover {
+/* hover + keyboard focus: the palette's hover tint + its dark ink (OtoSolve reference) */
+.nav-link:is(:hover, :focus-visible),
+.nav-child:is(:hover, :focus-visible) {
   background: var(--nav-hover);
   color: var(--nav-hover-ink)
 }
 
+/* pressed: the palette's pressed tone + its dark ink */
 .nav-link:active,
 .nav-child:active {
-  background: var(--nav-press)
+  background: var(--nav-press);
+  color: var(--nav-press-ink)
 }
 
 .nav-link:focus-visible,
@@ -249,11 +258,19 @@
 }
 
 /* CURRENT PAGE (top row): light-primary pill, dark-primary semibold text + icon */
-.nav-link.active,
-.nav-link.active:hover {
+.nav-link.active {
   background: var(--nav-active-bg);
   color: var(--nav-active-ink);
   font-weight: 500
+}
+
+/* the selected pill deepens slightly on hover / press, like the reference */
+.nav-link.active:is(:hover, :focus-visible) {
+  background: var(--nav-selected-hover)
+}
+
+.nav-link.active:active {
+  background: var(--nav-selected-press)
 }
 
 .nav-link.active .nav-ico {
@@ -274,8 +291,9 @@
   font-weight: 550
 }
 
-.nav-entry.has-current > .nav-link:hover {
-  background: var(--nav-hover)
+.nav-entry.has-current > .nav-link:is(:hover, :focus-visible) {
+  background: var(--nav-hover);
+  color: var(--nav-hover-ink)
 }
 
 .nav-entry.has-current > .nav-link .nav-ico {
@@ -348,9 +366,14 @@
   margin-top: 3px
 }
 
-.nav-child:hover {
+.nav-child:is(:hover, :focus-visible) {
   background: var(--nav-hover);
   color: var(--nav-hover-ink)
+}
+
+.nav-child:hover .nav-child-ico,
+.nav-child:focus-visible .nav-child-ico {
+  transform: translateY(-1px)
 }
 
 /* the child's line icon (falls back to a circle when the API sends none) */
@@ -360,7 +383,8 @@
   flex: 0 0 16px;
   width: 16px;
   height: 16px;
-  color: currentColor
+  color: currentColor;
+  transition: transform .16s ease
 }
 
 .nav-child-ico svg {
@@ -382,11 +406,19 @@
 }
 
 /* CURRENT PAGE (child): light-primary pill, dark-primary semibold text + icon */
-.nav-child.active,
-.nav-child.active:hover {
+.nav-child.active {
   background: var(--nav-active-bg);
   color: var(--nav-active-ink);
   font-weight: 500
+}
+
+/* the selected pill deepens slightly on hover / press, like the reference */
+.nav-child.active:is(:hover, :focus-visible) {
+  background: var(--nav-selected-hover)
+}
+
+.nav-child.active:active {
+  background: var(--nav-selected-press)
 }
 
 .nav-child.active .nav-child-ico {
@@ -425,7 +457,7 @@
 }
 
 .nav-toggle:hover {
-  background: var(--nav-active-bg)
+  background: var(--nav-hover)
 }
 
 .nav-children.deep {

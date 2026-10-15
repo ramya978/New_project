@@ -1,5 +1,15 @@
 /* YDot Hotel Sales Studio - global styles (original design). The sidebar's own styles are in
    src/app/Shared/layout/sidebar/sidebar.css. */
+
+
+:host button,
+:host input,
+:host select {
+  font: inherit
+}
+
+
+
 :root {
   --ink: #202333;
   --muted: #707788;
@@ -31,7 +41,14 @@
   --line-height: 1.5;
   --btn-radius: 8px;
   --icon-color: #6a7083;
-  --heading-color: #202333
+  --heading-color: #202333;
+
+  /* hover tint derived from the appearance palette's hover tone (Theme Settings -> Workspace).
+     Falls back to the accent colour when no palette is active. The header org selector, its rows
+     and menu rows use this so a selected palette's hover colour applies across the chrome. */
+  --hover-tint: color-mix(in srgb, var(--theme-hover, var(--accent)) 14%, var(--white));
+  /* softer wash for wide surfaces (table rows) so a palette tint reads without shouting */
+  --hover-subtle: color-mix(in srgb, var(--theme-hover, var(--accent)) 6%, var(--white))
 }
 
 * {
@@ -235,7 +252,7 @@ small {
 
 .btn:hover,
 .icon-btn:hover {
-  background: #f6f6f8
+  background: var(--hover-tint)
 }
 
 .btn.primary {
@@ -245,7 +262,7 @@ small {
 }
 
 .btn.primary:hover {
-  background: #69293c
+  background: color-mix(in srgb, var(--accent) 85%, #000)
 }
 
 .btn.small {
@@ -617,7 +634,8 @@ small {
 
 .tb-org:hover,
 .tb-org.is-open {
-  border-color: var(--accent)
+  border-color: var(--accent);
+  background: var(--hover-tint)
 }
 
 .tb-org .tb-org-glyph {
@@ -770,7 +788,7 @@ small {
 
 .tb-org-row:hover,
 .tb-menu-row:hover {
-  background: #f7f7fa
+  background: var(--hover-tint)
 }
 
 .tb-org-glyph {
@@ -1200,7 +1218,7 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #fcfcfe
+  background: var(--hover-subtle)
 }
 
 td small {
@@ -2367,7 +2385,7 @@ html[data-mode="dark"] .filter-input {
 
 html[data-mode="dark"] .btn:hover,
 html[data-mode="dark"] .icon-btn:hover {
-  background: #232936
+  background: var(--hover-tint)
 }
 
 html[data-mode="dark"] .btn.primary:hover {
@@ -2375,7 +2393,7 @@ html[data-mode="dark"] .btn.primary:hover {
 }
 
 html[data-mode="dark"] tbody tr:hover {
-  background: #191e29
+  background: var(--hover-subtle)
 }
 
 html[data-mode="dark"] .card-foot,
@@ -2401,7 +2419,13 @@ html[data-mode="dark"] .stat .stat-icon {
 
 html[data-mode="dark"] .tb-org-row:hover,
 html[data-mode="dark"] .tb-menu-row:hover {
-  background: #232936
+  background: var(--hover-tint)
+}
+
+/* the open/hovered org selector would otherwise be flattened by the panel background above */
+html[data-mode="dark"] .tb-org:hover,
+html[data-mode="dark"] .tb-org.is-open {
+  background: var(--hover-tint)
 }
 
 html[data-mode="dark"] .ts-none.is-on {
@@ -2421,7 +2445,11 @@ html[data-sidebar="dark"] app-sidebar {
   --nav-sub: #dfe3ee;
   --nav-muted: #a6adbe;
   --nav-line: #ffffff2e;
-  --nav-hover: #ffffff17;
+  /* palette hover over the dark surface: a colour wash; ink brightens instead of darkening */
+  --nav-hover: color-mix(in srgb, var(--theme-hover, #ffffff) 14%, transparent);
+  --nav-hover-ink: color-mix(in srgb, var(--theme-hover, #ffffff) 60%, #f4f6fb);
+  --nav-press: color-mix(in srgb, var(--theme-press, #ffffff) 22%, transparent);
+  --nav-press-ink: color-mix(in srgb, var(--theme-press, #ffffff) 70%, #f4f6fb);
   --nav-active: #9fd6c4
 }
 
@@ -2434,7 +2462,7 @@ html[data-sidebar="light"] app-sidebar {
   --nav-sub: #3a3f4d;
   --nav-muted: #8a909c;
   --nav-line: #dde0e5;
-  --nav-hover: #f5f6f8;
+  /* hover/press tones stay palette-driven from the component's :host block */
   --nav-active: #2f5a49
 }
 
@@ -2559,3 +2587,12 @@ html[data-layout="horizontal"] .nav-children.deep {
 html[data-layout="horizontal"] .nav-children.deep .nav-child {
   padding-left: 16px
 }
+
+
+.pf-hbtn.primary {
+    border-color: var(--pf-primary-ink);
+    background: var(--pf-primary-ink);
+    color: #fff;
+}
+
+

@@ -7,9 +7,13 @@
    ===================================================================================================== */
 .topbar.hd-bar {
   --hd-primary: var(--primary, var(--accent));
-  --hd-soft: color-mix(in srgb, var(--hd-primary) 7%, var(--white));      /* light tiles / pills */
-  --hd-faint: color-mix(in srgb, var(--hd-primary) 9%, var(--white));     /* hover */
-  --hd-press: color-mix(in srgb, var(--hd-primary) 9%, var(--white));     /* pressed */
+  /* selected / expanded tiles - the reference's --oh-selected (accent at 14%) */
+  --hd-soft: color-mix(in srgb, var(--hd-primary) 14%, var(--white));
+  /* hover + pressed follow the appearance palette's tones (Theme Settings -> Workspace),
+     like the OtoSolve reference: hover 12%, press 21%, ink = 50% darken of the hover tone */
+  --hd-faint: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 12%, var(--white));
+  --hd-press: color-mix(in srgb, var(--theme-press, var(--hd-primary)) 21%, var(--white));
+  --hd-hover-ink: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 50%, #000);
   --hd-strong: color-mix(in srgb, var(--hd-primary) 50%, #000);           /* text / icons on tiles */
   --hd-font: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
   --hd-ink: #20364a;
@@ -40,7 +44,8 @@ html[data-mode="dark"] .topbar.hd-bar {
   --hd-heading: var(--ink);
   --hd-muted: var(--muted);
   --hd-line: var(--line);
-  --hd-strong: color-mix(in srgb, var(--hd-primary) 55%, #fff)
+  --hd-strong: color-mix(in srgb, var(--hd-primary) 55%, #fff);
+  --hd-hover-ink: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 60%, #fff)
 }
 
 .hd-bar button,
@@ -77,7 +82,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-toggle:hover {
   background: var(--hd-faint);
-  color: var(--hd-strong)
+  color: var(--hd-hover-ink)
 }
 
 .hd-toggle:active {
@@ -109,7 +114,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-org:hover {
   background: var(--hd-faint);
-  color: var(--hd-strong)
+  color: var(--hd-hover-ink)
 }
 
 .hd-org.is-open {
@@ -246,7 +251,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-x:hover {
   background: var(--hd-faint);
-  color: var(--hd-strong)
+  color: var(--hd-hover-ink)
 }
 
 .hd-x svg {
@@ -255,32 +260,42 @@ html[data-mode="dark"] .topbar.hd-bar {
 }
 
 /* ---- organisation list ----
-   One 8px inset for everything: the search bar, the rows and the footer share the same left edge,
-   so the search icon sits right above the row tiles. */
+   Type follows the OtoSolve document: Inter / Segoe UI · 15px/650 panel title · 12px hint ·
+   13px/550 names · 11px captions · 12px/650 avatar letters · 10px footer.
+   Spacing follows the reference: roomy 20px panel edge for the heading, hint and search,
+   tall rows with a round 40px letter tile, name over "subdomain · location", tick on the right. */
 .hd-org-pop {
   left: 0;
   display: flex;
   flex-direction: column;
-  width: 340px;
+  width: 380px;
   max-width: calc(100vw - 32px);
-  padding: 0
+  padding: 0;
+  border-radius: 16px
 }
 
 /* heading: title + one-line hint (closes by clicking outside or Esc) */
 .hd-org-head {
-  padding: 14px 16px 4px
+  padding: 20px 20px 0
 }
 
-.hd-org-head p {
-  margin-top: 2px;
-  color: var(--hd-muted);
-  font-size: 12px;
+.hd-org-pop .hd-org-head h2 {
+  color: #163247;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -.2px;
   line-height: 1.5
 }
 
+.hd-org-head p {
+  margin-top: 6px;
+  color: var(--hd-muted);
+  font-size: 12px;
+  line-height: 1.6
+}
+
 .hd-org-search {
-  padding: 8px 8px 10px;
-  border-bottom: 1px solid var(--hd-line)
+  padding: 16px 20px 14px
 }
 
 .hd-search {
@@ -292,7 +307,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 .hd-search > svg {
   position: absolute;
   top: 50%;
-  left: 12px;
+  left: 13px;
   width: 16px;
   height: 16px;
   transform: translateY(-50%);
@@ -301,10 +316,10 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-search input {
   width: 100%;
-  height: 38px;
-  padding: 0 34px 0 38px;
+  height: 40px;
+  padding: 0 36px 0 40px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #f4f7f9;
   color: var(--hd-ink);
   font-size: 13px;
@@ -332,7 +347,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 .hd-search-clear {
   position: absolute;
   top: 50%;
-  right: 6px;
+  right: 7px;
   display: grid;
   place-items: center;
   width: 26px;
@@ -344,7 +359,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-search-clear:hover {
   background: var(--hd-faint);
-  color: var(--hd-strong)
+  color: var(--hd-hover-ink)
 }
 
 .hd-search-clear svg {
@@ -353,8 +368,8 @@ html[data-mode="dark"] .topbar.hd-bar {
 }
 
 .hd-org-list {
-  max-height: 280px;
-  padding: 6px 8px;
+  max-height: 340px;
+  padding: 0 6px 8px;
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin
@@ -363,18 +378,18 @@ html[data-mode="dark"] .topbar.hd-bar {
 .hd-org-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
-  min-height: 48px;
-  padding: 7px 8px;
-  border-radius: 8px;
+  min-height: 64px;
+  padding: 12px 14px 12px 12px;
+  border-radius: 12px;
   color: var(--hd-ink);
   text-align: left;
   transition: background-color .15s ease
 }
 
 .hd-org-row + .hd-org-row {
-  margin-top: 2px
+  margin-top: 4px
 }
 
 .hd-org-row:hover {
@@ -382,37 +397,42 @@ html[data-mode="dark"] .topbar.hd-bar {
 }
 
 .hd-org-row.is-current {
-  background: var(--hd-soft);
+  background: color-mix(in srgb, var(--hd-primary) 14%, var(--white));
   color: var(--hd-strong)
 }
 
-/* letter tile: rounded square, same family as the sidebar brand tile */
+/* letter tile: round, soft tint (white-on-tint for the chosen row, like the reference) */
 .hd-org-glyph {
   display: grid;
   place-items: center;
-  flex: 0 0 32px;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--hd-soft);
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--hd-primary) 12%, var(--white));
   color: var(--hd-strong);
-  font-size: 13px;
-  font-weight: 650
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1
 }
 
 .hd-org-row.is-current .hd-org-glyph {
-  background: var(--white)
+  background: transparent
 }
 
 .hd-org-pop .hd-empty {
-  padding: 18px 8px
+  padding: 22px 16px
 }
 
 .hd-org-pop .hd-pop-foot {
-  padding: 9px 16px
+  padding: 10px 20px 12px;
+  font-size: 10px
 }
 
 .hd-org-name {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   flex: 1;
   min-width: 0
 }
@@ -420,17 +440,26 @@ html[data-mode="dark"] .topbar.hd-bar {
 .hd-org-name strong {
   display: block;
   overflow: hidden;
+  color: var(--hd-ink);
   font-size: 13px;
   font-weight: 550;
+  line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap
 }
 
+.hd-org-row.is-current .hd-org-name strong {
+  color: var(--hd-strong)
+}
+
 .hd-org-name small {
   display: block;
+  overflow: hidden;
   color: var(--hd-muted);
   font-size: 11px;
-  line-height: 1.5
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap
 }
 
 .hd-check {
@@ -510,7 +539,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-icon:hover {
   background: var(--hd-faint);
-  color: var(--hd-strong)
+  color: var(--hd-hover-ink)
 }
 
 .hd-icon:active {
@@ -586,7 +615,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-user:hover {
   background: var(--hd-faint);
-  color: var(--hd-strong)
+  color: var(--hd-hover-ink)
 }
 
 .hd-user[aria-expanded="true"] {
@@ -699,7 +728,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 }
 
 .hd-menu-org:hover {
-  background: var(--hd-press)
+  background: var(--hd-faint)
 }
 
 .hd-menu-org-ico svg {
@@ -754,7 +783,7 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-menu-row:hover {
   background: var(--hd-faint);
-  color: var(--hd-strong)
+  color: var(--hd-hover-ink)
 }
 
 .hd-menu-row:active {

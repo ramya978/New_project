@@ -62,7 +62,10 @@
                 <button type="button" class="hd-org-row" role="option" [class.is-current]="org.id === selectedOrg()?.id"
                         [attr.aria-selected]="org.id === selectedOrg()?.id" (click)="chooseOrg(org)">
                   <span class="hd-org-glyph">{{ org.mark }}</span>
-                  <span class="hd-org-name"><strong>{{ org.name }}</strong><small>{{ org.subdomain }}</small></span>
+                  <span class="hd-org-name">
+                    <strong>{{ org.name }}</strong>
+                    <small>{{ org.subdomain }} · {{ org.location }}</small>
+                  </span>
                   @if (org.id === selectedOrg()?.id) {
                     <svg class="hd-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
                   } @else {
