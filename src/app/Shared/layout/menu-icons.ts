@@ -1,20 +1,9 @@
-/* =====================================================================================================
-   MENU ICONS - SVG path data keyed by the API's `icon` name.
-   OtoSolve line icons: 24x24 viewBox, drawn with stroke="currentColor" (no fill), stroke-width 1.5,
-   round caps and joins - the sidebar's <svg> sets those, so each entry is only the `d` attribute.
-   The geometry matches the OtoSolve navigation reference; circles, rects and ellipses are written as
-   path commands, so every icon is a single <path>.
 
-   To add one: draw it on a 24x24 grid in the same thin-line style, convert it to a single `d` string,
-   and add it under the API name.
-   ===================================================================================================== */
 
-/* rounded rectangle as a path: x, y, width, height, corner radius */
 const rect = (x: number, y: number, w: number, h: number, r: number): string =>
   `M${x + r} ${y}h${w - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${h - 2 * r}a${r} ${r} 0 0 1-${r} ${r}` +
   `h-${w - 2 * r}a${r} ${r} 0 0 1-${r}-${r}v-${h - 2 * r}a${r} ${r} 0 0 1 ${r}-${r}z`;
 
-/* circle / ellipse as a path: centre x, centre y, radius x (, radius y) */
 const ellipse = (cx: number, cy: number, rx: number, ry = rx): string =>
   `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0 ${rx} ${ry} 0 1 0-${2 * rx} 0`;
 
@@ -78,6 +67,10 @@ export const MENU_ICONS: Record<string, string> = {
   map: 'M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z M8 2v16 M16 6v16',
   /* Follow-ups / Communication history */
   clock: `${ellipse(12, 12, 9)} M12 6v6l4 2`,
+  /* View campaign: an open eye */
+  eye: `M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z ${ellipse(12, 12, 3)}`,
+  /* Campaign wizard: a magic wand with sparkles */
+  wand: 'M3 21 14 10 M12.5 8.5l3 3 M15 2v3 M15 13v3 M9 8h3 M18 8h3 M10.8 3.8l1.7 1.7 M17.5 10.5l1.7 1.7 M19.2 3.8l-1.7 1.7',
 
   // ---- other common menu icons, ready for new menu entries ----------------------------------------
   settings: `${ellipse(12, 12, 3)} M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z`,
@@ -111,5 +104,4 @@ export const MENU_ICONS: Record<string, string> = {
   check: 'M5 12l4 4L19 6'
 };
 
-/** Used when the API sends an icon name that is not in the list (a plain circle). */
 export const MENU_ICON_FALLBACK = ellipse(12, 12, 9);
