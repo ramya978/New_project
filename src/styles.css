@@ -5,6 +5,8 @@
    .btn-secondary = negative/secondary colour) shared across all screens.
    Imported here so the dev server picks it up through the watched styles.css. */
 @import './app/Shared/styles/common-buttons.css';
+/* Appearance studio hooks: status colours, content width, dark-mode extras, reduce motion */
+@import './app/Shared/styles/theme.css';
 
 
 :host button,
@@ -41,7 +43,7 @@
   --font-menu: Inter, "Segoe UI", Arial, sans-serif;
   --font-heading: Inter, "Segoe UI", Arial, sans-serif;
   --font-number: Inter, "Segoe UI", Arial, sans-serif;
-  --font-size: 13px;
+  --font-size: calc(13px * var(--font-scale, 1));
   --font-weight: 400;
   --line-height: 1.5;
   --btn-radius: 8px;
@@ -120,7 +122,7 @@ p {
 h1 {
   font-family: var(--font-heading);
   color: var(--heading-color);
-  font-size: 27px;
+  font-size: calc(27px * var(--font-scale, 1));
   letter-spacing: -.85px;
   font-weight: 650
 }
@@ -128,7 +130,7 @@ h1 {
 h2 {
   font-family: var(--font-heading);
   color: var(--heading-color);
-  font-size: 15px;
+  font-size: calc(15px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.2px
 }
@@ -136,12 +138,12 @@ h2 {
 h3 {
   font-family: var(--font-heading);
   color: var(--heading-color);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 650
 }
 
 small {
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .muted {
@@ -149,14 +151,14 @@ small {
 }
 
 .tiny {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   letter-spacing: .5px
 }
 
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 1.6px;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 650;
   color: var(--muted)
 }
@@ -247,11 +249,11 @@ small {
   justify-content: center;
   gap: 7px;
   background: var(--white);
-  border: 1px solid #dfe2e9;
+  border: 1px solid var(--line);
   border-radius: var(--btn-radius, 7px);
   padding: 8px 12px;
   font-weight: 550;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   white-space: nowrap
 }
 
@@ -260,19 +262,23 @@ small {
   background: var(--hover-tint)
 }
 
+/* Primary button. Custom colour controls (Theme Settings -> Workspace) override it through
+   --cc-btn / --cc-btn-hover / --cc-btn-ink; the fallbacks keep the accent look unchanged. */
 .btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff
+  background: var(--cc-btn, var(--accent));
+  border-color: var(--cc-btn, var(--accent));
+  color: var(--cc-btn-ink, var(--primary-on, #fff))
 }
 
 .btn.primary:hover {
-  background: color-mix(in srgb, var(--accent) 85%, #000)
+  background: var(--cc-btn-hover, color-mix(in srgb, var(--accent) 85%, #000));
+  border-color: var(--cc-btn-hover, var(--accent));
+  color: var(--cc-btn-hover-ink, var(--primary-on, #fff))
 }
 
 .btn.small {
   padding: 5px 9px;
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .btn.quiet {
@@ -287,7 +293,7 @@ small {
   gap: 4px;
   border-radius: 5px;
   padding: 3px 7px;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   white-space: nowrap;
   background: var(--chip);
@@ -295,32 +301,32 @@ small {
 }
 
 .badge.teal {
-  background: #e9f6f2;
+  background: color-mix(in srgb, #51b898 13%, var(--white));
   color: #157969
 }
 
 .badge.blue {
-  background: #edf2fd;
+  background: color-mix(in srgb, #5081ec 10%, var(--white));
   color: #4266b7
 }
 
 .badge.amber {
-  background: #fff5e7;
+  background: color-mix(in srgb, #ffb650 14%, var(--white));
   color: #a9691b
 }
 
 .badge.rose {
-  background: #fcf0f2;
+  background: color-mix(in srgb, #dc5168 9%, var(--white));
   color: #a94b61
 }
 
 .badge.purple {
-  background: #f4effb;
+  background: color-mix(in srgb, #8751d3 9%, var(--white));
   color: #7d56b2
 }
 
 .badge.red {
-  background: #fbeeee;
+  background: color-mix(in srgb, #d65050 10%, var(--white));
   color: #b64c51
 }
 
@@ -330,22 +336,22 @@ small {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #f0e8ed;
-  border: 2px solid white;
+  background: color-mix(in srgb, #8d5076 13%, var(--white));
+  border: 2px solid var(--white);
   border-radius: 50%;
   color: var(--accent);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 650;
   flex-shrink: 0
 }
 
 .avatar.blue {
-  background: #e9f0fc;
+  background: color-mix(in srgb, #5188e7 13%, var(--white));
   color: #4169c4
 }
 
 .avatar.teal {
-  background: #e6f3ee;
+  background: color-mix(in srgb, #50ab88 14%, var(--white));
   color: #168373
 }
 
@@ -372,7 +378,8 @@ small {
 .topbar {
   position: relative;
   height: 67px;
-  background: var(--white);
+  /* Custom colour controls -> Top header tint (fill only; text re-inks further down) */
+  background: var(--cc-top-head, var(--white));
   border-bottom: 1px solid var(--line);
   display: flex;
   align-items: center;
@@ -381,7 +388,7 @@ small {
 }
 
 .breadcrumb {
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   color: var(--muted);
   white-space: nowrap
 }
@@ -401,7 +408,7 @@ small {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #7c8191
+  color: var(--muted)
 }
 
 .tb-select .ico {
@@ -418,7 +425,7 @@ small {
   padding: 2px 24px 2px 0;
   color: #525a6b;
   max-width: 200px;
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .topbar .rolebox {
@@ -427,7 +434,7 @@ small {
 }
 
 .topbar .rolebox small {
-  font-size: 9px;
+  font-size: calc(9px * var(--font-scale, 1));
   display: block;
   color: var(--muted);
   letter-spacing: .4px;
@@ -455,7 +462,7 @@ small {
 
 .tb-icon-btn:hover {
   border-color: var(--line);
-  background: #f6f6f8;
+  background: var(--chip);
   color: var(--ink)
 }
 
@@ -480,7 +487,7 @@ small {
   height: 7px;
   border-radius: 50%;
   background: var(--accent);
-  border: 1.5px solid #fff
+  border: 1.5px solid var(--white)
 }
 
 /* account chip: dark round avatar, name over role, chevron (like the theme screenshot) */
@@ -515,8 +522,8 @@ small {
   height: 38px;
   border-radius: 50%;
   background: var(--tb-avatar, var(--accent));
-  color: #fff;
-  font-size: 13px;
+  color: var(--primary-on, #fff);
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: .3px;
   line-height: 1
@@ -526,7 +533,7 @@ small {
   flex-basis: 42px;
   width: 42px;
   height: 42px;
-  font-size: 14px
+  font-size: calc(14px * var(--font-scale, 1))
 }
 
 .tb-user-meta {
@@ -539,7 +546,7 @@ small {
 .tb-user-meta strong {
   overflow: hidden;
   color: var(--ink);
-  font-size: 13.5px;
+  font-size: calc(13.5px * var(--font-scale, 1));
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap
@@ -547,7 +554,7 @@ small {
 
 .tb-user-meta small {
   color: var(--muted);
-  font-size: 11.5px
+  font-size: calc(11.5px * var(--font-scale, 1))
 }
 
 .tb-user-chev {
@@ -580,7 +587,7 @@ small {
   z-index: 60;
   width: min(360px, calc(100vw - 30px));
   padding: 14px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: 0 18px 50px #1e233424
@@ -604,7 +611,7 @@ small {
 
 .tb-head-text strong {
   display: block;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 650
 }
 
@@ -612,7 +619,7 @@ small {
   display: block;
   overflow: hidden;
   color: var(--muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   text-overflow: ellipsis;
   white-space: nowrap
 }
@@ -629,7 +636,7 @@ small {
   gap: 10px;
   width: 100%;
   padding: 9px 10px;
-  border: 1px solid #ecdde3;
+  border: 1px solid var(--line);
   border-radius: 9px;
   background: var(--accentbg);
   color: var(--ink);
@@ -644,7 +651,7 @@ small {
 }
 
 .tb-org .tb-org-glyph {
-  background: #fff
+  background: var(--white)
 }
 
 .tb-org.is-open .tb-chev {
@@ -658,7 +665,7 @@ small {
   right: 0;
   z-index: 5;
   padding: 8px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--line);
   border-radius: 10px;
   box-shadow: 0 14px 34px #1e233424;
@@ -691,7 +698,7 @@ small {
 .tb-org-empty {
   padding: 14px 8px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   text-align: center
 }
 
@@ -708,7 +715,7 @@ small {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--white);
   color: var(--accent)
 }
 
@@ -720,13 +727,13 @@ small {
 .tb-org-meta small {
   display: block;
   color: var(--muted);
-  font-size: 9px;
+  font-size: calc(9px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: 1.2px
 }
 
 .tb-org-meta strong {
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600
 }
 
@@ -734,7 +741,7 @@ small {
   flex: 0 0 14px;
   width: 14px;
   height: 14px;
-  color: #8a90a0;
+  color: var(--muted);
   transition: transform .18s ease
 }
 
@@ -758,11 +765,11 @@ small {
 .tb-search input {
   width: 100%;
   padding: 8px 10px 8px 32px;
-  border: 1px solid #e1e4ec;
+  border: 1px solid var(--line);
   border-radius: 7px;
-  background: #fff;
+  background: var(--white);
   color: var(--ink);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .tb-search input:focus {
@@ -787,7 +794,7 @@ small {
   border-radius: 7px;
   background: none;
   color: #4b5264;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   text-align: left
 }
 
@@ -804,9 +811,9 @@ small {
   height: 30px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fcf8fa;
+  background: color-mix(in srgb, #c3749b 5%, var(--white));
   color: var(--accent);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 650
 }
 
@@ -827,7 +834,7 @@ small {
 .tb-org-name small {
   display: block;
   color: var(--muted);
-  font-size: 10px
+  font-size: calc(10px * var(--font-scale, 1))
 }
 
 .tb-menu-sep {
@@ -861,7 +868,7 @@ small {
   width: min(640px, 100%);
   max-height: min(620px, calc(100vh - 40px));
   overflow: hidden;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--line);
   border-radius: 15px;
   box-shadow: 0 25px 90px #1e23342e
@@ -891,12 +898,12 @@ small {
   padding: 11px 13px;
   border: 1px solid var(--line);
   border-radius: 9px;
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .tb-note.unread {
-  border-color: #ecdde3;
-  background: #fdf8fa
+  border-color: var(--line);
+  background: color-mix(in srgb, #d7749b 5%, var(--white))
 }
 
 .tb-note > div {
@@ -911,12 +918,12 @@ small {
 
 .tb-note small {
   color: var(--muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .n-time {
   color: var(--muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .n-ico {
@@ -926,23 +933,23 @@ small {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  font-size: 14px
+  font-size: calc(14px * var(--font-scale, 1))
 }
 
-.n-ico.teal { background: #e9f6f2; color: #157969 }
-.n-ico.amber { background: #fff5e7; color: #a9691b }
-.n-ico.purple { background: #f4effb; color: #7d56b2 }
-.n-ico.blue { background: #edf2fd; color: #4266b7 }
+.n-ico.teal { background: color-mix(in srgb, #51b898 13%, var(--white)); color: #157969 }
+.n-ico.amber { background: color-mix(in srgb, #ffb650 14%, var(--white)); color: #a9691b }
+.n-ico.purple { background: color-mix(in srgb, #8751d3 9%, var(--white)); color: #7d56b2 }
+.n-ico.blue { background: color-mix(in srgb, #5081ec 10%, var(--white)); color: #4266b7 }
 
 .demo-strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fffdf9;
-  border-bottom: 1px solid #eee9dd;
+  background: color-mix(in srgb, #ffd788 5%, var(--white));
+  border-bottom: 1px solid var(--line);
   padding: 6px 30px;
   color: #8b7d5b;
-  font-size: 10px
+  font-size: calc(10px * var(--font-scale, 1))
 }
 
 .content {
@@ -961,7 +968,7 @@ small {
 
 .pagehead p {
   color: var(--muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   margin-top: 4px
 }
 
@@ -976,8 +983,8 @@ small {
 .scopebar select,
 .scopebar input,
 .filter-input {
-  background: white;
-  border: 1px solid #e1e4ec;
+  background: var(--white);
+  border: 1px solid var(--line);
   border-radius: 7px;
   padding: 8px 10px;
   color: #555e70
@@ -985,7 +992,7 @@ small {
 
 .scopebar label {
   color: var(--muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .scopebar .search {
@@ -1003,7 +1010,7 @@ small {
 .tabs button {
   padding: 9px 0 11px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   position: relative
 }
 
@@ -1028,7 +1035,8 @@ small {
 
 .card {
   background: var(--panel);
-  border: 1px solid var(--line);
+  /* Custom colour controls -> Card outline: the fill never changes, only this hairline */
+  border: 1px solid var(--cc-card-outline, var(--line));
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   min-width: 0;
@@ -1044,7 +1052,7 @@ small {
 }
 
 .card-head p {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: var(--muted);
   margin-top: 3px
 }
@@ -1056,7 +1064,7 @@ small {
 .card-foot {
   padding: 11px 20px;
   border-top: 1px solid var(--line);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: var(--muted);
   background: var(--panel2)
 }
@@ -1096,7 +1104,7 @@ small {
 }
 
 .stat-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: #6f7688;
   font-weight: 550;
   display: flex;
@@ -1105,14 +1113,14 @@ small {
 }
 
 .stat-label .stat-icon {
-  background: #f7f0f3;
+  background: color-mix(in srgb, #a25174 9%, var(--white));
   color: var(--accent);
   border-radius: 7px;
   padding: 6px
 }
 
 .stat strong.value {
-  font-size: 29px;
+  font-size: calc(29px * var(--font-scale, 1));
   font-weight: 650;
   line-height: 1.7;
   letter-spacing: -1px;
@@ -1120,7 +1128,7 @@ small {
 }
 
 .stat .stat-note {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted);
   display: flex;
   align-items: center;
@@ -1137,7 +1145,7 @@ small {
 
 .progress {
   height: 5px;
-  background: #f0f1f5;
+  background: color-mix(in srgb, #515d8b 9%, var(--white));
   border-radius: 5px;
   overflow: hidden
 }
@@ -1163,7 +1171,7 @@ small {
 .legend {
   display: flex;
   gap: 16px;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted)
 }
 
@@ -1174,7 +1182,7 @@ small {
 
 .chart text {
   font-family: inherit;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   fill: #9299a9
 }
 
@@ -1185,7 +1193,7 @@ small {
 }
 
 .chart-label {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: var(--muted)
 }
 
@@ -1197,14 +1205,14 @@ table {
   border-collapse: collapse;
   width: 100%;
   text-align: left;
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 th {
-  font-size: 9px;
+  font-size: calc(9px * var(--font-scale, 1));
   text-transform: uppercase;
   letter-spacing: .65px;
-  color: #9297a5;
+  color: var(--muted);
   font-weight: 600;
   background: var(--panel2);
   white-space: nowrap;
@@ -1214,7 +1222,7 @@ th {
 
 td {
   padding: 12px 15px;
-  border-bottom: 1px solid #eff0f4;
+  border-bottom: 1px solid var(--line);
   vertical-align: middle
 }
 
@@ -1229,7 +1237,7 @@ tbody tr:hover {
 td small {
   display: block;
   color: var(--muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   margin-top: 3px
 }
 
@@ -1264,13 +1272,13 @@ td .link {
 }
 
 .microstats strong {
-  font-size: 17px;
+  font-size: calc(17px * var(--font-scale, 1));
   display: block;
   font-weight: 600
 }
 
 .microstats small {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted)
 }
 
@@ -1290,37 +1298,37 @@ td .link {
   padding: 8px;
   border-radius: 8px;
   color: var(--orange);
-  background: #fff6eb
+  background: color-mix(in srgb, #ffb151 11%, var(--white))
 }
 
 .priority-item p {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: var(--muted);
   margin-top: 3px
 }
 
 .priority-item h3 {
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .panel-note {
   padding: 13px 16px;
-  border: 1px solid #e5eaf2;
-  background: #f8faff;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, #749bff 5%, var(--white));
   border-radius: 8px;
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: #647087
 }
 
 .panel-note.amber {
-  background: #fffaf1;
+  background: color-mix(in srgb, #ffc151 8%, var(--white));
   border-color: #f0e7d3;
   color: #9a7d45
 }
 
 .panel-note.rose {
-  background: #fcf4f6;
-  border-color: #f1e1e7;
+  background: color-mix(in srgb, #d05171 6%, var(--white));
+  border-color: var(--line);
   color: #895268
 }
 
@@ -1330,7 +1338,7 @@ td .link {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: conic-gradient(var(--teal) 0deg 268deg, #edf3f1 268deg 360deg);
+  background: conic-gradient(var(--teal) 0deg 268deg, color-mix(in srgb, #508b77 10%, var(--white)) 268deg 360deg);
   position: relative;
   margin: auto
 }
@@ -1340,7 +1348,7 @@ td .link {
   position: absolute;
   inset: 11px;
   border-radius: 50%;
-  background: white
+  background: var(--white)
 }
 
 .ring>div {
@@ -1349,13 +1357,13 @@ td .link {
 }
 
 .ring strong {
-  font-size: 28px;
+  font-size: calc(28px * var(--font-scale, 1));
   font-weight: 650;
   display: block
 }
 
 .ring small {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted)
 }
 
@@ -1365,7 +1373,7 @@ td .link {
   gap: 12px;
   align-items: center;
   margin-bottom: 17px;
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .bar-row:last-child {
@@ -1385,7 +1393,7 @@ td .link {
 }
 
 .column {
-  background: #f0f2f6;
+  background: color-mix(in srgb, #516897 9%, var(--white));
   border-radius: 10px;
   padding: 12px;
   min-height: 400px
@@ -1396,12 +1404,12 @@ td .link {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 13px;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600
 }
 
 .column-head small {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 400;
   color: var(--muted);
   display: block;
@@ -1410,8 +1418,8 @@ td .link {
 
 .deal {
   padding: 14px;
-  background: white;
-  border: 1px solid #e5e7ef;
+  background: var(--white);
+  border: 1px solid var(--line);
   border-radius: 8px;
   margin-bottom: 11px;
   box-shadow: 0 2px 5px #00000002
@@ -1422,17 +1430,17 @@ td .link {
 }
 
 .deal h3 {
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   margin: 9px 0 2px
 }
 
 .deal p {
   color: var(--muted);
-  font-size: 10px
+  font-size: calc(10px * var(--font-scale, 1))
 }
 
 .deal .deal-money {
-  font-size: 17px;
+  font-size: calc(17px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.3px;
   margin: 11px 0
@@ -1440,10 +1448,10 @@ td .link {
 
 .deal select {
   max-width: 130px;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   border: 1px solid var(--line);
   border-radius: 5px;
-  background: #fff;
+  background: var(--white);
   padding: 4px;
   color: #646b7c
 }
@@ -1455,12 +1463,12 @@ td .link {
   border-top: 1px solid var(--line);
   padding-top: 9px;
   margin-top: 11px;
-  font-size: 10px
+  font-size: calc(10px * var(--font-scale, 1))
 }
 
 .column.dragover {
   outline: 2px dashed var(--accent);
-  background: #f7eef2
+  background: color-mix(in srgb, #ad5079 10%, var(--white))
 }
 
 .agenda {
@@ -1471,7 +1479,7 @@ td .link {
 }
 
 .agenda .time {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 550;
   color: var(--muted);
   padding-top: 4px
@@ -1480,12 +1488,12 @@ td .link {
 .agenda .event {
   border-left: 3px solid var(--accent);
   padding: 9px 12px;
-  background: #fcf6f8;
+  background: color-mix(in srgb, #c55178 5%, var(--white));
   border-radius: 0 7px 7px 0
 }
 
 .agenda .event p {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted);
   margin-top: 4px
 }
@@ -1502,12 +1510,12 @@ td .link {
 }
 
 .activity p {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: var(--muted)
 }
 
 .activity small {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted)
 }
 
@@ -1516,7 +1524,7 @@ td .link {
 }
 
 .account-card h2 {
-  font-size: 15px;
+  font-size: calc(15px * var(--font-scale, 1));
   margin: 12px 0 3px
 }
 
@@ -1527,9 +1535,9 @@ td .link {
   border-radius: 11px;
   display: grid;
   place-items: center;
-  font-size: 17px;
+  font-size: calc(17px * var(--font-scale, 1));
   color: var(--accent);
-  background: #fcf8fa
+  background: color-mix(in srgb, #c3749b 5%, var(--white))
 }
 
 .detail-grid {
@@ -1539,24 +1547,24 @@ td .link {
 }
 
 .detail-grid .field-label {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted);
   margin-bottom: 3px
 }
 
 .detail-grid .field-value {
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 550
 }
 
 .detail-hero {
   padding: 22px;
-  background: linear-gradient(120deg, #fcf5f7, #fff 75%);
+  background: linear-gradient(120deg, color-mix(in srgb, #cb5174 6%, var(--white)), var(--white) 75%);
   border-bottom: 1px solid var(--line)
 }
 
 .detail-hero h2 {
-  font-size: 22px;
+  font-size: calc(22px * var(--font-scale, 1));
   margin: 6px 0
 }
 
@@ -1568,21 +1576,21 @@ td .link {
 }
 
 .step {
-  background: #eef0f5;
+  background: color-mix(in srgb, #506498 10%, var(--white));
   border-radius: 5px;
   padding: 7px 12px;
-  font-size: 10px;
-  color: #7b8191
+  font-size: calc(10px * var(--font-scale, 1));
+  color: var(--muted)
 }
 
 .step.done {
-  background: #edf5f2;
+  background: color-mix(in srgb, #509e81 10%, var(--white));
   color: var(--teal)
 }
 
 .step.current {
   background: var(--accent);
-  color: white
+  color: var(--primary-on, #fff)
 }
 
 .calendar {
@@ -1600,32 +1608,32 @@ td .link {
 
 .calendar .day {
   min-height: 50px;
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
-  background: #fcfcfd
+  background: var(--white)
 }
 
 .calendar .venue {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted)
 }
 
 .cal-event {
   padding: 7px;
-  background: #f0ebf8;
+  background: color-mix(in srgb, #7c51c2 11%, var(--white));
   border-left: 3px solid var(--purple);
   border-radius: 4px;
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   margin-bottom: 6px
 }
 
 .cal-event.teal {
-  background: #eaf7f2;
+  background: color-mix(in srgb, #51bd93 12%, var(--white));
   border-color: var(--teal)
 }
 
 .cal-event.amber {
-  background: #fff4e4;
+  background: color-mix(in srgb, #ffb850 15%, var(--white));
   border-color: var(--orange)
 }
 
@@ -1648,13 +1656,13 @@ td .link {
 .report-card .report-icon {
   padding: 8px;
   border-radius: 8px;
-  background: #f5f0f4;
+  background: color-mix(in srgb, #8b517f 9%, var(--white));
   color: var(--accent);
   align-self: flex-start
 }
 
 .report-card p {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: var(--muted);
   margin: 5px 0 12px
 }
@@ -1664,7 +1672,7 @@ td .link {
   grid-template-columns: 110px repeat(5, 1fr);
   gap: 6px;
   align-items: center;
-  font-size: 10px
+  font-size: calc(10px * var(--font-scale, 1))
 }
 
 .heat div {
@@ -1682,7 +1690,7 @@ td .link {
 
 .matrix td,
 .matrix th {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   padding: 10px 12px
 }
 
@@ -1704,7 +1712,7 @@ td .link {
 }
 
 .guide p {
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   color: #636c7f;
   line-height: 1.8
 }
@@ -1714,14 +1722,14 @@ td .link {
 }
 
 .guide h3 {
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   margin-bottom: 6px
 }
 
 .guide ol,
 .guide ul {
   padding-left: 18px;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   color: #636c7f
 }
 
@@ -1732,14 +1740,14 @@ td .link {
 .guide details {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: white;
+  background: var(--white);
   margin-bottom: 10px;
   overflow: hidden
 }
 
 .guide summary {
   padding: 14px 18px;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
   cursor: pointer
 }
@@ -1750,7 +1758,7 @@ td .link {
 
 .guide .source-list a {
   display: block;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600;
   margin-bottom: 4px
 }
@@ -1772,7 +1780,7 @@ td .link {
 }
 
 .phase .number {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   letter-spacing: 1px;
   color: var(--accent);
   margin-bottom: 8px
@@ -1784,7 +1792,7 @@ td .link {
   display: flex;
   justify-content: space-between;
   gap: 15px;
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .keyline:last-child {
@@ -1798,16 +1806,16 @@ td .link {
 .notice {
   border-left: 3px solid var(--accent);
   padding: 10px 15px;
-  background: #fbf7f9;
-  font-size: 12px;
+  background: color-mix(in srgb, #af6088 5%, var(--white));
+  font-size: calc(12px * var(--font-scale, 1));
   margin: 15px 0
 }
 
 .footer {
   display: flex;
   justify-content: space-between;
-  color: #969cac;
-  font-size: 10px;
+  color: var(--muted);
+  font-size: calc(10px * var(--font-scale, 1));
   margin-top: 25px
 }
 
@@ -1835,7 +1843,7 @@ dialog::backdrop {
 }
 
 .modal-head h2 {
-  font-size: 18px
+  font-size: calc(18px * var(--font-scale, 1))
 }
 
 .modal-body {
@@ -1848,7 +1856,7 @@ dialog::backdrop {
   justify-content: flex-end;
   padding: 15px 23px;
   border-top: 1px solid var(--line);
-  background: #fafbfd
+  background: var(--panel2)
 }
 
 .formgrid {
@@ -1858,7 +1866,7 @@ dialog::backdrop {
 }
 
 .formgrid label {
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   color: #687085;
   display: block
 }
@@ -1868,12 +1876,12 @@ dialog::backdrop {
 .formgrid textarea {
   display: block;
   width: 100%;
-  border: 1px solid #dfe3ec;
+  border: 1px solid var(--line);
   border-radius: 7px;
   padding: 9px 10px;
   margin-top: 5px;
   color: var(--ink);
-  background: white
+  background: var(--white)
 }
 
 .formgrid .full {
@@ -1894,7 +1902,7 @@ dialog::backdrop {
   padding: 12px 18px;
   background: #292e40;
   color: white;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   box-shadow: 0 8px 25px #0002;
   z-index: 100;
   max-width: 90vw
@@ -1909,18 +1917,18 @@ dialog::backdrop {
   padding: 3px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  background: white
+  background: var(--white)
 }
 
 .switcher button {
   padding: 5px 9px;
   border-radius: 5px;
   color: var(--muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .switcher button.active {
-  background: #f3edf1;
+  background: color-mix(in srgb, #8b5077 10%, var(--white));
   color: var(--accent)
 }
 
@@ -1938,7 +1946,7 @@ dialog::backdrop {
 }
 
 .scope-note {
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   color: var(--muted);
   margin: 0 0 14px
 }
@@ -1959,7 +1967,7 @@ dialog::backdrop {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   padding: 8px 0
 }
 
@@ -1968,12 +1976,12 @@ dialog::backdrop {
 }
 
 .outline-empty {
-  border: 1px dashed #dce1eb;
+  border: 1px dashed var(--line);
   border-radius: 8px;
   padding: 16px;
   text-align: center;
   color: var(--muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .sr-only {
@@ -2002,16 +2010,16 @@ dialog::backdrop {
   }
 
   body {
-    font-size: 14px
+    font-size: calc(14px * var(--font-scale, 1))
   }
 
   td {
     padding: 14px 17px;
-    font-size: 13px
+    font-size: calc(13px * var(--font-scale, 1))
   }
 
   .stat strong.value {
-    font-size: 34px
+    font-size: calc(34px * var(--font-scale, 1))
   }
 
   .card-head {
@@ -2091,7 +2099,7 @@ dialog::backdrop {
 
   .topbar select {
     max-width: 145px;
-    font-size: 11px
+    font-size: calc(11px * var(--font-scale, 1))
   }
 
   .topbar .rolebox {
@@ -2141,7 +2149,7 @@ dialog::backdrop {
   .demo-strip {
     padding: 6px 15px;
     gap: 10px;
-    font-size: 9px
+    font-size: calc(9px * var(--font-scale, 1))
   }
 
   .demo-strip span:last-child {
@@ -2154,7 +2162,7 @@ dialog::backdrop {
   }
 
   h1 {
-    font-size: 24px
+    font-size: calc(24px * var(--font-scale, 1))
   }
 
   .g2,
@@ -2176,11 +2184,11 @@ dialog::backdrop {
   }
 
   .stat strong.value {
-    font-size: 24px
+    font-size: calc(24px * var(--font-scale, 1))
   }
 
   .stat .stat-note {
-    font-size: 9px
+    font-size: calc(9px * var(--font-scale, 1))
   }
 
   .stat .spark {
@@ -2220,7 +2228,7 @@ dialog::backdrop {
 
   .footer {
     gap: 10px;
-    font-size: 9px
+    font-size: calc(9px * var(--font-scale, 1))
   }
 
   .roadmap {
@@ -2254,7 +2262,7 @@ dialog::backdrop {
   }
 
   body {
-    background: white
+    background: #fff
   }
 
   .card {
@@ -2272,7 +2280,7 @@ dialog::backdrop {
 
   th,
   td {
-    font-size: 9px;
+    font-size: calc(9px * var(--font-scale, 1));
     padding: 7px
   }
 
@@ -2301,7 +2309,7 @@ dialog::backdrop {
   }
 
   h1 {
-    font-size: 23px
+    font-size: calc(23px * var(--font-scale, 1))
   }
 
   .g4 {
@@ -2310,18 +2318,18 @@ dialog::backdrop {
 }
 
 th {
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--font-scale, 1));
   color: #717a8c
 }
 
 .eyebrow,
 .tiny {
-  font-size: 10px
+  font-size: calc(10px * var(--font-scale, 1))
 }
 
 .card-head p,
 .stat-label {
-  font-size: 11.5px
+  font-size: calc(11.5px * var(--font-scale, 1))
 }
 
 .tablewrap small {
@@ -2329,7 +2337,7 @@ th {
 }
 
 .badge {
-  font-size: 10.5px
+  font-size: calc(10.5px * var(--font-scale, 1))
 }
 
 .stat .value {
@@ -2495,109 +2503,94 @@ html[data-layout="horizontal"] .app.sidebar-collapsed {
   grid-template-columns: 1fr
 }
 
-html[data-layout="horizontal"] .sidebar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px;
-  height: auto;
-  padding: 9px 16px;
-  border-right: 0;
-  border-bottom: 1px solid var(--line);
-  background: var(--sidebar-bg, var(--white));
-  /* visible (not auto) so the absolute dropdowns are not clipped by the strip */
-  overflow: visible
-}
+/* Order in the horizontal layout: the top header (organisation, clock, notifications, profile)
+   first, the menu strip right under it, then the page. .main is flattened (display: contents) so
+   its header and content can be ordered around <app-sidebar> without changing app.html.
+   Both stay on screen while the page scrolls: the header sticks at the top (it is 76 px tall)
+   and the strip (sidebar.css, :host(.is-horizontal)) sticks right under it. The header sits above
+   the strip so its own dropdowns (organisation, clock, notifications, profile) open over it.
+   The rail toggle is hidden - there is no rail in this layout. */
+@media (min-width: 801px) {
+  html[data-layout="horizontal"] .app,
+  html[data-layout="horizontal"] .app.sidebar-collapsed {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh
+  }
 
-html[data-layout="horizontal"] .brand {
-  flex: 0 0 auto;
-  padding: 0
-}
+  html[data-layout="horizontal"] .app > .main {
+    display: contents
+  }
 
-html[data-layout="horizontal"] .nav {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 4px;
-  flex: 1;
-  overflow: visible;
-  padding: 0
-}
+  html[data-layout="horizontal"] .topbar.hd-bar {
+    order: 1;
+    position: sticky;
+    top: 0;
+    z-index: 70;
+    height: var(--hd-height, 76px)
+  }
 
-html[data-layout="horizontal"] .nav-heading {
-  display: none
-}
+  html[data-layout="horizontal"] app-sidebar {
+    order: 2;
+    top: var(--hd-height, 76px)
+  }
 
-html[data-layout="horizontal"] .nav-entry {
-  position: relative;
-  flex: 0 0 auto
-}
+  html[data-layout="horizontal"] .main > .content {
+    order: 3
+  }
 
-html[data-layout="horizontal"] .nav-link {
-  width: auto;
-  margin: 0;
-  padding: 9px 11px;
-  white-space: nowrap
-}
-
-/* sub-pages become a dropdown under their menu item */
-html[data-layout="horizontal"] .nav-children {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 70;
-  min-width: 230px;
-  margin: 0;
-  padding: 6px;
-  border: 1px solid var(--line);
-  border-left: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--white);
-  box-shadow: 0 16px 40px #1e233426
-}
-
-/* the last menu item's dropdown stays inside the viewport */
-html[data-layout="horizontal"] .nav-entry:last-child .nav-children {
-  left: auto;
-  right: 0
-}
-
-html[data-layout="horizontal"] .nav-child {
-  width: 100%;
-  margin: 1px 0;
-  padding: 8px 10px;
-  border-radius: 7px
-}
-
-html[data-layout="horizontal"] .nav-child:hover,
-html[data-layout="horizontal"] .nav-child.active {
-  background: var(--accentbg)
-}
-
-html[data-layout="horizontal"] .nav-child.active:after {
-  display: none
-}
-
-html[data-layout="horizontal"] .nav-children.deep {
-  margin: 0;
-  padding: 4px;
-  border-left: 0;
-  border-top: 1px dashed var(--line);
-  border-radius: 0
-}
-
-html[data-layout="horizontal"] .nav-children.deep .nav-child {
-  padding-left: 16px
+  html[data-layout="horizontal"] .hd-toggle {
+    display: none
+  }
 }
 
 
 .pf-hbtn.primary {
-    border-color: var(--pf-primary-ink);
-    background: var(--pf-primary-ink);
-    color: #fff;
+    border-color: var(--cc-btn, var(--primary, var(--accent)));
+    background: var(--cc-btn, var(--primary, var(--accent)));
+    color: var(--cc-btn-ink, var(--primary-on, #fff));
+}
+
+
+/* =====================================================================================================
+   CUSTOM COLOUR CONTROLS - <html data-cc="on"> is set by applyTheme while Theme Settings ->
+   Workspace -> Custom colour controls is ticked. Each surface reads its --cc-* tokens through the
+   normal declarations (buttons, .card outline, .topbar fill); this block covers the rules that
+   would otherwise win over those tokens: per-component table headers, the sidebar's selection pill
+   and the horizontal menu's child rows. Interiors never change - only outlines and header fills.
+   ===================================================================================================== */
+
+/* grid header tint: the picked colour wins over every table's neutral fill, text flips for it */
+html[data-cc="on"] th {
+  background: var(--cc-grid-head) !important;
+  color: var(--cc-grid-ink) !important
+}
+
+/* menu selection: current-page pill (vertical, compact or rail) + its ink - same html[..]
+   app-sidebar specificity pattern as the sidebar tone block above */
+html[data-cc="on"] app-sidebar {
+  --nav-active-bg: var(--cc-menu-sel);
+  --nav-active-ink: var(--cc-menu-ink)
+}
+
+/* the horizontal layout paints child rows with the accent wash directly - keep them on the control */
+html[data-cc="on"][data-layout="horizontal"] .nav-child.active {
+  background: var(--cc-menu-sel);
+  color: var(--cc-menu-ink)
+}
+
+/* legacy top bar text (those rules use fixed greys) re-inks against the chosen tint */
+html[data-cc="on"] .topbar .breadcrumb,
+html[data-cc="on"] .topbar .breadcrumb strong,
+html[data-cc="on"] .topbar .breadcrumb .crumb-sep,
+html[data-cc="on"] .topbar .tb-select,
+html[data-cc="on"] .topbar select,
+html[data-cc="on"] .topbar .rolebox small {
+  color: color-mix(in srgb, var(--cc-top-ink) 84%, transparent)
+}
+
+html[data-cc="on"] .topbar .tb-divider {
+  background: color-mix(in srgb, var(--cc-top-ink) 30%, transparent)
 }
 
 

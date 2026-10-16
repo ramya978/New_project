@@ -6,21 +6,22 @@
    ===================================================================================================== */
 :host {
   --pr-primary: var(--primary, var(--accent));
-  --pr-primary-soft: color-mix(in srgb, var(--pr-primary) 14%, #fff);
-  --pr-primary-ink: color-mix(in srgb, var(--pr-primary) 50%, #000);
-  --pr-hover: color-mix(in srgb, var(--pr-primary) 9%, #fff);
+  --pr-primary-soft: color-mix(in srgb, var(--pr-primary) 14%, var(--white));
+  --pr-primary-ink: color-mix(in srgb, var(--pr-primary) 50%, var(--mix-ink, #000));
+  --pr-hover: color-mix(in srgb, var(--pr-primary) 9%, var(--white));
   --pr-font: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
-  --pr-ink: #24364a;
-  --pr-heading: #102b3f;
-  --pr-muted: #5b6d7d;
-  --pr-line: #e2e9ee;
-  --pr-row-line: #edf1f5;
-  --pr-head-bg: #f8fafc;
-  --pr-field-line: #8295a4;
+  --pr-ink: var(--ink);
+  --pr-heading: var(--heading-color, var(--ink));
+  --pr-muted: var(--muted);
+  --pr-line: var(--line);
+  --pr-row-line: color-mix(in srgb, var(--line) 65%, var(--white));
+  --pr-head-bg: var(--cc-grid-head, var(--panel2));
+  --pr-field-line: color-mix(in srgb, var(--muted) 70%, var(--line));
 
   display: block;
   color: var(--pr-ink);
-  font: 14px/1.5 var(--pr-font)
+  font: calc(14px * var(--font-scale, 1))/var(--line-height, 1.5) var(--pr-font);
+  font-weight: var(--font-weight, 400)
 }
 
 :host button,
@@ -33,7 +34,7 @@
 .pagehead h1 {
   color: var(--pr-heading);
   font-family: inherit;
-  font-size: 30px;
+  font-size: calc(30px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.8px;
   line-height: 1.25
@@ -43,7 +44,7 @@
   max-width: 680px;
   margin-top: 9px;
   color: var(--pr-muted);
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 /* ---------- summary cards ---------- */
@@ -59,8 +60,8 @@
   min-width: 0;
   padding: 21px 23px 22px;
   border: 1px solid var(--pr-line);
-  border-radius: 11px;
-  background: #fff
+  border-radius: var(--radius);
+  background: var(--white)
 }
 
 .pr-stat-head {
@@ -73,7 +74,7 @@
 .pr-stat-label {
   padding-top: 8px;
   color: var(--pr-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 550;
   line-height: 1.4
 }
@@ -93,17 +94,17 @@
   stroke-width: 1.5
 }
 
-.pr-stat.tone-accent .pr-stat-icon { background: #fdf3e7; color: #a9691b }
-.pr-stat.tone-teal .pr-stat-icon { background: #e9f6f2; color: #157969 }
-.pr-stat.tone-blue .pr-stat-icon { background: #edf2fd; color: #4266b7 }
-.pr-stat.tone-red .pr-stat-icon { background: #fbeeee; color: #b4383e }
+.pr-stat.tone-accent .pr-stat-icon { background: color-mix(in srgb, #f0a750 14%, var(--white)); color: var(--status-warning-ink) }
+.pr-stat.tone-teal .pr-stat-icon { background: var(--status-success-bg); color: var(--status-success-ink) }
+.pr-stat.tone-blue .pr-stat-icon { background: color-mix(in srgb, #5081ec 10%, var(--white)); color: #4266b7 }
+.pr-stat.tone-red .pr-stat-icon { background: var(--status-danger-bg); color: var(--status-danger-ink) }
 
 .pr-stat-value {
   display: block;
   margin-top: 10px;
   overflow: hidden;
   color: var(--pr-heading);
-  font-size: 30px;
+  font-size: calc(30px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: -.8px;
   line-height: 1.25;
@@ -115,7 +116,7 @@
 .pr-stat-note {
   margin-top: 6px;
   color: var(--pr-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   line-height: 1.5
 }
 
@@ -123,7 +124,7 @@
 .pr-card {
   padding: 0;
   border: 1px solid var(--pr-line);
-  border-radius: 14px;
+  border-radius: var(--radius);
   overflow: hidden;
   box-shadow: none
 }
@@ -142,7 +143,7 @@
   margin: 0;
   color: var(--pr-heading);
   font-family: inherit;
-  font-size: 19px;
+  font-size: calc(19px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.35px;
   line-height: 1.3
@@ -151,7 +152,7 @@
 .pr-head-text p {
   margin: 6px 0 0;
   color: var(--pr-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .pr-tools {
@@ -171,13 +172,13 @@
   height: 39px;
   padding: 6px 34px 6px 11px;
   border: 1px solid var(--pr-field-line);
-  border-radius: 7px;
-  background: #fff;
+  border-radius: var(--btn-radius);
+  background: var(--white);
   color: var(--pr-ink);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
-.pr-search input::placeholder { color: #8a99a6 }
+.pr-search input::placeholder { color: color-mix(in srgb, var(--muted) 72%, var(--white)) }
 
 .pr-search input:focus,
 .pr-select:focus {
@@ -198,10 +199,10 @@
   height: 39px;
   padding: 6px 30px 6px 10px;
   border: 1px solid var(--pr-field-line);
-  border-radius: 7px;
-  background: #fff;
+  border-radius: var(--btn-radius);
+  background: var(--white);
   color: var(--pr-ink);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   appearance: none;
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6d7d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -221,7 +222,7 @@
   min-width: 1080px;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 /* Action is a narrow fixed column (just the icon); the other 5 columns share the rest equally */
@@ -234,7 +235,7 @@
   border-top: 1px solid var(--pr-line);
   border-bottom: 1px solid var(--pr-line);
   color: var(--pr-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1.2px;
   line-height: 1.5;
@@ -246,9 +247,9 @@
 .pr-table tbody td {
   padding: 16px 20px;
   border-bottom: 1px solid var(--pr-row-line);
-  background: #fff;
+  background: var(--white);
   color: var(--pr-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   line-height: 1.45;
   vertical-align: middle
 }
@@ -256,7 +257,7 @@
 .pr-table tbody tr:last-child td { border-bottom: 0 }
 
 .pr-table tbody tr:hover td {
-  background: color-mix(in srgb, var(--pr-primary) 3%, #fff)
+  background: color-mix(in srgb, var(--pr-primary) 3%, var(--white))
 }
 
 /* all headings and cells are left-aligned with the same 20px side padding (set above),
@@ -275,7 +276,7 @@
   max-width: 100%;
   overflow: hidden;
   color: var(--pr-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.4;
   text-overflow: ellipsis;
@@ -296,7 +297,7 @@
   max-width: 100%;
   overflow: hidden;
   color: var(--pr-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap
@@ -318,23 +319,23 @@
   height: 36px;
   border: 1px solid var(--pr-line);
   border-radius: 50%;
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 650;
   line-height: 1
 }
 
-.pr-av.av-0 { background: #e9f6f2; color: #157969 }
-.pr-av.av-1 { background: #edf2fd; color: #4266b7 }
+.pr-av.av-0 { background: var(--status-success-bg); color: var(--status-success-ink) }
+.pr-av.av-1 { background: color-mix(in srgb, #5081ec 10%, var(--white)); color: #4266b7 }
 .pr-av.av-2 { background: var(--pr-primary-soft); color: var(--pr-primary-ink) }
-.pr-av.av-3 { background: #fff5e7; color: #a9691b }
-.pr-av.av-none { background: #f0f4f7; color: var(--pr-muted) }
+.pr-av.av-3 { background: var(--status-warning-bg); color: var(--status-warning-ink) }
+.pr-av.av-none { background: var(--chip); color: var(--pr-muted) }
 
 /* reference */
 .pr-ref {
   max-width: 100%;
   overflow: hidden;
   color: var(--pr-primary-ink);
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--font-scale, 1));
   font-weight: 550;
   text-overflow: ellipsis;
   white-space: nowrap
@@ -343,7 +344,7 @@
 /* amount */
 .pr-amount {
   color: var(--pr-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
   white-space: nowrap;
   font-variant-numeric: tabular-nums
@@ -355,15 +356,15 @@
   align-items: center;
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.4;
   white-space: nowrap
 }
 
-.pr-tag.tag-successful { background: #e9f6f2; color: #157969 }
-.pr-tag.tag-pending { background: #fff5e7; color: #a9691b }
-.pr-tag.tag-failed { background: #fbeeee; color: #b4383e }
+.pr-tag.tag-successful { background: var(--status-success-bg); color: var(--status-success-ink) }
+.pr-tag.tag-pending { background: var(--status-warning-bg); color: var(--status-warning-ink) }
+.pr-tag.tag-failed { background: var(--status-danger-bg); color: var(--status-danger-ink) }
 
 /* action: soft primary icon tile → solid primary on hover, the eye slides right, a "View" tip shows */
 .pr-view {
@@ -374,8 +375,8 @@
   height: 32px;
   padding: 0;
   border: 0;
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--pr-primary) 10%, #fff);
+  border-radius: var(--btn-radius);
+  background: color-mix(in srgb, var(--pr-primary) 10%, var(--white));
   color: var(--pr-primary);
   cursor: pointer;
   vertical-align: middle;
@@ -398,7 +399,7 @@
 .pr-view:hover,
 .pr-view:focus-visible {
   background: var(--pr-primary);
-  color: #fff
+  color: var(--primary-on, #fff)
 }
 
 /* only animation: the pupil slides to the right inside the eye */
@@ -426,9 +427,9 @@
   padding: 4px 9px;
   border: 1px solid var(--pr-line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--white);
   color: var(--pr-ink);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 550;
   line-height: 1.4;
   white-space: nowrap;
@@ -454,7 +455,7 @@
 td.empty {
   padding: 30px 15px;
   color: var(--pr-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   text-align: center
 }
 
@@ -467,7 +468,7 @@ td.empty {
   gap: 10px;
   padding: 13px 26px;
   border-top: 1px solid var(--pr-line);
-  background: #fff
+  background: var(--white)
 }
 
 .pr-foot-left {
@@ -475,7 +476,7 @@ td.empty {
   align-items: center;
   gap: 12px;
   color: var(--pr-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .pr-foot-left .muted {
@@ -493,9 +494,9 @@ td.empty {
   padding: 4px 22px 4px 8px;
   border: 1px solid var(--pr-field-line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--white);
   color: var(--pr-ink);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   appearance: none;
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6d7d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -515,11 +516,11 @@ td.empty {
   min-width: 30px;
   height: 30px;
   padding: 0 8px;
-  border: 1px solid #ccd8df;
+  border: 1px solid color-mix(in srgb, var(--muted) 28%, var(--line));
   border-radius: 6px;
-  background: #fff;
+  background: var(--white);
   color: var(--pr-ink);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   cursor: pointer;
   transition: background-color .15s ease, color .15s ease
 }
@@ -559,9 +560,9 @@ td.empty {
   flex-direction: column;
   width: min(880px, 100%);
   max-height: calc(100vh - 48px);
-  border: 1px solid #d9e3e9;
-  border-radius: 14px;
-  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
   box-shadow: 0 20px 80px #12334b33;
   overflow: hidden;
   animation: pr-rise .18s ease-out
@@ -580,7 +581,7 @@ td.empty {
   margin: 0;
   color: var(--pr-heading);
   font-family: inherit;
-  font-size: 19px;
+  font-size: calc(19px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.35px
 }
@@ -595,7 +596,7 @@ td.empty {
   padding: 0;
   border: 1px solid var(--pr-line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--white);
   color: var(--pr-ink);
   cursor: pointer
 }
@@ -623,7 +624,7 @@ td.empty {
 .pr-eyebrow {
   display: block;
   color: var(--pr-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1.2px;
   text-transform: uppercase
@@ -639,7 +640,7 @@ td.empty {
   margin: 8px 0 0;
   color: var(--pr-heading);
   font-family: inherit;
-  font-size: 24px;
+  font-size: calc(24px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: -.8px;
   line-height: 1.3;
@@ -651,14 +652,14 @@ td.empty {
   margin-top: 16px;
   padding: 5px 10px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
   white-space: nowrap
 }
 
-.pill-successful { background: #e9f6f2; color: #157969 }
-.pill-pending { background: #fff5e7; color: #a9691b }
-.pill-failed { background: #fbeeee; color: #b4383e }
+.pill-successful { background: var(--status-success-bg); color: var(--status-success-ink) }
+.pill-pending { background: var(--status-warning-bg); color: var(--status-warning-ink) }
+.pill-failed { background: var(--status-danger-bg); color: var(--status-danger-ink) }
 
 .pr-fields {
   display: grid;
@@ -672,13 +673,13 @@ td.empty {
 .pr-field dt {
   margin-bottom: 3px;
   color: var(--pr-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .pr-field dd {
   margin: 0;
   color: var(--pr-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
   overflow-wrap: anywhere
 }
@@ -686,11 +687,11 @@ td.empty {
 .pr-note {
   margin: 0;
   padding: 16px 18px;
-  border: 1px solid #edf1f5;
-  border-radius: 10px;
-  background: #f8fafc;
+  border: 1px solid color-mix(in srgb, var(--line) 65%, var(--white));
+  border-radius: var(--radius);
+  background: var(--panel2);
   color: var(--pr-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   line-height: 1.8
 }
 
@@ -700,25 +701,26 @@ td.empty {
   gap: 10px;
   padding: 15px 25px;
   border-top: 1px solid var(--pr-line);
-  background: #fff
+  background: var(--white)
 }
 
 .pr-btn {
   min-height: 39px;
   padding: 8px 14px;
-  border: 1px solid #ccd8df;
-  border-radius: 7px;
-  background: #fff;
-  color: #243b4e;
-  font-size: 11px;
+  border: 1px solid color-mix(in srgb, var(--muted) 28%, var(--line));
+  border-radius: var(--btn-radius);
+  background: var(--white);
+  color: var(--ink);
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 550;
   cursor: pointer;
   transition: background-color .15s ease, color .15s ease
 }
 
 .pr-btn:hover {
-  background: var(--pr-hover);
-  color: var(--pr-primary-ink)
+  background: var(--secondary-hover);
+  border-color: var(--secondary-line);
+  color: var(--secondary-ink)
 }
 
 @keyframes pr-fade { from { opacity: 0 } }
@@ -739,10 +741,10 @@ td.empty {
 }
 
 @media (max-width: 760px) {
-  .pagehead h1 { font-size: 26px }
+  .pagehead h1 { font-size: calc(26px * var(--font-scale, 1)) }
   .pr-stats { grid-template-columns: 1fr; gap: 12px }
   .pr-stat { padding: 18px 20px }
-  .pr-stat-value { font-size: 26px }
+  .pr-stat-value { font-size: calc(26px * var(--font-scale, 1)) }
   .pr-head { padding: 20px }
   .pr-foot { padding: 12px 16px }
   .pr-fields { grid-template-columns: 1fr }

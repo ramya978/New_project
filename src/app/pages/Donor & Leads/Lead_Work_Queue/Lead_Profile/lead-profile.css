@@ -6,27 +6,27 @@
    ===================================================================================================== */
 :host {
   --lp-primary: var(--primary, var(--accent, #087e8b));
-  --lp-soft: color-mix(in srgb, var(--lp-primary) 10%, #fff);
-  --lp-softer: color-mix(in srgb, var(--lp-primary) 5%, #fff);
-  --lp-hover: color-mix(in srgb, var(--theme-hover, var(--lp-primary)) 9%, #fff);
-  --lp-press: color-mix(in srgb, var(--theme-press, var(--lp-primary)) 16%, #fff);
-  --lp-strong: color-mix(in srgb, var(--lp-primary) 55%, #000);
+  --lp-soft: color-mix(in srgb, var(--lp-primary) 10%, var(--white));
+  --lp-softer: color-mix(in srgb, var(--lp-primary) 5%, var(--white));
+  --lp-hover: color-mix(in srgb, var(--theme-hover, var(--lp-primary)) 9%, var(--white));
+  --lp-press: color-mix(in srgb, var(--theme-press, var(--lp-primary)) 16%, var(--white));
+  --lp-strong: color-mix(in srgb, var(--lp-primary) 55%, var(--mix-ink, #000));
   --lp-font: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
-  --lp-ink: #24364a;
-  --lp-heading: #102b3f;
-  --lp-muted: #5b6d7d;
-  --lp-faint: #8a9aa8;
-  --lp-line: #e2e9ee;
-  --lp-row-line: #edf1f5;
-  --lp-head-bg: #f8fafc;
-  --lp-ok: #157969;
-  --lp-ok-soft: #e9f6f2;
-  --lp-warn: #a9691b;
-  --lp-warn-soft: #fff5e7;
-  --lp-bad: #b42335;
-  --lp-bad-soft: #fff0f1;
-  --lp-cold: #2f5fa7;
-  --lp-cold-soft: #eaf1fb;
+  --lp-ink: var(--ink);
+  --lp-heading: var(--heading-color, var(--ink));
+  --lp-muted: var(--muted);
+  --lp-faint: color-mix(in srgb, var(--muted) 72%, var(--white));
+  --lp-line: var(--line);
+  --lp-row-line: color-mix(in srgb, var(--line) 65%, var(--white));
+  --lp-head-bg: var(--cc-grid-head, var(--panel2));
+  --lp-ok: var(--status-success-ink);
+  --lp-ok-soft: var(--status-success-bg);
+  --lp-warn: var(--status-warning-ink);
+  --lp-warn-soft: var(--status-warning-bg);
+  --lp-bad: var(--status-danger-ink);
+  --lp-bad-soft: var(--status-danger-bg);
+  --lp-cold: var(--status-info-ink);
+  --lp-cold-soft: var(--status-info-bg);
 
   /* status colours - same as the dots in the lead list */
   --st-new: #2f5fa7;
@@ -38,7 +38,8 @@
 
   display: block;
   color: var(--lp-ink);
-  font: 14px/1.5 var(--lp-font)
+  font: calc(14px * var(--font-scale, 1))/var(--line-height, 1.5) var(--lp-font);
+  font-weight: var(--font-weight, 400)
 }
 
 
@@ -101,10 +102,10 @@
   min-height: 38px;
   padding: 8px 14px;
   border: 1px solid var(--lp-line);
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--btn-radius);
+  background: var(--white);
   color: var(--lp-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 550;
   white-space: nowrap;
   transition: background-color .15s, border-color .15s, color .15s
@@ -112,34 +113,37 @@
 
 .lp-btn:hover:not(:disabled),
 .lp-btn.is-open {
-  background: var(--lp-hover);
-  border-color: color-mix(in srgb, var(--lp-primary) 22%, var(--lp-line))
+  background: var(--secondary-hover);
+  border-color: var(--secondary-line);
+  color: var(--secondary-ink)
 }
 
 .lp-btn:active:not(:disabled) {
-  background: var(--lp-press)
+  background: var(--secondary-press)
 }
 
 .lp-btn-primary {
-  background: var(--lp-primary);
-  border-color: var(--lp-primary);
-  color: #fff
+  background: var(--cc-btn, var(--lp-primary));
+  border-color: var(--cc-btn, var(--lp-primary));
+  color: var(--cc-btn-ink, var(--primary-on, #fff))
 }
 
 .lp-btn-primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--lp-primary) 88%, #000);
-  border-color: color-mix(in srgb, var(--lp-primary) 88%, #000);
-  color: #fff
+  background: var(--cc-btn-hover, color-mix(in srgb, var(--theme-hover, var(--lp-primary)) 88%, #000));
+  border-color: var(--cc-btn-hover, color-mix(in srgb, var(--theme-hover, var(--lp-primary)) 88%, #000));
+  color: var(--cc-btn-hover-ink, var(--primary-on, #fff))
 }
 
 .lp-btn-primary:active:not(:disabled) {
-  background: color-mix(in srgb, var(--lp-primary) 78%, #000)
+  background: var(--cc-btn-press, color-mix(in srgb, var(--theme-press, var(--lp-primary)) 78%, #000));
+  border-color: var(--cc-btn-press, color-mix(in srgb, var(--theme-press, var(--lp-primary)) 78%, #000));
+  color: var(--cc-btn-press-ink, var(--primary-on, #fff))
 }
 
 .lp-btn-sm {
   min-height: 32px;
   padding: 5px 11px;
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .lp-btn-sm .lp-ico {
@@ -155,8 +159,8 @@
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: var(--lp-strong);
-  font-size: 13px;
+  color: var(--secondary-ink);
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 550
 }
 
@@ -213,7 +217,7 @@
 .lp-eyebrow {
   display: block;
   color: var(--lp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1.2px;
   text-transform: uppercase
@@ -222,7 +226,7 @@
 .lp-head h1 {
   margin-top: 8px;
   color: var(--lp-heading);
-  font-size: 30px;
+  font-size: calc(30px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.8px;
   line-height: 1.25
@@ -235,7 +239,7 @@
   gap: 4px 6px;
   margin-top: 6px;
   color: var(--lp-muted);
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 .lp-ref {
@@ -258,10 +262,9 @@
    ===================================================================================================== */
 .lp-hero {
   margin-bottom: 20px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--lp-line);
-  border-radius: 12px
-}
+  border-radius: var(--radius)}
 
 /* band 1 - identity + owner */
 .lp-hero-top {
@@ -287,7 +290,7 @@
 .lp-hero-meta {
   margin-top: 8px;
   color: var(--lp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 /* chips */
@@ -303,9 +306,9 @@
   gap: 6px;
   padding: 3px 9px;
   border-radius: 6px;
-  background: #f0f4f7;
+  background: var(--chip);
   color: var(--lp-ink);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
   white-space: nowrap
 }
@@ -319,7 +322,7 @@
 .tone-closed { --st: var(--st-closed) }
 
 .lp-chip.is-status {
-  background: color-mix(in srgb, var(--st, var(--lp-ok)) 10%, #fff);
+  background: color-mix(in srgb, var(--st, var(--lp-ok)) 10%, var(--white));
   color: var(--st, var(--lp-ok))
 }
 
@@ -339,7 +342,7 @@
 }
 
 .lp-chip.is-plain {
-  background: #fff;
+  background: var(--white);
   box-shadow: inset 0 0 0 1px var(--lp-line);
   color: var(--lp-muted)
 }
@@ -348,14 +351,14 @@
   margin-left: 8px;
   padding: 2px 8px;
   border: 1px solid var(--lp-line);
-  background: #fff;
+  background: var(--white);
   color: var(--lp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   vertical-align: middle
 }
 
 .lp-chip-inline.is-ok {
-  border-color: color-mix(in srgb, var(--lp-ok) 35%, #fff);
+  border-color: color-mix(in srgb, var(--lp-ok) 35%, var(--white));
   background: var(--lp-ok-soft);
   color: var(--lp-ok)
 }
@@ -375,14 +378,14 @@
   padding: 6px 6px 6px 14px;
   border: 1px solid var(--lp-line);
   border-radius: 10px;
-  background: #fbfcfd
+  background: var(--panel2)
 }
 
 .lp-owner-label {
   padding-right: 10px;
   border-right: 1px solid var(--lp-line);
   color: var(--lp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase
@@ -397,13 +400,13 @@
 
 .lp-owner-name {
   color: var(--lp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600
 }
 
 .lp-owner-copy small {
   color: var(--lp-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .lp-avatar {
@@ -415,7 +418,7 @@
   border-radius: 50%;
   background: var(--lp-soft);
   color: var(--lp-strong);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 650;
   line-height: 1
 }
@@ -430,7 +433,7 @@
   flex-basis: 40px;
   width: 40px;
   height: 40px;
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 .lp-avatar.xl {
@@ -439,8 +442,8 @@
   height: 48px;
   border-radius: 12px;
   background: var(--lp-primary);
-  color: #fff;
-  font-size: 15px
+  color: var(--primary-on, #fff);
+  font-size: calc(15px * var(--font-scale, 1))
 }
 
 /* reassign dropdown */
@@ -455,9 +458,9 @@
   z-index: 30;
   width: 300px;
   max-width: calc(100vw - 32px);
-  background: #fff;
-  border: 1px solid #d9e3e9;
-  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   box-shadow: 0 12px 38px #19374b18, 0 2px 7px #19374b09;
   overflow: hidden;
   animation: lp-pop .14s ease-out
@@ -468,8 +471,8 @@
 }
 
 .lp-pop-head h3 {
-  color: #163247;
-  font-size: 15px;
+  color: var(--ink);
+  font-size: calc(15px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.2px
 }
@@ -477,7 +480,7 @@
 .lp-pop-head p {
   margin-top: 4px;
   color: var(--lp-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   line-height: 1.6
 }
 
@@ -503,16 +506,16 @@
   height: 38px;
   padding: 0 12px 0 36px;
   border: 1px solid transparent;
-  border-radius: 8px;
-  background: #f4f7f9;
-  font-size: 13px;
+  border-radius: var(--btn-radius);
+  background: var(--chip);
+  font-size: calc(13px * var(--font-scale, 1));
   outline: none;
   transition: background-color .15s, border-color .15s, box-shadow .15s
 }
 
 .lp-owner-search input:focus {
-  border-color: color-mix(in srgb, var(--lp-primary) 35%, #fff);
-  background: #fff;
+  border-color: color-mix(in srgb, var(--lp-primary) 35%, var(--white));
+  background: var(--white);
   box-shadow: 0 0 0 3px var(--lp-soft)
 }
 
@@ -547,7 +550,7 @@
 .lp-pop-list li.lp-empty {
   justify-content: center;
   color: var(--lp-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   cursor: default
 }
 
@@ -563,13 +566,13 @@
 }
 
 .lp-pop-copy b {
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 550
 }
 
 .lp-pop-copy small {
   color: var(--lp-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .lp-tick {
@@ -601,7 +604,7 @@
 
 .lp-progress-title {
   color: var(--lp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1.2px;
   text-transform: uppercase
@@ -609,7 +612,7 @@
 
 .lp-progress-state {
   color: var(--st, var(--lp-strong));
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600
 }
 
@@ -631,21 +634,21 @@
 .lp-step-bar {
   height: 6px;
   border-radius: 3px;
-  background: #edf1f5;
+  background: var(--chip);
   transition: background-color .2s
 }
 
 .lp-step-label {
   overflow: hidden;
   color: var(--lp-faint);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap
 }
 
 .lp-steps li.is-done .lp-step-bar {
-  background: color-mix(in srgb, var(--st, var(--lp-primary)) 40%, #fff)
+  background: color-mix(in srgb, var(--st, var(--lp-primary)) 40%, var(--white))
 }
 
 .lp-steps li.is-done .lp-step-label {
@@ -662,7 +665,7 @@
 }
 
 .lp-steps.is-closed .lp-step-bar {
-  background: repeating-linear-gradient(135deg, #f3dfe2 0 6px, #fbeff1 6px 12px)
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--status-danger) 16%, var(--white)) 0 6px, var(--status-danger-bg) 6px 12px)
 }
 
 /* band 3 - key figures strip */
@@ -693,7 +696,7 @@
 
 .lp-kpi dt {
   color: var(--lp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase
@@ -705,7 +708,7 @@
   gap: 8px;
   margin-top: 2px;
   color: var(--lp-heading);
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.4
 }
@@ -715,7 +718,7 @@
   margin-top: 2px;
   overflow: hidden;
   color: var(--lp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   text-overflow: ellipsis;
   white-space: nowrap
 }
@@ -727,7 +730,7 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #f4f7f9;
+  background: var(--chip);
   color: var(--lp-muted)
 }
 
@@ -781,7 +784,7 @@
 }
 
 .lp-ring-bg {
-  stroke: #edf1f5
+  stroke: color-mix(in srgb, var(--line) 65%, var(--white))
 }
 
 .lp-ring-val.is-good {
@@ -801,7 +804,7 @@
   left: 24px;
   width: 40px;
   color: var(--lp-heading);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 650;
   text-align: center;
   font-variant-numeric: tabular-nums
@@ -845,9 +848,9 @@ dd.is-due {
 
 .lp-card {
   padding: 22px 22px 20px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--lp-line);
-  border-radius: 12px;
+  border-radius: var(--radius);
       margin-bottom: 10px;
 }
 
@@ -881,7 +884,7 @@ dd.is-due {
 
 .lp-card-head h2 {
   color: var(--lp-heading);
-  font-size: 15px;
+  font-size: calc(15px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.2px;
   line-height: 1.4
@@ -890,7 +893,7 @@ dd.is-due {
 .lp-card-head p {
   margin-top: 2px;
   color: var(--lp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .lp-head-btn {
@@ -906,13 +909,13 @@ dd.is-due {
 
 .lp-grid3 dt {
   color: var(--lp-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .lp-grid3 dd {
   margin-top: 3px;
   color: var(--lp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
   overflow-wrap: anywhere
 }
@@ -942,13 +945,13 @@ dd.is-due {
 .lp-rows dt {
   flex-shrink: 0;
   color: var(--lp-ink);
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 .lp-rows dd {
   min-width: 0;
   color: var(--lp-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   text-align: right;
   overflow-wrap: anywhere
 }
@@ -958,7 +961,7 @@ dd.is-due {
 }
 
 .lp-link {
-  color: var(--lp-strong)
+  color: var(--secondary-ink)
 }
 
 /* person block */
@@ -973,13 +976,13 @@ dd.is-due {
 .lp-person strong {
   display: block;
   color: var(--lp-heading);
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600
 }
 
 .lp-person small {
   color: var(--lp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 /* tags */
@@ -988,9 +991,9 @@ dd.is-due {
   align-items: center;
   padding: 3px 8px;
   border-radius: 5px;
-  background: #f0f4f7;
+  background: var(--chip);
   color: var(--lp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
   white-space: nowrap
 }
@@ -1013,7 +1016,7 @@ dd.is-due {
 /* status tag (Lifecycle card) */
 .lp-tag[class*='tone-'] {
   gap: 6px;
-  background: color-mix(in srgb, var(--st) 10%, #fff);
+  background: color-mix(in srgb, var(--st) 10%, var(--white));
   color: var(--st)
 }
 
@@ -1051,13 +1054,13 @@ dd.is-due {
 .lp-activity-copy strong {
   display: block;
   color: var(--lp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600
 }
 
 .lp-activity-copy small {
   color: var(--lp-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 /* consent */
@@ -1071,7 +1074,7 @@ dd.is-due {
 
 .lp-evidence small {
   color: var(--lp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase
@@ -1079,13 +1082,13 @@ dd.is-due {
 
 .lp-evidence b {
   color: var(--lp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600
 }
 
 .lp-table-wrap {
   border: 1px solid var(--lp-line);
-  border-radius: 10px;
+  border-radius: var(--radius);
   overflow-x: auto
 }
 
@@ -1093,7 +1096,7 @@ dd.is-due {
   width: 100%;
   min-width: 620px;
   border-collapse: collapse;
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 .lp-table th {
@@ -1101,7 +1104,7 @@ dd.is-due {
   background: var(--lp-head-bg);
   border-bottom: 1px solid var(--lp-line);
   color: var(--lp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1px;
   text-align: left;
@@ -1170,7 +1173,7 @@ dd.is-due {
 .lp-foot-note {
   margin-top: 12px;
   color: var(--lp-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 /* lifecycle actions */
@@ -1187,7 +1190,7 @@ dd.is-due {
 .lp-actions-label {
   margin-right: auto;
   color: var(--lp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase
@@ -1198,7 +1201,7 @@ dd.is-due {
   padding: 2px 0 0 12px;
   border-left: 2px solid var(--lp-soft);
   color: var(--lp-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   line-height: 1.7
 }
 
@@ -1217,10 +1220,10 @@ dd.is-due {
   gap: 9px;
   max-width: calc(100vw - 32px);
   padding: 12px 18px;
-  border-radius: 10px;
-  background: var(--lp-heading);
+  border-radius: var(--radius);
+  background: var(--inverse-bg);
   color: #fff;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   box-shadow: 0 8px 26px #102b3f33;
   transform: translateX(-50%);
   animation: lp-toast .2s ease-out
@@ -1282,7 +1285,7 @@ dd.is-due {
   }
 
   .lp-head h1 {
-    font-size: 26px
+    font-size: calc(26px * var(--font-scale, 1))
   }
 
   .lp-head-actions {
@@ -1312,7 +1315,7 @@ dd.is-due {
   }
 
   .lp-step-label {
-    font-size: 11px
+    font-size: calc(11px * var(--font-scale, 1))
   }
 
   .lp-grid3 {

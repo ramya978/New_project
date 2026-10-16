@@ -1,156 +1,196 @@
 <!-- =====================================================================================================
-     AUTH · PROFILE - page header, status strip, tabs, identity panels, roles table, security rail.
-     Page classes are .pf-*; card section is scaled to match the page header.
+     AUTH · MY PROFILE - page header, identity hero, stat strip, tabs (Overview / Access / Security),
+     main cards on the left and a guidance rail on the right. Page classes are .pf-*.
      ===================================================================================================== -->
 
-<!-- page header -->
+<!-- reusable line icon -->
+<ng-template #ico let-name let-size="size">
+  <svg viewBox="0 0 24 24" [attr.width]="size ?? 16" [attr.height]="size ?? 16" fill="none" stroke="currentColor"
+       stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path [attr.d]="iconPath(name)" />
+  </svg>
+</ng-template>
+
+<!-- label / value row used by the Identity and Organisation cards -->
+<ng-template #fieldCell let-f>
+  @if (f) {
+    <div class="pf-field">
+      <span class="pf-field-label">{{ f.label }}</span>
+      <span class="pf-field-value" [class.mono]="f.mono" [class.notset]="f.value === null">{{ f.value ?? 'Not provided' }}</span>
+    </div>
+  } @else {
+    <div class="pf-field pf-field-blank"></div>
+  }
+</ng-template>
+
+<!-- ============================ page header ============================ -->
 <header class="pf-pagehead">
   <div class="pf-pagehead-text">
-    <span class="pf-kicker">User account · Platform operations</span>
-    <h1>Vikram Anand</h1>
-    <p class="pf-sub">Platform Operations Lead · PLT-001 · Profile, access and security for this account.</p>
+    <span class="pf-kicker">Account workspace</span>
+    <h1>My profile</h1>
+    <p class="pf-sub">Your identity, organisation context and account access in one place.</p>
   </div>
   <div class="pf-head-actions">
     <button type="button" class="pf-hbtn btn-secondary" (click)="settingsOpen.set(true)">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('settings')" /></svg>
-      Settings
+      <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'appearance' }" />
+      Appearance
     </button>
     <button type="button" class="pf-hbtn btn-primary">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('edit')" /></svg>
-      Edit
+      <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'edit' }" />
+      Edit profile
     </button>
   </div>
 </header>
 
-<section class="pf-card">
+<!-- ============================ identity hero ============================ -->
+<section class="pf-hero">
+  <span class="pf-avatar" [style.background]="avatarBg() ?? ''" aria-hidden="true">{{ avatarBg() ? '' : profile.initials }}</span>
 
-  <!-- status strip: six cells divided by hairlines -->
-  <div class="pf-strip">
-    @for (s of stats; track s.label) {
-      <div class="pf-cell">
-        <span class="eyebrow">{{ s.label }}</span>
-        @if (s.pill) {
-          <span class="badge teal pf-pill">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('check')" /></svg>
-            {{ s.value }}
-          </span>
-        } @else {
-          <strong [class.pf-warn]="s.tone === 'amber'">{{ s.value }}</strong>
-        }
-      </div>
-    }
+  <div class="pf-hero-main">
+    <div class="pf-hero-name">
+      <h2>{{ profile.name }}</h2>
+      <span class="pf-chip green">Active · sample</span>
+    </div>
+    <p class="pf-hero-role">{{ profile.designation }} <span class="pf-dot">·</span> <code>{{ profile.reference }}</code></p>
+    <p class="pf-hero-meta">
+      <span><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'building', size: 14 }" />{{ profile.organisation }}</span>
+      <span><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'mail', size: 14 }" />{{ profile.email }}</span>
+    </p>
   </div>
 
-  <!-- body: main column (tabs + content) and the right rail -->
-  <div class="pf-body">
-    <div class="pf-main">
+  <div class="pf-hero-side">
+    <span class="pf-eyebrow">Primary role</span>
+    <strong>{{ profile.primaryRole }}</strong>
+    <small>{{ profile.primaryRoleNote }}</small>
+  </div>
+</section>
 
-      <!-- Overview / Access / Security -->
-      <nav class="pf-tabs" aria-label="Profile sections">
-        @for (t of tabs; track t.id) {
-          <button type="button" [class.active]="tab() === t.id"
-                  [attr.aria-current]="tab() === t.id ? 'page' : null" (click)="setTab(t.id)">
-            {{ t.label }} <span class="pf-tab-meta num">{{ t.meta }}</span>
-          </button>
-        }
-      </nav>
+<!-- ============================ stat strip ============================ -->
+<section class="pf-strip" aria-label="Account summary">
+  @for (s of stats; track s.label) {
+    <div class="pf-stat">
+      <span class="pf-stat-ico"><ng-container *ngTemplateOutlet="ico; context: { $implicit: s.icon }" /></span>
+      <div class="pf-stat-text">
+        <span class="pf-eyebrow">{{ s.label }}</span>
+        <p>
+          <strong [class.amber]="s.tone === 'amber'">{{ s.value }}</strong>
+          @if (s.note) { <small>{{ s.note }}</small> }
+        </p>
+      </div>
+    </div>
+  }
+</section>
 
-      @if (tab() === 'overview') {
-        <h2 class="pf-title">Identity &amp; organisation</h2>
+<!-- ============================ tabs ============================ -->
+<div class="pf-tabbar">
+  <nav class="pf-tabs" aria-label="Profile sections">
+    @for (t of tabs; track t.id) {
+      <button type="button" [class.active]="tab() === t.id" [attr.aria-current]="tab() === t.id ? 'page' : null"
+              (click)="setTab(t.id)">
+        <ng-container *ngTemplateOutlet="ico; context: { $implicit: t.icon }" />
+        {{ t.label }}
+        @if (t.count) { <span class="pf-tab-count num">{{ t.count }}</span> }
+      </button>
+    }
+  </nav>
+  <span class="pf-tabbar-note">Sample account · local preview</span>
+</div>
 
-        <!-- identity + organisation panels -->
-        <div class="pf-panels">
-          <section class="pf-panel">
-            <h3 class="pf-panel-head">
-              <span class="pf-panel-ico">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('user')" /></svg>
-              </span>
-              Identity
-            </h3>
-            @for (r of identity; track r.label) {
-              <div class="pf-row">
-                <span class="pf-row-ico">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(r.icon)" /></svg>
-                </span>
-                <span class="pf-row-label">{{ r.label }}</span>
-                <span [class]="'pf-row-value' + (r.value === null ? ' notset' : '')">{{ r.value ?? 'Not set' }}</span>
-              </div>
-            }
-          </section>
-          <section class="pf-panel">
-            <h3 class="pf-panel-head">
-              <span class="pf-panel-ico">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('grid')" /></svg>
-              </span>
-              Organisation
-            </h3>
-            @for (r of organisation; track r.label) {
-              <div class="pf-row">
-                <span class="pf-row-ico">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(r.icon)" /></svg>
-                </span>
-                <span class="pf-row-label">{{ r.label }}</span>
-                <span [class]="'pf-row-value' + (r.value === null ? ' notset' : '')">{{ r.value ?? 'Not set' }}</span>
-              </div>
-            }
-          </section>
-        </div>
-      } @else if (tab() === 'security') {
-        <h2 class="pf-title">Security</h2>
-        <section class="pf-panel pf-panel-wide">
-          <h3 class="pf-panel-head">
-            <span class="pf-panel-ico">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('shield')" /></svg>
-            </span>
-            Security checks
-          </h3>
-          @for (s of security; track s.label) {
-            <div class="pf-row">
-              <span class="pf-row-ico">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(s.icon)" /></svg>
-              </span>
-              <span class="pf-row-label">{{ s.label }} <small class="muted">{{ s.detail }}</small></span>
-              <span [class]="'pf-state ' + s.tone">{{ s.status }}</span>
+<!-- security banner sits above both columns -->
+@if (tab() === 'security') {
+  <div class="pf-banner">
+    <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'info' }" />
+    <p><strong>Illustrative security view.</strong> These states and sessions are sample records. No password, verification method or real session can be changed here.</p>
+  </div>
+}
+
+<div class="pf-body">
+  <!-- ============================ main column ============================ -->
+  <div class="pf-main">
+
+    @switch (tab()) {
+
+      <!-- ---------- OVERVIEW ---------- -->
+      @case ('overview') {
+        <section class="pf-card">
+          <header class="pf-card-head">
+            <div>
+              <h3>Identity &amp; contact</h3>
+              <p>Keep personal details clear and separate from sign-in credentials.</p>
             </div>
-          }
+            <button type="button" class="pf-iconbtn" aria-label="Edit identity and contact">
+              <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'pencil' }" />
+            </button>
+          </header>
+          <div class="pf-fields">
+            @for (p of pairs(identityLeft, identityRight); track $index) {
+              <ng-container *ngTemplateOutlet="fieldCell; context: { $implicit: p[0] }" />
+              <ng-container *ngTemplateOutlet="fieldCell; context: { $implicit: p[1] }" />
+            }
+          </div>
+        </section>
+
+        <section class="pf-card">
+          <header class="pf-card-head">
+            <div>
+              <h3>Organisation &amp; reporting</h3>
+              <p>Place this account in the right unit, department and reporting line.</p>
+            </div>
+            <button type="button" class="pf-iconbtn" aria-label="Edit organisation and reporting">
+              <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'pencil' }" />
+            </button>
+          </header>
+          <div class="pf-fields">
+            @for (p of pairs(orgLeft, orgRight); track $index) {
+              <ng-container *ngTemplateOutlet="fieldCell; context: { $implicit: p[0] }" />
+              <ng-container *ngTemplateOutlet="fieldCell; context: { $implicit: p[1] }" />
+            }
+          </div>
+          <p class="pf-footnote">
+            <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'info', size: 14 }" />
+            Organisation and role assignment are managed separately from personal profile details.
+          </p>
+        </section>
+
+        <section class="pf-card">
+          <header class="pf-card-head">
+            <div>
+              <h3>Access at a glance</h3>
+              <p>One primary role is shown for this example account.</p>
+            </div>
+            <button type="button" class="pf-link" (click)="setTab('access')">
+              Review access <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'arrow' }" />
+            </button>
+          </header>
+          <div class="pf-glance">
+            <span class="pf-tile"><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'shield' }" /></span>
+            <div class="pf-glance-text">
+              <strong>{{ profile.primaryRole }}</strong>
+              <small>{{ profile.organisation }} · whole organisation</small>
+            </div>
+            <span class="pf-chip">Permissions not loaded</span>
+          </div>
         </section>
       }
 
-      <!-- assigned roles: shown on Overview and Access -->
-      @if (tab() !== 'security') {
-        <section class="pf-roles">
-          <div class="pf-roles-head">
-            <h2 class="pf-title plain">Assigned roles <span class="pf-count num">{{ visibleRoles().length }}</span></h2>
-            <div class="pf-tools">
-              <label class="pf-search">
-                <input type="search" placeholder="Search roles..." [value]="roleQuery()"
-                       (input)="setRoleQuery($any($event.target).value)" aria-label="Search roles" />
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('search')" /></svg>
-              </label>
-              <label class="pf-sort">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('sort')" /></svg>
-                <span>Sort by</span>
-                <select [value]="roleSort()" (change)="setRoleSort($any($event.target).value)" aria-label="Sort roles">
-                  <option value="role">Role</option>
-                  <option value="scope">Scope</option>
-                </select>
-              </label>
-              <button type="button" class="pf-hbtn btn-primary" (click)="setTab('access')">Open access
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('arrow')" /></svg>
-              </button>
+      <!-- ---------- ACCESS ---------- -->
+      @case ('access') {
+        <section class="pf-card">
+          <header class="pf-card-head">
+            <div>
+              <h3>Assigned roles</h3>
+              <p>Role, scope and assignment term belong together.</p>
             </div>
+            <span class="pf-chip">1 assignment · sample</span>
+          </header>
+
+          <div class="pf-toolbar">
+            <label class="pf-search">
+              <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'search' }" />
+              <input type="text" inputmode="search" placeholder="Search role or scope..." [value]="roleQuery()"
+                     (input)="setRoleQuery($any($event.target).value)" aria-label="Search role or scope" />
+            </label>
+            <span class="pf-toolbar-count">{{ visibleRoles().length }} {{ visibleRoles().length === 1 ? 'role' : 'roles' }}</span>
           </div>
 
           <div class="pf-table">
@@ -158,7 +198,7 @@
               <thead>
                 <tr>
                   <th>Role</th>
-                  <th>Scope</th>
+                  <th>Data scope</th>
                   <th>Permissions</th>
                   <th>Term</th>
                 </tr>
@@ -166,88 +206,180 @@
               <tbody>
                 @for (r of visibleRoles(); track r.name) {
                   <tr>
-                    <td>
-                      <span class="pf-role">
-                        <span class="pf-role-mark" aria-hidden="true">{{ r.mark }}</span>
-                        <span><strong>{{ r.name }}</strong><small>{{ r.note }}</small></span>
-                      </span>
-                    </td>
-                    <td>
-                      <span class="pf-inline">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('layers')" /></svg>
-                        {{ r.scope }}
-                      </span>
-                    </td>
-                    <td>
-                      <span class="pf-inline">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"
-                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('key')" /></svg>
-                        {{ r.permissions }} permissions
-                      </span>
-                    </td>
-                    <td><span class="pf-term">{{ r.term }}</span></td>
+                    <td><strong>{{ r.name }}</strong><small>{{ r.note }}</small></td>
+                    <td><span class="pf-cell-main">{{ r.scope }}</span><small class="pf-accent">{{ r.scopeNote }}</small></td>
+                    <td><span class="pf-chip">{{ r.permissions }}</span></td>
+                    <td><span class="pf-chip green">{{ r.term }}</span></td>
                   </tr>
                 } @empty {
-                  <tr><td colspan="4" class="empty">No roles match this search.</td></tr>
+                  <tr><td colspan="4" class="pf-empty">No roles match this search.</td></tr>
                 }
               </tbody>
             </table>
           </div>
+
+          <p class="pf-footnote">
+            <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'info', size: 14 }" />
+            The permission details are unavailable in this preview. This does not mean the account has zero permissions.
+          </p>
+        </section>
+
+        <section class="pf-card">
+          <header class="pf-card-head">
+            <div><h3>Assignment details</h3></div>
+          </header>
+          <ol class="pf-steps">
+            @for (s of assignmentSteps; track s.title; let i = $index) {
+              <li>
+                <span class="pf-step-num num">{{ (i + 1).toString().padStart(2, '0') }}</span>
+                <div>
+                  <strong>{{ s.title }}</strong>
+                  <p>{{ s.detail }}</p>
+                </div>
+              </li>
+            }
+          </ol>
         </section>
       }
-    </div><!-- /.pf-main -->
 
-    <!-- right rail: security posture, sessions, record completeness -->
-    <aside class="pf-rail" aria-label="Security and record summary">
-      <div class="pf-rail-block">
-        <div class="pf-rail-head">
-          <span class="eyebrow">Security posture</span>
-          <span class="pf-ring" role="img" aria-label="2 of 3 complete"
-                [style.background]="postureArc(2, 3)">
-            <span class="pf-ring-num num">2<small>/3</small></span>
-          </span>
-        </div>
-        <ul class="pf-checks">
-          @for (s of security; track s.label) {
-            <li>
-              <span class="pf-check-ico">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(s.icon)" /></svg>
-              </span>
-              <span class="pf-check-text"><strong>{{ s.label }}</strong><small>{{ s.detail }}</small></span>
-              <span [class]="'pf-state ' + s.tone">{{ s.status }}</span>
-            </li>
+      <!-- ---------- SECURITY ---------- -->
+      @case ('security') {
+        <section class="pf-card">
+          <header class="pf-card-head">
+            <div>
+              <h3>Sign-in &amp; protection</h3>
+              <p>Review your sign-in details and the protection available for this account.</p>
+            </div>
+            <span class="pf-chip">Sample states</span>
+          </header>
+          <div class="pf-list">
+            @for (r of signInRows; track r.title) {
+              <ng-container *ngTemplateOutlet="secRow; context: { $implicit: r }" />
+            }
+          </div>
+        </section>
+
+        <section class="pf-card">
+          <header class="pf-card-head">
+            <div>
+              <h3>Account sessions</h3>
+              <p>Two illustrative sessions on one desktop. No live device data is available.</p>
+            </div>
+            <span class="pf-chip">Sample records</span>
+          </header>
+          <div class="pf-list">
+            @for (r of sessionRows; track r.title) {
+              <ng-container *ngTemplateOutlet="secRow; context: { $implicit: r }" />
+            }
+          </div>
+        </section>
+      }
+    }
+  </div><!-- /.pf-main -->
+
+  <!-- ============================ right rail ============================ -->
+  <aside class="pf-rail" aria-label="Guidance">
+    @switch (tab()) {
+
+      @case ('overview') {
+        <section class="pf-card pf-rail-card">
+          <div class="pf-complete-head">
+            <h3>Complete your profile</h3>
+            <strong class="num">{{ completeness().percent }}%</strong>
+          </div>
+          <div class="pf-progress"><span [style.width.%]="completeness().percent"></span></div>
+          <p class="pf-rail-text">{{ completeness().filled }} of {{ completeness().total }} fields completed. Optional details help colleagues recognise and contact you.</p>
+          <ul class="pf-missing">
+            @for (m of completeness().shown; track m) {
+              <li><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'plus', size: 14 }" />{{ m }}</li>
+            }
+          </ul>
+          @if (completeness().more) {
+            <p class="pf-more">And {{ completeness().more }} more optional details</p>
           }
-        </ul>
-        <button type="button" class="pf-link" (click)="setTab('security')">Review security
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('arrow')" /></svg>
-        </button>
-      </div>
+          <button type="button" class="pf-outline">
+            Complete details <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'arrow' }" />
+          </button>
+        </section>
 
-      <div class="pf-rail-block">
-        <span class="eyebrow">Sessions</span>
-        <p class="pf-sessions">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('monitor')" /></svg>
-          <strong class="num">2</strong> active on 1 device
-        </p>
-      </div>
+        <section class="pf-card pf-rail-card">
+          <div class="pf-rail-title">
+            <span class="pf-tile sm"><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'shield' }" /></span>
+            <h3>Account protection</h3>
+          </div>
+          <p class="pf-rail-text">Two-step verification is not enrolled in this sample. Review the available protection methods before making changes.</p>
+          <button type="button" class="pf-link" (click)="setTab('security')">
+            Review security <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'arrow' }" />
+          </button>
+        </section>
 
-      <div class="pf-rail-block">
-        <div class="pf-rail-head">
-          <span class="eyebrow">Record completeness</span>
-          <span class="num pf-score">{{ completeness.filled }}<small>/{{ completeness.total }}</small></span>
+        <div class="pf-note">
+          <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'info' }" />
+          <div>
+            <strong>Missing is different from zero.</strong>
+            <p>“Not provided” means a profile field is empty. “Not loaded” means the application has no verified access information yet.</p>
+          </div>
         </div>
-        <div class="pf-progress"><span [style.width.%]="completeness.percent"></span></div>
-        <p class="pf-rail-note">{{ completeness.percent }}% of the personnel record is filled in.</p>
-      </div>
-    </aside>
-  </div><!-- /.pf-body -->
-</section>
+      }
 
-<!-- theme settings offcanvas: opens from the header Settings button -->
+      @case ('access') {
+        <section class="pf-card pf-rail-card">
+          <span class="pf-tile sm"><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'building' }" /></span>
+          <span class="pf-rail-label">Current organisation</span>
+          <h3 class="pf-rail-big">{{ profile.organisation }}</h3>
+          <p class="pf-rail-text">This is the profile's sample organisation. Switching header context does not edit this assignment.</p>
+          <button type="button" class="pf-outline">
+            <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'help' }" /> Access information
+          </button>
+        </section>
+
+        <div class="pf-note">
+          <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'lock' }" />
+          <div>
+            <strong>Need different access?</strong>
+            <p>Ask your organisation administrator to review the role and scope you need for your work.</p>
+          </div>
+        </div>
+      }
+
+      @case ('security') {
+        <section class="pf-card pf-rail-card">
+          <span class="pf-tile sm"><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'shield' }" /></span>
+          <h3 class="pf-rail-h">Protect your account</h3>
+          <p class="pf-rail-text">When two-step verification is enabled, keep a recovery method available so you can still access your account.</p>
+          <ul class="pf-ticks">
+            @for (t of protectTips; track t) {
+              <li><ng-container *ngTemplateOutlet="ico; context: { $implicit: 'tick', size: 14 }" />{{ t }}</li>
+            }
+          </ul>
+        </section>
+      }
+    }
+  </aside>
+</div><!-- /.pf-body -->
+
+<!-- security / session row -->
+<ng-template #secRow let-r>
+  <div class="pf-sec">
+    <span class="pf-tile"><ng-container *ngTemplateOutlet="ico; context: { $implicit: r.icon }" /></span>
+    <div class="pf-sec-text">
+      <strong>{{ r.title }}</strong>
+      <p>{{ r.detail }}</p>
+      @if (r.extra) { <small>{{ r.extra }}</small> }
+    </div>
+    @if (r.action) {
+      <button type="button" class="pf-outline sm">
+        {{ r.action }}
+        @if (r.action !== 'View revoke flow') { <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'arrow' }" /> }
+      </button>
+    } @else if (r.chip) {
+      <span class="pf-chip" [class.primary]="r.chipTone === 'primary'">{{ r.chip }}</span>
+    }
+  </div>
+</ng-template>
+
+<!-- theme settings offcanvas: opens from the header Appearance button -->
 @if (settingsOpen()) {
-  <app-theme-settings (closed)="settingsOpen.set(false)" />
+  <app-theme-settings (closed)="settingsOpen.set(false)" >
+  </app-theme-settings>
 }

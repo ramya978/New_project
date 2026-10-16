@@ -1,128 +1,174 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { ThemeSettings } from './settings';
 import { ThemeSettingsService, profileImageSrc } from './theme-settings';
 
-export interface InfoRow {
-  icon: string;
-  label: string;
-  value: string | null;
-}
-
 export type ProfileTab = 'overview' | 'access' | 'security';
 
+/** One label / value line in the Identity or Organisation card ("null" = Not provided). */
+export interface FieldRow {
+  label: string;
+  value: string | null;
+  mono?: boolean;
+}
+
 export interface StatCell {
+  icon: string;
   label: string;
   value: string;
-  pill?: boolean;
+  note?: string;
   tone?: 'amber';
 }
 
 export interface AssignedRole {
-  mark: string;
   name: string;
   note: string;
   scope: string;
-  permissions: number;
+  scopeNote: string;
+  permissions: string;
   term: string;
 }
 
-export interface SecurityItem {
-  icon: string;
-  label: string;
+export interface AssignmentStep {
+  title: string;
   detail: string;
-  status: string;
-  tone: 'green' | 'amber';
 }
 
+/** Security / session rows: right side is either a chip or an action button. */
+export interface SecurityRow {
+  icon: string;
+  title: string;
+  detail: string;
+  extra?: string;
+  chip?: string;
+  chipTone?: 'neutral' | 'primary';
+  action?: string;
+}
+
+const PROFILE = {
+  name: 'Vikram Anand',
+  initials: 'VA',
+  designation: 'Platform Operations Lead',
+  reference: 'PLT-001',
+  organisation: 'Unity for Change',
+  email: 'vikram.anand@example.test',
+  primaryRole: 'Super admin',
+  primaryRoleNote: 'Organisation-wide scope · sample'
+};
+
 const STATS: StatCell[] = [
-  { label: 'Status', value: 'Active', pill: true },
-  { label: 'Primary role', value: 'Platform Admin' },
-  { label: 'Sign-in e-mail', value: 'vikram.anand@ngoplanet.test' },
-  { label: 'Roles', value: '1 assigned' },
-  { label: 'Two-step', value: 'Not Enrolled', tone: 'amber' },
-  { label: 'Last sign-in', value: '10/15/2026, 9:16:43 AM' }
+  { icon: 'user', label: 'Profile completeness', value: '6 of 12 fields' },
+  { icon: 'shield', label: 'Assigned roles', value: '1 role', note: '· illustrative' },
+  { icon: 'lock', label: 'Two-step verification', value: 'Not enrolled', note: '· sample', tone: 'amber' },
+  { icon: 'clock', label: 'Last sign-in · sample', value: '15 Oct 2026, 09:16', note: 'IST' }
 ];
 
-const TABS: { id: ProfileTab; label: string; meta: string }[] = [
-  { id: 'overview', label: 'Overview', meta: '64%' },
-  { id: 'access', label: 'Access', meta: '1' },
-  { id: 'security', label: 'Security', meta: '2/3' }
+const TABS: { id: ProfileTab; label: string; icon: string; count?: number }[] = [
+  { id: 'overview', label: 'Overview', icon: 'user' },
+  { id: 'access', label: 'Access', icon: 'shield', count: 1 },
+  { id: 'security', label: 'Security', icon: 'lock' }
 ];
 
-const IDENTITY: InfoRow[] = [
-  { icon: 'hash', label: 'Reference', value: 'PLT-001' },
-  { icon: 'user', label: 'Display name', value: 'Vikram Anand' },
-  { icon: 'target', label: 'Preferred name', value: null },
-  { icon: 'card', label: 'Employee ID', value: null },
-  { icon: 'at', label: 'Username', value: 'vikram.anand' },
-  { icon: 'mail', label: 'E-mail', value: 'vikram.anand@ngoplanet.test' },
-  { icon: 'phone', label: 'Mobile', value: '+91 9845012876' },
-  { icon: 'globe', label: 'Language · timezone', value: 'en-IN · Asia/Kolkata' }
+/** Identity & contact - left and right columns, read row by row. */
+const IDENTITY_LEFT: FieldRow[] = [
+  { label: 'Display name', value: 'Vikram Anand' },
+  { label: 'Preferred name', value: null },
+  { label: 'Employee ID', value: null },
+  { label: 'Username', value: 'vikram.anand', mono: true }
 ];
 
-const ORGANISATION: InfoRow[] = [
-  { icon: 'grid', label: 'Unit', value: null },
-  { icon: 'users', label: 'Department', value: null },
-  { icon: 'briefcase', label: 'Designation', value: 'Platform Operations Lead' },
-  { icon: 'user-check', label: 'Manager', value: null },
-  { icon: 'calendar', label: 'Joined', value: '10/14/2026' },
-  { icon: 'layers', label: 'Data scopes', value: 'Whole organisation' }
+const IDENTITY_RIGHT: FieldRow[] = [
+  { label: 'Contact email', value: 'vikram.anand@example.test' },
+  { label: 'Mobile number', value: null },
+  { label: 'Language', value: 'English (India)' },
+  { label: 'Time zone', value: 'Asia/Kolkata' }
+];
+
+const ORG_LEFT: FieldRow[] = [
+  { label: 'Organisation', value: 'Unity for Change' },
+  { label: 'Business unit', value: null },
+  { label: 'Department', value: null }
+];
+
+const ORG_RIGHT: FieldRow[] = [
+  { label: 'Designation', value: 'Platform Operations Lead' },
+  { label: 'Reports to', value: null },
+  { label: 'Joined on', value: '14 Oct 2026' }
 ];
 
 const ROLES: AssignedRole[] = [
-  { mark: 'P', name: 'Platform Admin', note: 'Primary assignment', scope: 'Whole organisation', permissions: 0, term: 'Permanent' }
+  {
+    name: 'Super admin',
+    note: 'Primary assignment',
+    scope: 'Unity for Change',
+    scopeNote: 'Whole organisation',
+    permissions: 'Not loaded',
+    term: 'Permanent · sample'
+  }
 ];
 
-const SECURITY: SecurityItem[] = [
-  { icon: 'shield', label: 'Multi-factor', detail: 'No second factor', status: 'Not enrolled', tone: 'amber' },
-  { icon: 'lock', label: 'Password', detail: 'Changed today', status: 'Current', tone: 'green' },
-  { icon: 'alert', label: 'Lockout', detail: 'Can sign in normally', status: 'Clear', tone: 'green' }
+const ASSIGNMENT_STEPS: AssignmentStep[] = [
+  { title: 'Granted by an administrator', detail: 'Primary role assigned by the platform administrator · sample record.' },
+  { title: 'Organisation-wide scope', detail: 'This example assignment covers Unity for Change. A separate assignment is needed for other organisations.' },
+  { title: 'No end date', detail: 'Permanent assignment · sample. Ask an authorised administrator to review or change access.' }
 ];
 
-/** Feather-style 24x24 line paths used by the page (same approach as the payments screen). */
+const SIGN_IN_ROWS: SecurityRow[] = [
+  { icon: 'mail', title: 'Sign-in email', detail: 'vikram.anand@example.test', chip: 'Managed identity' },
+  { icon: 'shield', title: 'Two-step verification', detail: 'Not enrolled · sample. A second verification method adds protection at sign-in.', action: 'View setup steps' },
+  { icon: 'lock', title: 'Password', detail: 'Password age and policy have not been loaded.', action: 'View password flow' },
+  { icon: 'shield', title: 'Lockout state', detail: 'The account lockout status is currently unavailable.', chip: 'Not loaded' }
+];
+
+const SESSION_ROWS: SecurityRow[] = [
+  { icon: 'devices', title: 'Desktop browser', detail: 'Windows · Chrome · sample device', extra: 'Started 15 Oct 2026, 09:16 IST', chip: 'Current · sample', chipTone: 'primary' },
+  { icon: 'devices', title: 'Second browser session', detail: 'Same sample desktop · earlier sign-in', extra: 'Started 14 Oct 2026, 16:40 IST', action: 'View revoke flow' }
+];
+
+const PROTECT_TIPS = ['Use a second verification method', 'Store recovery codes securely', 'Review unfamiliar sessions'];
+
+/** Feather-style 24x24 line paths used by the page. */
 const ICON_PATHS: Record<string, string> = {
-  settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z',
-  edit: 'M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7 M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z',
-  check: 'M22 11.08V12a10 10 0 1 1-5.93-9.14 M22 4L12 14.01l-3-3',
-  hash: 'M4 9h16 M4 15h16 M10 3L8 21 M16 3l-2 18',
+  appearance: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 2v20 M2 12h20',
+  edit: 'M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z',
+  pencil: 'M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z',
   user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
-  target: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
-  card: 'M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z M1 10h22',
-  at: 'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z M9 12l2 2 4-4',
+  lock: 'M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z M7 11V7a5 5 0 0 1 10 0v4 M12 15v3',
+  clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 6v6l4 2',
+  building: 'M4 21V5l8-3 8 3v16 M2 21h20 M8 8h1 M15 8h1 M8 12h1 M15 12h1 M10 21v-5h4v5',
   mail: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22 6l-10 7L2 6',
-  phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
-  globe: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M2 12h20 M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z',
-  grid: 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z',
-  users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75',
-  briefcase: 'M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16',
-  'user-check': 'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M8.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M17 11l2 2 4-4',
-  calendar: 'M8 2v4 M16 2v4 M3 10h18 M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z',
-  layers: 'M12 2L2 7l10 5 10-5-10-5z M2 17l10 5 10-5 M2 12l10 5 10-5',
+  info: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 16v-4 M12 8h.01',
+  help: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3 M12 17h.01',
+  plus: 'M12 5v14 M5 12h14',
+  tick: 'M20 6 9 17l-5-5',
+  arrow: 'M5 12h14 M12 5l7 7-7 7',
   search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.35-4.35',
-  sort: 'M4 21v-7 M4 10V3 M12 21v-9 M12 8V3 M20 21v-5 M20 12V3 M1 14h6 M9 8h6 M17 16h6',
-  key: 'M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4',
-  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-  lock: 'M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2z M7 11V7a5 5 0 0 1 10 0v4',
-  alert: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M12 8v4 M12 16h.01',
-  monitor: 'M20 3H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z M8 21h8 M12 17v4',
-  arrow: 'M5 12h14 M12 5l7 7-7 7'
+  devices: 'M3 4h13a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z M6 18h7 M9.5 14v4 M18 9h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z'
 };
 
 @Component({
   selector: 'app-profile',
-  imports: [ThemeSettings],
+  imports: [NgTemplateOutlet, ThemeSettings],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
 export class Profile {
+  protected readonly profile = PROFILE;
   protected readonly stats = STATS;
   protected readonly tabs = TABS;
-  protected readonly identity = IDENTITY;
-  protected readonly organisation = ORGANISATION;
-  protected readonly security = SECURITY;
+  protected readonly identityLeft = IDENTITY_LEFT;
+  protected readonly identityRight = IDENTITY_RIGHT;
+  protected readonly orgLeft = ORG_LEFT;
+  protected readonly orgRight = ORG_RIGHT;
+  protected readonly assignmentSteps = ASSIGNMENT_STEPS;
+  protected readonly signInRows = SIGN_IN_ROWS;
+  protected readonly sessionRows = SESSION_ROWS;
+  protected readonly protectTips = PROTECT_TIPS;
 
   private readonly theme = inject(ThemeSettingsService);
 
+  /** Appearance offcanvas (theme settings). */
   protected readonly settingsOpen = signal(false);
 
   /** Selected avatar image src, or null when initials are used. */
@@ -130,24 +176,35 @@ export class Profile {
     () => profileImageSrc(this.theme.prefs().profileImage)
   );
 
-  /** Same avatar as a CSS background value (kept for existing [style.background] bindings). */
+  /** Same avatar as a CSS background value. */
   protected readonly avatarBg = computed<string | null>(() => {
     const src = this.avatarSrc();
     return src ? `url("${src}") center / cover no-repeat` : null;
   });
 
-  protected readonly completeness = { filled: 9, total: 14, percent: 64 };
+  /** Every profile field, used for the "Complete your profile" card. */
+  private readonly allFields: FieldRow[] = [...IDENTITY_LEFT, ...IDENTITY_RIGHT, ...ORG_LEFT, ...ORG_RIGHT];
+
+  protected readonly completeness = computed(() => {
+    const total = this.allFields.length;
+    const missing = this.allFields.filter((f) => f.value === null).map((f) => f.label);
+    const filled = total - missing.length;
+    return {
+      filled,
+      total,
+      percent: Math.round((filled / total) * 100),
+      shown: missing.slice(0, 4),
+      more: Math.max(missing.length - 4, 0)
+    };
+  });
 
   readonly tab = signal<ProfileTab>('overview');
 
   readonly roleQuery = signal('');
-  readonly roleSort = signal<'role' | 'scope'>('role');
 
   readonly visibleRoles = computed(() => {
     const q = this.roleQuery().trim().toLowerCase();
-    const rows = ROLES.filter((r) => !q || [r.name, r.scope, r.note].some((v) => v.toLowerCase().includes(q)));
-    const key = this.roleSort();
-    return [...rows].sort((a, b) => (key === 'role' ? a.name.localeCompare(b.name) : a.scope.localeCompare(b.scope)));
+    return ROLES.filter((r) => !q || [r.name, r.note, r.scope, r.scopeNote].some((v) => v.toLowerCase().includes(q)));
   });
 
   setTab(tab: ProfileTab): void {
@@ -158,16 +215,13 @@ export class Profile {
     this.roleQuery.set(value);
   }
 
-  setRoleSort(value: string): void {
-    this.roleSort.set(value as 'role' | 'scope');
+  /** Left and right columns zipped into rows, so both sides share one row height. */
+  pairs(left: FieldRow[], right: FieldRow[]): [FieldRow | null, FieldRow | null][] {
+    const n = Math.max(left.length, right.length);
+    return Array.from({ length: n }, (_, i) => [left[i] ?? null, right[i] ?? null]);
   }
 
   iconPath(name: string): string {
     return ICON_PATHS[name] ?? '';
-  }
-
-  postureArc(done: number, total: number): string {
-    const deg = Math.round((done / total) * 360);
-    return `conic-gradient(var(--orange) 0 ${deg}deg, #edeff3 ${deg}deg 360deg)`;
   }
 }

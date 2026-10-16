@@ -11,6 +11,1270 @@
   --hd-soft: color-mix(in srgb, var(--hd-primary) 14%, var(--white));
   /* hover + pressed follow the appearance palette's tones (Theme Settings -> Workspace),
      like the OtoSolve reference: hover 12%, press 21%, ink = 50% darken of the hover tone */
+  --hd-faint: color-mix(in srgb, var(--muted) 30%, var(--white));
+  --hd-press: color-mix(in srgb, var(--theme-press, var(--hd-primary)) 21%, var(--white));
+  --hd-hover-ink: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 50%, var(--mix-ink, #000));
+  --hd-strong: color-mix(in srgb, var(--hd-primary) 50%, var(--mix-ink, #000));           /* text / icons on tiles */
+  --hd-font: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
+  --hd-ink: var(--ink);
+  --hd-heading: var(--heading-color, var(--ink));
+  --hd-muted: var(--muted);
+  --hd-line: var(--line);
+  --hd-danger: var(--status-danger-ink);
+  --hd-shadow: 0 12px 38px #19374b18, 0 2px 7px #19374b09;
+
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: auto;
+  min-height: 76px;
+  padding: 10px 28px;
+  /* Custom colour controls -> Top header tint (fill only; the ink tokens flip below) */
+  background: var(--cc-top-head, var(--white));
+  border-bottom: 1px solid var(--hd-line);
+  color: var(--hd-ink);
+  font: calc(14px * var(--font-scale, 1))/1.5 var(--hd-font)
+}
+
+/* dark mode: text tokens follow the app theme */
+html[data-mode="dark"] .topbar.hd-bar {
+  --hd-ink: var(--ink);
+  --hd-heading: var(--heading-color, var(--ink));
+  --hd-muted: var(--muted);
+  --hd-line: var(--line);
+  --hd-strong: color-mix(in srgb, var(--hd-primary) 55%, var(--white));
+  --hd-hover-ink: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 60%, var(--white))
+}
+
+/* Custom colour controls (Theme Settings -> Workspace): the picked top-header tint re-inks the
+   bar - text, hairlines and pill washes flip automatically for contrast against that colour.
+   Declared after the dark-mode block so data-cc wins when both are on. */
+html[data-cc="on"] .topbar.hd-bar {
+  --hd-ink: var(--cc-top-ink);
+  --hd-heading: var(--heading-color, var(--ink));
+  --hd-muted: var(--muted);
+  --hd-line: var(--line);
+  --hd-soft: color-mix(in srgb, var(--cc-top-ink) 14%, var(--cc-top-head));
+  --hd-faint: color-mix(in srgb, var(--muted) 30%, var(--white));
+  --hd-press: color-mix(in srgb, var(--cc-top-ink) 16%, var(--cc-top-head));
+  --hd-hover-ink: var(--cc-top-ink);
+  --hd-strong: var(--cc-top-ink)
+}
+
+.hd-bar button,
+.hd-bar input {
+  font: inherit
+}
+
+.hd-bar svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+.hd-bar button:focus-visible,
+.hd-bar input:focus-visible {
+  outline: 2px solid var(--hd-strong);
+  outline-offset: 3px
+}
+
+/* ---- sidebar toggle ---- */
+.hd-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--hd-line);
+  border-radius: 9px;
+  color: var(--hd-ink);
+  transition: background-color .15s ease, color .15s ease
+}
+
+.hd-toggle:hover {
+  background: var(--hd-faint);
+  color: var(--hd-hover-ink)
+}
+
+.hd-toggle:active {
+  background: var(--hd-press)
+}
+
+.hd-toggle svg {
+  width: 20px;
+  height: 20px
+}
+
+/* ---- organisation switcher ---- */
+.hd-org-wrap {
+  position: relative;
+  min-width: 0
+}
+
+.hd-org {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 8px 10px 8px 8px;
+  border-radius: 9px;
+  color: var(--hd-ink);
+  text-align: left;
+  transition: background-color .15s ease, color .15s ease
+}
+
+.hd-org:hover {
+  background: var(--hd-faint);
+  color: var(--hd-hover-ink)
+}
+
+.hd-org.is-open {
+  background: var(--hd-soft);
+  color: var(--hd-strong)
+}
+
+.hd-org-ico {
+  display: grid;
+  place-items: center;
+  flex: none
+}
+
+.hd-org-ico svg {
+  width: 20px;
+  height: 20px
+}
+
+.hd-org-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0
+}
+
+.hd-org-meta small {
+  color: var(--hd-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  letter-spacing: 1.1px;
+  line-height: 1.4;
+  text-transform: uppercase
+}
+
+.hd-org-meta strong {
+  max-width: 185px;
+  overflow: hidden;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.hd-chev {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  transition: transform .16s ease
+}
+
+.hd-org.is-open .hd-chev,
+.hd-user[aria-expanded="true"] .hd-chev {
+  transform: rotate(180deg)
+}
+
+/* ---- shared dropdown surface ---- */
+.hd-pop {
+  position: absolute;
+  top: calc(100% + 12px);
+  z-index: 60;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--hd-shadow);
+  overflow: hidden;
+  white-space: normal;
+  animation: hd-pop-in .16s ease-out
+}
+
+@keyframes hd-pop-in {
+  from { opacity: 0; transform: translateY(-4px) }
+}
+
+.hd-pop h2 {
+  margin: 0;
+  color: var(--hd-heading);
+  font-family: inherit;
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 650;
+  letter-spacing: -.2px
+}
+
+.hd-pop p {
+  margin: 0
+}
+
+.hd-pop-foot {
+  padding: 10px 16px;
+  border-top: 1px solid var(--hd-line);
+  color: var(--hd-muted);
+  font-size: calc(10px * var(--font-scale, 1))
+}
+
+.hd-empty {
+  padding: 16px 12px;
+  color: var(--hd-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  text-align: center
+}
+
+.hd-link {
+  min-height: 28px;
+  padding: 6px;
+  border-radius: 5px;
+  color: var(--hd-strong);
+  font-size: calc(11px * var(--font-scale, 1)) !important;
+  white-space: nowrap
+}
+
+.hd-link:hover:not(:disabled) {
+  background: var(--hd-faint)
+}
+
+.hd-link:disabled {
+  opacity: .55;
+  cursor: default
+}
+
+.hd-pop-head,
+.hd-notes-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 15px 10px
+}
+
+.hd-x {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: var(--hd-ink)
+}
+
+.hd-x:hover {
+  background: var(--hd-faint);
+  color: var(--hd-hover-ink)
+}
+
+.hd-x svg {
+  width: 20px;
+  height: 20px
+}
+
+/* ---- organisation list ----
+   Type follows the OtoSolve document: Inter / Segoe UI · 15px/650 panel title · 12px hint ·
+   13px/550 names · 11px captions · 12px/650 avatar letters · 10px footer.
+   Spacing follows the reference: roomy 20px panel edge for the heading, hint and search,
+   tall rows with a round 40px letter tile, name over "subdomain · location", tick on the right. */
+.hd-org-pop {
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  border-radius: var(--radius)}
+
+/* heading: title + one-line hint (closes by clicking outside or Esc) */
+.hd-org-head {
+  padding: 20px 20px 0
+}
+
+.hd-org-pop .hd-org-head h2 {
+  color: var(--ink);
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 650;
+  letter-spacing: -.2px;
+  line-height: 1.5
+}
+
+.hd-org-head p {
+  margin-top: 6px;
+  color: var(--hd-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+.hd-org-search {
+  padding: 16px 20px 14px
+}
+
+.hd-search {
+  position: relative;
+  display: block;
+  color: var(--hd-muted)
+}
+
+.hd-search > svg {
+  position: absolute;
+  top: 50%;
+  left: 13px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  pointer-events: none
+}
+
+.hd-search input {
+  width: 100%;
+  height: 40px;
+  padding: 0 36px 0 40px;
+  border: 1px solid transparent;
+  border-radius: var(--btn-radius);
+  background: var(--chip);
+  color: var(--hd-ink);
+  font-size: calc(13px * var(--font-scale, 1));
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease
+}
+
+.hd-search input::placeholder {
+  color: color-mix(in srgb, var(--muted) 72%, var(--white))
+}
+
+/* the focus ring is drawn by the box-shadow below, so the global outline is switched off here */
+.hd-bar .hd-search input:focus,
+.hd-bar .hd-search input:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--hd-primary) 35%, var(--white));
+  background: var(--white);
+  box-shadow: 0 0 0 3px var(--hd-soft)
+}
+
+/* hide the browser's own clear (x) - the button below is used instead */
+.hd-search input::-webkit-search-cancel-button {
+  display: none
+}
+
+.hd-search-clear {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  color: var(--hd-muted);
+  transform: translateY(-50%)
+}
+
+.hd-search-clear:hover {
+  background: var(--hd-faint);
+  color: var(--hd-hover-ink)
+}
+
+.hd-search-clear svg {
+  width: 14px;
+  height: 14px
+}
+
+.hd-org-list {
+  max-height: 340px;
+  padding: 0 6px 8px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin
+}
+
+.hd-org-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 14px 12px 12px;
+  border-radius: 12px;
+  color: var(--hd-ink);
+  text-align: left;
+  transition: background-color .15s ease
+}
+
+.hd-org-row + .hd-org-row {
+  margin-top: 4px
+}
+
+.hd-org-row:hover {
+  background: var(--hd-faint)
+}
+
+.hd-org-row.is-current {
+  background: color-mix(in srgb, var(--hd-primary) 14%, var(--white));
+  color: var(--hd-strong)
+}
+
+/* letter tile: round, soft tint (white-on-tint for the chosen row, like the reference) */
+.hd-org-glyph {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--hd-primary) 12%, var(--white));
+  color: var(--hd-strong);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 650;
+  line-height: 1
+}
+
+.hd-org-row.is-current .hd-org-glyph {
+  background: transparent
+}
+
+.hd-org-pop .hd-empty {
+  padding: 22px 16px
+}
+
+.hd-org-pop .hd-pop-foot {
+  padding: 10px 20px 12px;
+  font-size: calc(10px * var(--font-scale, 1))
+}
+
+.hd-org-name {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0
+}
+
+.hd-org-name strong {
+  display: block;
+  overflow: hidden;
+  color: var(--hd-ink);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 550;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.hd-org-row.is-current .hd-org-name strong {
+  color: var(--hd-strong)
+}
+
+.hd-org-name small {
+  display: block;
+  overflow: hidden;
+  color: var(--hd-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.hd-check {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--hd-strong)
+}
+
+.hd-status {
+  flex: none;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--status-warning-bg);
+  color: var(--status-warning-ink);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.hd-status.is-active {
+  background: var(--status-success-bg);
+  color: var(--status-success-ink)
+}
+
+/* ---- clock in the header ---- */
+.hd-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 150px;
+  text-align: right;
+  white-space: nowrap
+}
+
+.hd-clock-top {
+  display: flex;
+  align-items: baseline
+}
+
+.hd-clock-top strong {
+  color: var(--hd-heading);
+  font-size: calc(17px * var(--font-scale, 1)) !important;
+  font-weight: 500;
+  letter-spacing: .3px;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums
+}
+
+.hd-clock-state {
+  margin-left: 5px;
+  color: var(--hd-strong);
+  font-size: calc(10px * var(--font-scale, 1))
+}
+
+.hd-clock-state.is-paused {
+  color: var(--status-warning-ink)
+}
+
+.hd-clock small {
+  color: var(--hd-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  line-height: 1.5
+}
+
+/* ---- quiet icon buttons ---- */
+.hd-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+  color: var(--hd-ink);
+  transition: background-color .15s ease, color .15s ease
+}
+
+.hd-icon:hover {
+  background: var(--hd-faint);
+  color: var(--hd-hover-ink)
+}
+
+.hd-icon:active {
+  background: var(--hd-press)
+}
+
+.hd-icon.is-open {
+  background: var(--hd-soft);
+  color: var(--hd-strong)
+}
+
+.hd-icon svg {
+  width: 20px;
+  height: 20px
+}
+
+/* the clock button is a touch smaller, like the reference */
+.hd-clock-btn {
+  width: 34px;
+  height: 36px
+}
+
+.hd-clock-btn svg {
+  width: 17px;
+  height: 17px
+}
+
+/* unread count on the bell */
+.hd-count {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 3px;
+  border: 2px solid var(--white);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--hd-primary) 50%, #000);
+  color: #fff;
+  font-size: calc(9px * var(--font-scale, 1));
+  font-weight: 700;
+  line-height: 12px
+}
+
+.hd-sep {
+  flex: none;
+  width: 1px;
+  height: 30px;
+  margin: 0 8px;
+  background: var(--hd-line)
+}
+
+/* ---- account chip ---- */
+.hd-account,
+.hd-bell-wrap {
+  position: relative;
+  display: flex
+}
+
+.hd-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 5px 8px;
+  border-radius: 9px;
+  color: var(--hd-ink);
+  text-align: left;
+  transition: background-color .15s ease, color .15s ease
+}
+
+.hd-user:hover {
+  background: var(--hd-faint);
+  color: var(--hd-hover-ink)
+}
+
+.hd-user[aria-expanded="true"] {
+  background: var(--hd-soft);
+  color: var(--hd-strong)
+}
+
+.hd-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--hd-line);
+  border-radius: 50%;
+  background: var(--hd-soft);
+  color: var(--hd-strong);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 650;
+  line-height: 1
+}
+
+.hd-avatar.xl {
+  flex-basis: 46px;
+  width: 46px;
+  height: 46px;
+  font-size: calc(15px * var(--font-scale, 1))
+}
+
+.hd-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0
+}
+
+.hd-user-meta strong {
+  max-width: 155px;
+  overflow: hidden;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.hd-user-meta small {
+  color: var(--hd-muted);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+/* ---- account menu ---- */
+.hd-menu {
+  right: 0;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  padding: 8px
+}
+
+.hd-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px 16px
+}
+
+.hd-menu-who {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0
+}
+
+.hd-menu-who strong {
+  color: var(--hd-heading);
+  font-size: calc(15px * var(--font-scale, 1));
+  font-weight: 650;
+  letter-spacing: -.2px
+}
+
+.hd-menu-who span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: var(--hd-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+.hd-role {
+  margin-top: 6px;
+  padding: 1px 6px;
+  border: 1px solid var(--hd-line);
+  border-radius: 4px;
+  color: var(--hd-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-style: normal
+}
+
+.hd-menu-org {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 8px);
+  min-height: 44px;
+  margin: 0 4px 12px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  background: var(--hd-soft);
+  color: var(--hd-strong);
+  text-align: left;
+  transition: background-color .15s ease
+}
+
+.hd-menu-org:hover {
+  background: var(--hd-faint)
+}
+
+.hd-menu-org-ico svg {
+  width: 20px;
+  height: 20px
+}
+
+.hd-menu-org-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0
+}
+
+.hd-menu-org-meta small {
+  color: var(--hd-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  letter-spacing: 1.1px;
+  line-height: 1.4;
+  text-transform: uppercase
+}
+
+.hd-menu-org-meta strong {
+  overflow: hidden;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.hd-menu-sep {
+  margin: 0;
+  border-top: 1px solid var(--hd-line)
+}
+
+.hd-menu-group {
+  padding: 8px 0
+}
+
+.hd-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  color: var(--hd-ink);
+  text-align: left;
+  transition: background-color .15s ease, color .15s ease
+}
+
+.hd-menu-row:hover {
+  background: var(--hd-faint);
+  color: var(--hd-hover-ink)
+}
+
+.hd-menu-row:active {
+  background: var(--hd-press)
+}
+
+.hd-row-ico {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  transition: transform .16s ease
+}
+
+.hd-menu-row:hover .hd-row-ico {
+  transform: translateX(2px)
+}
+
+.hd-row-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0
+}
+
+.hd-row-text strong {
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 550
+}
+
+.hd-row-text small {
+  color: var(--hd-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.5
+}
+
+.hd-row-chev {
+  flex: 0 0 13px;
+  width: 13px;
+  height: 13px
+}
+
+.hd-menu-row.danger {
+  color: var(--hd-danger)
+}
+
+.hd-menu-row.danger small {
+  color: color-mix(in srgb, var(--hd-danger) 70%, var(--muted))
+}
+
+.hd-menu-row.danger:hover {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-ink)
+}
+
+.hd-menu-row.danger:active {
+  background: var(--status-danger-bg);
+  color: var(--status-danger-ink)
+}
+
+.hd-menu .hd-pop-foot {
+  margin: 0 -8px -8px;
+  padding: 10px 20px 12px
+}
+
+/* ---- notifications panel ---- */
+.hd-notes {
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: 365px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 110px);
+  padding: 8px
+}
+
+.hd-notes-head {
+  padding: 6px 7px 10px
+}
+
+.hd-notes-sub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 10px 10px;
+  color: var(--hd-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+.hd-notes-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin
+}
+
+.hd-note {
+  display: flex;
+  gap: 11px;
+  padding: 13px 10px;
+  border-top: 1px solid var(--hd-line)
+}
+
+.hd-note-ico {
+  display: grid;
+  place-items: center;
+  flex: 0 0 33px;
+  width: 33px;
+  height: 33px;
+  border-radius: 8px;
+  background: var(--hd-soft);
+  color: var(--hd-strong)
+}
+
+.hd-note-ico svg {
+  width: 17px;
+  height: 17px
+}
+
+.hd-note-body {
+  flex: 1;
+  min-width: 0
+}
+
+.hd-note-body strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--hd-ink);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  transition: font-weight .15s ease, color .15s ease
+}
+
+.hd-note-body p {
+  color: var(--hd-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+.hd-note-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px
+}
+
+.hd-note-foot small {
+  color: var(--hd-muted);
+  font-size: calc(10px * var(--font-scale, 1))
+}
+
+.hd-read {
+    border: 0;
+    background: transparent;
+    color: var(--hd-strong);
+    font-size: calc(11px * var(--font-scale, 1));
+    padding: 6px;
+    border-radius: 5px;
+    min-height: 28px;
+}
+
+/* already read: quieter icon */
+.hd-note:not(.is-unread) .hd-note-ico {
+  background: var(--chip);
+  color: var(--hd-muted)
+}
+
+/* already read: title drops to normal weight (unread stays 600) */
+.hd-note:not(.is-unread) .hd-note-body strong {
+  font-weight: 400
+}
+
+.hd-notes .hd-pop-foot {
+  margin: 0 -8px -8px;
+  padding: 10px 20px 12px
+}
+
+/* ---- workspace clock dropdown ---- */
+.hd-clock-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px
+}
+
+.hd-clock-pop {
+  right: 0;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 110px);
+  padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain
+}
+
+.hd-clock-pop .hd-pop-head {
+  padding: 6px 7px 10px
+}
+
+.hd-clock-body {
+  padding: 8px 10px 12px
+}
+
+/* big time card */
+.hd-clock-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 17px;
+  padding: 15px;
+  border-radius: 8px;
+  background: var(--hd-soft);
+  color: var(--hd-strong);
+  text-align: center
+}
+
+.hd-clock-face strong {
+  font-size: calc(27px * var(--font-scale, 1));
+  font-weight: 500;
+  letter-spacing: .3px;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums
+}
+
+.hd-clock-face span {
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+/* timezone field */
+.hd-field {
+  margin: 0 0 15px
+}
+
+.hd-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--hd-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.hd-select-wrap {
+  position: relative
+}
+
+.hd-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 40px;
+  padding: 6px 10px 6px 11px;
+  border: 1px solid color-mix(in srgb, var(--muted) 70%, var(--line));
+  border-radius: var(--btn-radius);
+  background: var(--white);
+  color: var(--hd-ink);
+  font-size: calc(14px * var(--font-scale, 1));
+  text-align: left;
+  transition: border-color .15s ease, box-shadow .15s ease
+}
+
+.hd-select span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.hd-select:hover {
+  border-color: var(--hd-strong)
+}
+
+.hd-select.is-open {
+  border-color: var(--hd-strong);
+  box-shadow: 0 0 0 3px var(--hd-soft)
+}
+
+.hd-select.is-open .hd-chev {
+  transform: rotate(180deg)
+}
+
+.hd-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 5;
+  max-height: 240px;
+  padding: 6px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--hd-shadow);
+  scrollbar-width: thin;
+  animation: hd-pop-in .12s ease-out
+}
+
+.hd-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  color: var(--hd-ink);
+  text-align: left
+}
+
+.hd-option:hover {
+  background: var(--hd-faint)
+}
+
+.hd-option.is-current {
+  background: var(--hd-soft);
+  color: var(--hd-strong)
+}
+
+.hd-option-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0
+}
+
+.hd-option-text strong {
+  overflow: hidden;
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.hd-option-text small {
+  color: var(--hd-muted);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+/* option checkboxes */
+.hd-checks {
+  display: grid;
+  gap: 0
+}
+
+.hd-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 14px 0 0;
+  font-size: calc(12px * var(--font-scale, 1));
+  cursor: pointer
+}
+
+.hd-check-row:first-child {
+  margin-top: 0
+}
+
+.hd-check-row input {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  border: 1.5px solid color-mix(in srgb, var(--muted) 70%, var(--line));
+  border-radius: 3px;
+  background: var(--white) no-repeat center / 11px 11px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease
+}
+
+.hd-check-row input:checked {
+  border-color: color-mix(in srgb, var(--hd-primary) 50%, #000);
+  background-color: color-mix(in srgb, var(--hd-primary) 50%, #000);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+}
+
+.hd-check-row span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0
+}
+
+.hd-check-row strong {
+  color: var(--hd-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 400
+}
+
+.hd-check-row small {
+  color: var(--hd-muted);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+.hd-clock-note {
+  margin-top: 14px !important;
+  color: var(--hd-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+/* ---- sizes ---- */
+@media (max-width: 1200px) {
+  .topbar.hd-bar { gap: 10px; padding-inline: 18px }
+  .hd-org-meta { display: none }
+  .hd-clock { min-width: 140px }
+  .hd-user-meta strong { max-width: 130px }
+  .hd-sep { margin-inline: 3px }
+}
+
+@media (max-width: 950px) {
+  .topbar.hd-bar { padding-inline: 12px; gap: 8px }
+  .hd-user-meta { display: none }
+  .hd-user { gap: 7px }
+  .hd-full { display: none }
+}
+
+@media (max-width: 800px) {
+  .topbar.hd-bar {
+    min-height: 64px;
+    padding: 10px 12px;
+    gap: 6px
+  }
+
+  .hd-clock,
+  .hd-sep,
+  .hd-user .hd-chev { display: none }
+
+  .hd-clock-wrap,
+  .hd-bell-wrap,
+  .hd-account,
+  .hd-org-wrap { position: static }
+
+  /* dropdowns take the screen width on a phone */
+  .hd-org-pop,
+  .hd-notes,
+  .hd-menu,
+  .hd-clock-pop {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 90px)
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hd-bar *,
+  .hd-bar *::before,
+  .hd-bar *::after { animation: none !important; transition: none !important }
+}
+
+@media print {
+  .topbar.hd-bar { display: none !important }
+}
+
+
+/* =====================================================================================================
+   TOP HEADER - styles for app.html (loaded after app.css, see styleUrls in app.ts).
+     [⧉] [▦ ORGANISATION / Name v]            08:23 AM Live  [◷] [⛶] [🔔3] | (VA) Vikram Anand v
+   Dropdowns: organisation list · workspace clock · notifications panel · account menu.
+   Typography: Inter / Segoe UI · 14px base · 13px names · 10–11px captions · 15px panel titles.
+   Every colour comes from --primary (falls back to --accent).
+   ===================================================================================================== */
+.topbar.hd-bar {
+  --hd-primary: var(--primary, var(--accent));
+  /* selected / expanded tiles - the reference's --oh-selected (accent at 14%) */
+  --hd-soft: color-mix(in srgb, var(--hd-primary) 14%, var(--white));
+  /* hover + pressed follow the appearance palette's tones (Theme Settings -> Workspace),
+     like the OtoSolve reference: hover 12%, press 21%, ink = 50% darken of the hover tone */
   --hd-faint: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 12%, var(--white));
   --hd-press: color-mix(in srgb, var(--theme-press, var(--hd-primary)) 21%, var(--white));
   --hd-hover-ink: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 50%, #000);
@@ -32,7 +1296,8 @@
   height: auto;
   min-height: 76px;
   padding: 10px 28px;
-  background: var(--white);
+  /* Custom colour controls -> Top header tint (fill only; the ink tokens flip below) */
+  background: var(--cc-top-head, var(--white));
   border-bottom: 1px solid var(--hd-line);
   color: var(--hd-ink);
   font: 14px/1.5 var(--hd-font)
@@ -46,6 +1311,21 @@ html[data-mode="dark"] .topbar.hd-bar {
   --hd-line: var(--line);
   --hd-strong: color-mix(in srgb, var(--hd-primary) 55%, #fff);
   --hd-hover-ink: color-mix(in srgb, var(--theme-hover, var(--hd-primary)) 60%, #fff)
+}
+
+/* Custom colour controls (Theme Settings -> Workspace): the picked top-header tint re-inks the
+   bar - text, hairlines and pill washes flip automatically for contrast against that colour.
+   Declared after the dark-mode block so data-cc wins when both are on. */
+html[data-cc="on"] .topbar.hd-bar {
+  --hd-ink: var(--cc-top-ink);
+  --hd-heading: var(--cc-top-ink);
+  --hd-muted: color-mix(in srgb, var(--cc-top-ink) 76%, transparent);
+  --hd-line: color-mix(in srgb, var(--cc-top-ink) 30%, transparent);
+  --hd-soft: color-mix(in srgb, var(--cc-top-ink) 14%, var(--cc-top-head));
+  --hd-faint: color-mix(in srgb, var(--cc-top-ink) 10%, var(--cc-top-head));
+  --hd-press: color-mix(in srgb, var(--cc-top-ink) 16%, var(--cc-top-head));
+  --hd-hover-ink: var(--cc-top-ink);
+  --hd-strong: var(--cc-top-ink)
 }
 
 .hd-bar button,
@@ -218,7 +1498,7 @@ html[data-mode="dark"] .topbar.hd-bar {
   padding: 6px;
   border-radius: 5px;
   color: var(--hd-strong);
-  font-size: 11px;
+  font-size: 11px !important;
   white-space: nowrap
 }
 
@@ -501,8 +1781,8 @@ html[data-mode="dark"] .topbar.hd-bar {
 
 .hd-clock-top strong {
   color: var(--hd-heading);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 17px !important;
+  font-weight: 500;
   letter-spacing: .3px;
   line-height: 1.35;
   font-variant-numeric: tabular-nums
@@ -574,10 +1854,10 @@ html[data-mode="dark"] .topbar.hd-bar {
   right: 2px;
   display: grid;
   place-items: center;
-      min-width: 19px;
-    height: 19px;
+  min-width: 19px;
+  height: 19px;
   padding: 0 3px;
-  border: 2px solid var(--white); 
+  border: 2px solid var(--white);
   border-radius: 10px;
   background: var(--hd-strong);
   color: #fff;
@@ -915,7 +2195,8 @@ html[data-mode="dark"] .topbar.hd-bar {
   margin-bottom: 3px;
   color: var(--hd-ink);
   font-size: 13px;
-  font-weight: 600
+  font-weight: 600;
+  transition: font-weight .15s ease, color .15s ease
 }
 
 .hd-note-body p {
@@ -938,14 +2219,24 @@ html[data-mode="dark"] .topbar.hd-bar {
 }
 
 .hd-read {
-  color: var(--hd-muted);
-  font-size: 10px
+    border: 0;
+    background: transparent;
+    color: var(--oh-selected-ink);
+    font-size: 11px;
+    padding: 6px;
+    border-radius: 5px;
+    min-height: 28px;
 }
 
 /* already read: quieter icon */
 .hd-note:not(.is-unread) .hd-note-ico {
   background: #f0f4f7;
   color: var(--hd-muted)
+}
+
+/* already read: title drops to normal weight (unread stays 600) */
+.hd-note:not(.is-unread) .hd-note-body strong {
+  font-weight: 400
 }
 
 .hd-notes .hd-pop-foot {
@@ -993,8 +2284,8 @@ html[data-mode="dark"] .topbar.hd-bar {
 }
 
 .hd-clock-face strong {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 27px;
+  font-weight: 500;
   letter-spacing: .3px;
   line-height: 1.35;
   font-variant-numeric: tabular-nums

@@ -12,8 +12,8 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  color: #969cac;
-  font-size: 10px;
+  color: color-mix(in srgb, var(--muted) 72%, var(--white));
+  font-size: calc(10px * var(--font-scale, 1));
   margin-top: 25px
 }
 
@@ -22,6 +22,6 @@
     justify-content: center;
     text-align: center;
     gap: 4px;
-    font-size: 9px
+    font-size: calc(9px * var(--font-scale, 1))
   }
 }

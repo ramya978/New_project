@@ -13,30 +13,42 @@
   --nav-primary: var(--primary, var(--accent, #087e8b));
 
   /* highlight tones, all mixed from the primary colour */
-  --nav-active-bg: color-mix(in srgb, var(--nav-primary) 14%, #fff);   /* current page pill */
-  --nav-active-ink: color-mix(in srgb, var(--nav-primary) 50%, #000);  /* current page text + icon */
-  --nav-open-bg: color-mix(in srgb, var(--nav-primary) 4%, #fff);      /* open / holding menu pill */
+  --nav-active-bg: var(--cc-menu-sel, color-mix(in srgb, var(--nav-primary) 14%, var(--white)));   /* current page pill */
+  --nav-active-ink: var(--cc-menu-ink, color-mix(in srgb, var(--nav-primary) 50%, var(--mix-ink, #000)));  /* current page text + icon */
+  --nav-open-bg: color-mix(in srgb, var(--nav-primary) 4%, var(--white));      /* open / holding menu pill */
   /* hover + pressed: an appearance palette (Theme Settings → Workspace) brings its own tones in
      --theme-hover / --theme-press; without one they follow the primary colour.
      Derivations mirror the OtoSolve reference: hover 12%, selected-hover 19%, press 21%,
      selected-press 26%; the *-ink tones darken the same colour for readable text. */
-  --nav-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 12%, #fff);
-  --nav-hover-ink: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 50%, #000);
-  --nav-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 21%, #fff);
-  --nav-press-ink: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 50%, #000);
-  --nav-selected-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 19%, #fff);
-  --nav-selected-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 26%, #fff);
+  --nav-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 12%, var(--white));
+  --nav-hover-ink: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 50%, var(--mix-ink, #000));
+  --nav-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 21%, var(--white));
+  --nav-press-ink: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 50%, var(--mix-ink, #000));
+  --nav-selected-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 19%, var(--white));
+  --nav-selected-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 26%, var(--white));
 
   /* text + lines */
   --nav-font: var(--font-menu, Inter, "Segoe UI", Arial, sans-serif); /* Theme Settings → Menu font */
-  --nav-ink: #24364a;
-  --nav-heading-ink: #102b3f;
-  --nav-sub: #596b7b;
-  --nav-muted: #596b7b;
-  --nav-heading: #596b7b;
-  --nav-line: #e6ebef;
-  --nav-icon: var(--icon-color, #24364a); /* Theme Settings → Icon Colors */
-  --nav-sub-icon: #596b7b;
+  --nav-ink: var(--ink);
+  --nav-heading-ink: var(--heading-color, var(--ink));
+  --nav-sub: var(--muted);
+  --nav-muted: var(--muted);
+  --nav-heading: var(--muted);
+  --nav-line: var(--line);
+  --nav-icon: var(--icon-color, var(--ink)); /* Theme Settings → Icon Colors */
+  --nav-sub-icon: var(--muted);
+
+  /* secondary submenu states, from the secondary button base (--teal = Secondary colour).
+     Custom colour controls (Theme Settings -> Colour) override the tones through
+     --cc-sec-menu-sel / --cc-sec-hover / --cc-sec-press; without them the fallbacks
+     follow the secondary colour. The *-ink tones darken the same colour for readable text. */
+  --nav-sec: var(--teal, #138879);
+  --nav-sec-active-bg: color-mix(in srgb, var(--cc-sec-menu-sel, var(--nav-sec)) 14%, var(--white));
+  --nav-sec-active-ink: color-mix(in srgb, var(--cc-sec-menu-sel, var(--nav-sec)) 50%, var(--mix-ink, #000));
+  --nav-sec-hover: color-mix(in srgb, var(--cc-sec-hover, var(--nav-sec)) 12%, var(--white));
+  --nav-sec-hover-ink: color-mix(in srgb, var(--cc-sec-hover, var(--nav-sec)) 50%, var(--mix-ink, #000));
+  --nav-sec-press: color-mix(in srgb, var(--cc-sec-press, var(--nav-sec)) 21%, var(--white));
+  --nav-sec-press-ink: color-mix(in srgb, var(--cc-sec-press, var(--nav-sec)) 50%, var(--mix-ink, #000));
 
   /* icon line thickness - lower = thinner (1.5 looked heavy) */
   --nav-stroke: 1.9;
@@ -53,9 +65,9 @@
   flex-direction: column;
   height: 100vh;
   padding: 0 12px 12px;
-  font: 13px/1.45 var(--nav-font);
+  font: calc(13px * var(--font-scale, 1))/1.45 var(--nav-font);
   color: var(--nav-ink);
-  background: var(--sidebar-bg, var(--white, #fff)); /* Theme Settings → Sidebar Background */
+  background: var(--sidebar-bg, var(--white, var(--white))); /* Theme Settings → Sidebar Background */
   background-size: cover;
   background-position: center;
   border-right: 1px solid var(--line, var(--nav-line))
@@ -71,6 +83,8 @@
   padding: 16px 7px
 }
 
+/* the brand tile always follows the brand colour itself - it deliberately does NOT pick up a
+   custom Menu selection colour (Theme Settings -> Workspace) the way the current-page pill does */
 .mark {
   display: grid;
   place-items: center;
@@ -78,9 +92,9 @@
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: var(--nav-active-bg);
-  color: var(--nav-active-ink);
-  font-size: 23px;
+  background: color-mix(in srgb, var(--nav-primary) 14%, var(--white));
+  color: color-mix(in srgb, var(--nav-primary) 50%, var(--mix-ink, #000));
+  font-size: calc(23px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: -1px;
   line-height: 1
@@ -93,7 +107,7 @@
 .brand strong {
   display: block;
   color: var(--nav-heading-ink);
-  font-size: 20px;
+  font-size: calc(20px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.65px;
   line-height: 1.2;
@@ -106,7 +120,7 @@
   display: block;
   margin-top: 4px;
   color: var(--nav-muted);
-  font-size: 9px;
+  font-size: calc(9px * var(--font-scale, 1));
   letter-spacing: 1.2px;
   line-height: 1.2;
   text-transform: uppercase
@@ -118,7 +132,7 @@
   overflow-x: hidden;
   padding: 0 0 18px;
   scrollbar-width: thin;
-  scrollbar-color: #d5dfe5 transparent
+  scrollbar-color: var(--line) transparent
 }
 
 /* ---- main headings: WORKSPACE / PLATFORM / FUNDRAISING … ---- */
@@ -126,7 +140,7 @@
   margin: 19px 12px 8px;
   padding: 0;
   color: var(--nav-heading);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1.15px;
   line-height: 1.5;
@@ -158,7 +172,7 @@
   background: none;
   color: var(--nav-ink);
   font: inherit;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 400;
   line-height: 1.4;
   text-align: left;
@@ -235,9 +249,9 @@
   min-width: 22px;
   padding: 2px 5px;
   border-radius: 5px;
-  background: #f0f4f7;
+  background: var(--chip);
   color: var(--nav-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.4;
   font-variant-numeric: tabular-nums
@@ -278,7 +292,7 @@
 }
 
 .nav-link.active .nav-badge {
-  background: #ffffffc7;
+  background: color-mix(in srgb, var(--white) 78%, transparent);
   color: inherit
 }
 
@@ -348,7 +362,7 @@
   background: none;
   color: var(--nav-sub);
   font: inherit;
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--font-scale, 1));
   font-weight: 400;
   line-height: 1.4;
   text-align: left;
@@ -466,7 +480,7 @@
 }
 
 .nav-children.deep .nav-child {
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 /* ---- navigation spacing: Compact (Theme Settings → Workspace sets <html data-density>) ---- */
@@ -550,6 +564,224 @@
 
 :host(.is-collapsed) .nav-entry.is-open:not(.has-current) > .nav-link:not(.active) {
   background: none
+}
+
+/* =====================================================================================================
+   HORIZONTAL LAYOUT (Appearance studio -> Layout -> Horizontal; host class .is-horizontal)
+   One sticky strip across the top: brand, then the menus in a row. A menu with pages opens a
+   dropdown right under itself - position: fixed (coordinates from sidebar.ts) so the strip never
+   clips it, and the strip sits above the top header so the dropdown is never hidden behind it.
+   Phones keep the slide-over menu below.
+   ===================================================================================================== */
+@media (min-width: 801px) {
+  :host(.is-horizontal) {
+    position: sticky;
+    top: 0;
+    z-index: 60
+  }
+
+  :host(.is-horizontal) .sidebar {
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+    height: auto;
+    min-height: 60px;
+    padding: 0 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line, var(--nav-line));
+    overflow: visible
+  }
+
+  :host(.is-horizontal) .brand {
+    flex: none;
+    height: auto;
+    min-height: 0;
+    padding: 10px 6px 10px 0
+  }
+
+  :host(.is-horizontal) .mark {
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: calc(19px * var(--font-scale, 1))
+  }
+
+  :host(.is-horizontal) .brand strong {
+    font-size: calc(17px * var(--font-scale, 1))
+  }
+
+  :host(.is-horizontal) .brand small {
+    margin-top: 2px
+  }
+
+  /* one line only: the row slides sideways instead of wrapping (arrows / wheel / swipe) */
+  :host(.is-horizontal) .nav {
+    display: flex;
+    flex: 1;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    padding: 8px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain
+  }
+
+  :host(.is-horizontal) .nav::-webkit-scrollbar {
+    display: none
+  }
+
+  /* slider arrows: round buttons sticky on the row's edges (readable over any sidebar image);
+     the negative margin lets them float over the menus instead of taking room in the row */
+  :host(.is-horizontal) .nav-slide {
+    position: sticky;
+    z-index: 2;
+    display: grid;
+    flex: 0 0 44px;
+    place-items: center;
+    align-self: stretch;
+    width: 44px;
+    padding: 0;
+    border: 0;
+    color: var(--nav-ink);
+    cursor: pointer
+  }
+
+  :host(.is-horizontal) .nav-slide.prev {
+    left: 0;
+    margin-right: -44px;
+    justify-items: start;
+    background: none
+  }
+
+  :host(.is-horizontal) .nav-slide.next {
+    right: 0;
+    margin-left: -44px;
+    justify-items: end;
+    background: none
+  }
+
+  :host(.is-horizontal) .nav-slide svg {
+    width: 30px;
+    height: 30px;
+    padding: 7px;
+    border: 1px solid var(--line, var(--nav-line));
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--ink);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    box-shadow: 0 2px 8px #1e23341f;
+    transition: background-color .15s ease, color .15s ease
+  }
+
+  :host(.is-horizontal) .nav-slide:hover svg {
+    background: var(--nav-hover);
+    color: var(--nav-hover-ink)
+  }
+
+  :host(.is-horizontal) .nav-slide:focus-visible {
+    outline: none
+  }
+
+  :host(.is-horizontal) .nav-slide:focus-visible svg {
+    outline: 2px solid var(--nav-primary);
+    outline-offset: 2px
+  }
+
+
+  :host(.is-horizontal) .nav-heading {
+    display: none
+  }
+
+  :host(.is-horizontal) .nav-entry {
+    flex: none
+  }
+
+  :host(.is-horizontal) .nav-link {
+    width: auto;
+    min-height: 36px;
+    margin: 0;
+    padding: 7px 10px;
+    gap: 7px;
+    white-space: nowrap
+  }
+
+  :host(.is-horizontal) .nav-text {
+    overflow: visible
+  }
+
+  :host(.is-horizontal) .nav-dot {
+    display: none
+  }
+
+  /* chevron points down; flips up while the dropdown is open */
+  :host(.is-horizontal) .nav-entry > .nav-link .nav-chev {
+    transform: rotate(90deg)
+  }
+
+  :host(.is-horizontal) .nav-entry.is-open > .nav-link .nav-chev {
+    transform: rotate(-90deg)
+  }
+
+  /* an open menu reads as pressed while its dropdown shows */
+  :host(.is-horizontal) .nav-entry.is-open > .nav-link {
+    background: var(--nav-hover);
+    color: var(--nav-hover-ink)
+  }
+
+  /* ---- the dropdown ---- */
+  .nav-children.is-drop {
+    /* the panel is always a light (or dark-mode) surface, whatever image the strip shows -
+       so its text tokens go back to the page ones */
+    --nav-ink: var(--ink);
+    --nav-sub: var(--muted);
+    --nav-muted: var(--muted);
+    --nav-sub-icon: var(--muted);
+    --nav-icon: var(--icon-color, var(--ink));
+    --nav-line: var(--line);
+    --nav-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 12%, var(--white));
+    --nav-hover-ink: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 50%, var(--mix-ink, #000));
+    --nav-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 21%, var(--white));
+    --nav-press-ink: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 50%, var(--mix-ink, #000));
+    --nav-active-bg: var(--cc-menu-sel, color-mix(in srgb, var(--nav-primary) 14%, var(--white)));
+    --nav-active-ink: var(--cc-menu-ink, color-mix(in srgb, var(--nav-primary) 50%, var(--mix-ink, #000)));
+    --nav-selected-hover: color-mix(in srgb, var(--theme-hover, var(--nav-primary)) 19%, var(--white));
+    --nav-selected-press: color-mix(in srgb, var(--theme-press, var(--nav-primary)) 26%, var(--white));
+
+    position: fixed;
+    z-index: 80;
+    width: 260px;
+    max-height: calc(100vh - 160px);
+    margin: 0;
+    padding: 6px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius, 10px);
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: 0 14px 36px #1e233424, 0 2px 6px #1e233412
+  }
+
+  .nav-children.is-drop .nav-child {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 10px
+  }
+
+  .nav-children.is-drop .nav-children.deep {
+    margin: 2px 0 4px 14px;
+    padding: 2px 0 2px 8px;
+    border-left: 1px solid var(--line)
+  }
 }
 
 /* ---- phone: slide-over menu ---- */

@@ -1,8 +1,11 @@
 <!-- =====================================================================================================
      THEME SETTINGS OFFCANVAS - overlay + right-hand panel.
-     Two tabs:  Theme      colours, layout, sidebar background, fonts, mode, icons, headings, shape, avatar
-                Workspace  appearance palette, navigation spacing, clock presentation
-     Reset / Save footer. Selected states use the app accent (var(--accent)).
+     Five icon tabs: Colour      theme mode, palettes, custom colour controls, status colours, my templates
+                     Layout      navigation layout, content width, menu spacing, clock, motion
+                     Typography  font families and type sizing
+                     Shape       corner style presets, shadow and radius
+                     Images      sidebar background, profile image
+     Reset / Apply changes footer. Selected states use the app accent (var(--accent)).
      ===================================================================================================== -->
 <div class="ts-overlay" (click)="close()" aria-hidden="true"></div>
 
@@ -11,7 +14,8 @@
   <!-- header -->
   <header class="ts-head">
     <div class="ts-head-text">
-      <h2 id="ts-title">Theme Settings</h2>
+      <span class="ts-eyebrow">Make OtoSolve your own</span>
+      <h2 id="ts-title">Appearance studio</h2>
       <p>Personalise colours, layout and typography</p>
     </div>
     <button type="button" class="ts-close" aria-label="Close settings" (click)="close()">
@@ -20,84 +24,352 @@
     </button>
   </header>
 
-  <!-- tabs -->
+
+  <!-- tabs: icon over label, active tab in the accent colour with an underline -->
   <div class="ts-tabbar">
+    <!-- one shared gradient for the tab icons: primary colour -> secondary colour (settings.css) -->
+    <svg class="ts-grad-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="ts-tab-grad" gradientUnits="userSpaceOnUse" x1="2" y1="2" x2="22" y2="22">
+          <stop class="ts-grad-a" offset="0" />
+          <stop class="ts-grad-b" offset="1" />
+        </linearGradient>
+      </defs>
+    </svg>
     <div class="ts-tabs" role="tablist" aria-label="Settings sections">
-      <button type="button" class="ts-tab" role="tab" id="ts-tab-theme" aria-controls="ts-pane-theme"
-              [class.is-on]="tab() === 'theme'" [attr.aria-selected]="tab() === 'theme'" (click)="tab.set('theme')">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('palette')" /></svg>
-        Theme
-      </button>
-      <button type="button" class="ts-tab" role="tab" id="ts-tab-workspace" aria-controls="ts-pane-workspace"
-              [class.is-on]="tab() === 'workspace'" [attr.aria-selected]="tab() === 'workspace'" (click)="tab.set('workspace')">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('workspace')" /></svg>
-        Workspace
-      </button>
+      @for (t of tabs; track t.id) {
+        <button type="button" class="ts-tab" role="tab" [id]="'ts-tab-' + t.id" [attr.aria-controls]="'ts-pane-' + t.id"
+                [class.is-on]="tab() === t.id" [attr.aria-selected]="tab() === t.id" (click)="tab.set(t.id)">
+          <svg class="ts-tab-ico" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="url(#ts-tab-grad)" stroke-width="1.6"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(t.icon)" /></svg>
+          <span class="ts-tab-label">{{ t.label }}</span>
+          @if (t.id === 'colour' && templates().length) {
+            <span class="ts-tab-count num" [attr.aria-label]="templates().length + ' saved templates'">{{ templates().length }}</span>
+          }
+        </button>
+      }
     </div>
   </div>
 
   <div class="ts-body">
 
     <!-- =================================================================================================
-         THEME TAB
+         COLOUR TAB - theme mode, nine palettes, custom colour controls, status colours, my templates
          ================================================================================================= -->
-    @if (tab() === 'theme') {
-    <div class="ts-pane" role="tabpanel" id="ts-pane-theme" aria-labelledby="ts-tab-theme">
+    @if (tab() === 'colour') {
+    <div class="ts-pane" role="tabpanel" id="ts-pane-colour" aria-labelledby="ts-tab-colour">
 
-    <!-- theme (primary) colours -->
+  
+    <!-- appearance palette -->
     <section class="ts-card">
       <div class="ts-card-head">
-        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('palette')" /></svg></span>
-        <div class="ts-sec-text"><h3>Theme Colors</h3><p>Buttons, links and active states</p></div>
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('brush')" /></svg></span>
+        <div class="ts-sec-text"><h3>Nine coordinated palettes</h3><p>Choose a starting point. The same selected, hover and pressed states apply to the sidebar and the page.</p></div>
       </div>
-      <div class="ts-swatches">
-        @for (c of themeColors(); track c) {
-          <button type="button" class="ts-swatch" [class.is-on]="prefs().themeColor === c"
-                  [style.background]="c" [attr.aria-label]="'Theme color ' + c"
-                  [attr.aria-pressed]="prefs().themeColor === c" (click)="setSwatch('themeColor', c)">
-            @if (prefs().themeColor === c) {
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('check')" /></svg>
+
+      <div class="ts-palettes">
+        @for (p of palettes; track p.id) {
+          <button type="button" class="ts-palette" [class.is-on]="activePaletteId() === p.id"
+                  [attr.aria-pressed]="activePaletteId() === p.id" [attr.aria-label]="'Palette ' + p.name"
+                  (click)="setPalette(p)">
+            <!-- accent · hover · pressed · selected tint -->
+            <span class="ts-palette-art" aria-hidden="true">
+              <span class="main" [style.background]="p.accent"></span>
+              <span [style.background]="p.hover"></span>
+              <span [style.background]="p.pressed"></span>
+              <span [style.background]="selectedTint(p)"></span>
+            </span>
+            <span class="ts-palette-name">{{ p.name }}</span>
+            @if (activePaletteId() === p.id) {
+              <span class="ts-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6"
+                     stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath('check')" /></svg>
+              </span>
             }
           </button>
         }
-        <label class="ts-swatch ts-picker" title="Custom colour">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('pen')" /></svg>
-          <input type="color" [value]="prefs().themeColor" aria-label="Custom theme colour"
-                 (input)="setSwatch('themeColor', $any($event.target).value)" />
-        </label>
       </div>
-      @if (paletteName(); as name) {
-        <p class="ts-hint">Set by the <strong>{{ name }}</strong> palette (Workspace tab). Picking a colour here replaces it.</p>
-      }
+
+      <div class="ts-palette-foot">
+        @if (prefs().customColourControls) {
+          <span>Using <strong>your custom colours</strong> · pick a palette to start from it again</span>
+        } @else if (paletteName(); as name) {
+          <span>Using <strong>{{ name }}</strong></span>
+          <button type="button" class="ts-text-btn" (click)="clearPalette()">Use my Theme Color instead</button>
+        } @else {
+          <span>Using your own Theme Color · pick a palette for matching hover and pressed tones</span>
+        }
+      </div>
     </section>
 
-    <!-- secondary colours -->
+    <!-- custom colour controls: live preview table + grouped colour fields -->
+    <section class="ts-card">
+      <div class="ts-cc-head">
+        <div class="ts-sec-text">
+          <h3 class="ts-cc-title">{{ previewTitle() }}</h3>
+          <p>How buttons and menu rows look in each state</p>
+        </div>
+        <span class="ts-cc-live"><i aria-hidden="true"></i>Live preview</span>
+      </div>
+
+      <!-- preview table: Default · Hover · Pressed across, Button / Menu / Contrast down -->
+      <div class="ts-cx" role="group" aria-label="Live colour preview">
+        <div class="ts-cx-row ts-cx-cols" aria-hidden="true">
+          <span></span><span>Default</span><span>Hover</span><span>Pressed</span>
+        </div>
+        <!-- primary -->
+        <div class="ts-cx-group">Primary <small>sidebar &amp; buttons</small></div>
+        <div class="ts-cx-row">
+          <span class="ts-cx-label">Button</span>
+          <span class="ts-cx-btn" [style.background]="effBtn()" [style.color]="solidInk(effBtn())">Default</span>
+          <span class="ts-cx-btn" [style.background]="effHover()" [style.color]="solidInk(effHover())">Hover</span>
+          <span class="ts-cx-btn" [style.background]="effPress()" [style.color]="solidInk(effPress())">Pressed</span>
+        </div>
+        <div class="ts-cx-row">
+          <span class="ts-cx-label">Menu</span>
+          <span class="ts-cx-tint" [style.background]="chipBg(effMenu(), 0.14)" [style.color]="chipInk(effMenu(), 0.14)">Selected</span>
+          <span class="ts-cx-tint" [style.background]="chipBg(effHover(), 0.12)" [style.color]="chipInk(effHover(), 0.12)">Hover</span>
+          <span class="ts-cx-tint" [style.background]="chipBg(effPress(), 0.21)" [style.color]="chipInk(effPress(), 0.21)">Pressed</span>
+        </div>
+        <div class="ts-cx-row ts-cx-ratio">
+          <span class="ts-cx-label">Contrast</span>
+          <span class="num">{{ contrastOf(effBtn()) }}</span>
+          <span class="num">{{ contrastOf(effHover()) }}</span>
+          <span class="num">{{ contrastOf(effPress()) }}</span>
+        </div>
+        <!-- secondary -->
+        <div class="ts-cx-group">Secondary <small>sub-menu &amp; buttons</small></div>
+        <div class="ts-cx-row">
+          <span class="ts-cx-label">Button</span>
+          <span class="ts-cx-btn" [style.background]="effSecBtn()" [style.color]="solidInk(effSecBtn())">Default</span>
+          <span class="ts-cx-btn" [style.background]="effSecHover()" [style.color]="solidInk(effSecHover())">Hover</span>
+          <span class="ts-cx-btn" [style.background]="effSecPress()" [style.color]="solidInk(effSecPress())">Pressed</span>
+        </div>
+        <div class="ts-cx-row">
+          <span class="ts-cx-label">Menu</span>
+          <span class="ts-cx-tint" [style.background]="chipBg(effSecMenu(), 0.14)" [style.color]="chipInk(effSecMenu(), 0.14)">Selected</span>
+          <span class="ts-cx-tint" [style.background]="chipBg(effSecHover(), 0.12)" [style.color]="chipInk(effSecHover(), 0.12)">Hover</span>
+          <span class="ts-cx-tint" [style.background]="chipBg(effSecPress(), 0.21)" [style.color]="chipInk(effSecPress(), 0.21)">Pressed</span>
+        </div>
+        <div class="ts-cx-row ts-cx-ratio">
+          <span class="ts-cx-label">Contrast</span>
+          <span class="num">{{ contrastOf(effSecBtn()) }}</span>
+          <span class="num">{{ contrastOf(effSecHover()) }}</span>
+          <span class="num">{{ contrastOf(effSecPress()) }}</span>
+        </div>
+      </div>
+
+      <hr class="ts-cc-rule" />
+
+      <div class="ts-cc-toggle">
+        <input type="checkbox" id="ts-cc-on" class="ts-cc-box" [checked]="prefs().customColourControls"
+               (change)="toggleCc($event)" />
+        <div class="ts-sec-text">
+          <h3><label for="ts-cc-on">Custom colour controls</label></h3>
+          <p>Set button states, menu highlights, outlines and header accents.</p>
+        </div>
+      </div>
+
+      <!-- colour fields, grouped into tiles: swatch on the left, label over an editable hex -->
+      <div class="ts-cc-list" [class.is-off]="!prefs().customColourControls">
+        @for (f of ccFields; track f.key) {
+          @switch (f.label) {
+            @case ('Primary button') { <p class="ts-cc-group">Primary</p> }
+            @case ('Secondary button') { <p class="ts-cc-group">Secondary</p> }
+            @case ('Secondary colour') { <p class="ts-cc-group">Secondary</p> }
+            @case ('Card outline') { <p class="ts-cc-group">Surfaces</p> }
+            @case ('Icon colour') { <p class="ts-cc-group">Text &amp; icons</p> }
+          }
+          <div class="ts-cc-tile" [class.is-bad]="hexError() === f.key">
+            <button type="button" class="ts-cc-swatch" [style.background]="prefs()[f.key]"
+                    [class.is-open]="pickerKey() === f.key" [disabled]="!prefs().customColourControls && !f.always"
+                    [attr.aria-label]="f.label + ' colour, ' + prefs()[f.key]" aria-haspopup="dialog"
+                    [attr.aria-expanded]="pickerKey() === f.key" (click)="openPicker(f.key, f.label, $event)"></button>
+            <div class="ts-cc-meta">
+              <span class="ts-cc-rlabel">{{ f.label }}</span>
+              <input type="text" class="ts-cc-hex" spellcheck="false" autocomplete="off" maxlength="7"
+                     [value]="hexText()[f.key]" [disabled]="!prefs().customColourControls && !f.always"
+                     [attr.aria-label]="f.label + ' hex colour'"
+                     [attr.aria-invalid]="hexError() === f.key"
+                     (input)="onHexInput(f.key, $event)" (blur)="onHexBlur(f.key)" />
+            </div>
+          </div>
+        }
+      </div>
+
+      <p class="ts-hint">Six-digit hex colours. Text colour adjusts automatically for contrast. Page and card interiors always stay white; card colour changes the outline only.</p>
+    </section>
+
+    <!-- status colours: five meanings, each a base hex; washes and readable text shades are derived -->
     <section class="ts-card">
       <div class="ts-card-head">
-        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('droplet')" /></svg></span>
-        <div class="ts-sec-text"><h3>Secondary Colors</h3><p>Supporting accents and outlines</p></div>
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('info')" /></svg></span>
+        <div class="ts-sec-text">
+          <h3>Status colours</h3>
+          <p>Info, success, warning, danger, and neutral colours maintain consistent meanings across the UI, with labels always visible.</p>
+        </div>
       </div>
-      <div class="ts-swatches">
-        @for (c of secondaryColors(); track c) {
-          <button type="button" class="ts-swatch" [class.is-on]="prefs().secondaryColor === c"
-                  [style.background]="c" [attr.aria-label]="'Secondary color ' + c"
-                  [attr.aria-pressed]="prefs().secondaryColor === c" (click)="setSwatch('secondaryColor', c)">
-            @if (prefs().secondaryColor === c) {
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('check')" /></svg>
-            }
+
+      <div class="ts-cc-list ts-status-list">
+        @for (f of statusFields; track f.key) {
+          <div class="ts-cc-tile" [class.is-bad]="hexError() === f.key">
+            <button type="button" class="ts-cc-swatch" [style.background]="prefs()[f.key]"
+                    [class.is-open]="pickerKey() === f.key"
+                    [attr.aria-label]="f.label + ' colour, ' + prefs()[f.key]" aria-haspopup="dialog"
+                    [attr.aria-expanded]="pickerKey() === f.key" (click)="openPicker(f.key, f.label, $event)"></button>
+            <div class="ts-cc-meta">
+              <span class="ts-cc-rlabel">{{ f.label }}</span>
+              <input type="text" class="ts-cc-hex" spellcheck="false" autocomplete="off" maxlength="7"
+                     [value]="hexText()[f.key]" [attr.aria-label]="f.label + ' hex colour'"
+                     [attr.aria-invalid]="hexError() === f.key"
+                     (input)="onHexInput(f.key, $event)" (blur)="onHexBlur(f.key)" />
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- live chips: icon + label always shown, so meaning never depends on colour alone -->
+      <div class="ts-status-chips" aria-label="Status preview">
+        @for (f of statusFields; track f.key) {
+          <span class="ts-status-chip" [attr.data-tone]="f.tone">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath(f.icon)" /></svg>
+            {{ f.label }}
+          </span>
+        }
+      </div>
+
+      <p class="ts-hint">Text shades adjust automatically for readability. Card interiors stay white.</p>
+    </section>
+
+    <!-- my custom templates: last card of the Colour tab -->
+    <section class="ts-card" id="ts-templates">
+      <div class="ts-tpl-head">
+        <h3>My custom templates</h3>
+        <span class="ts-tpl-count num" [class.is-full]="atTemplateLimit()">{{ templates().length }} / {{ maxTemplates }}</span>
+      </div>
+      <p class="ts-tpl-intro">Save the complete appearance: mode, colours, layout, width, shape, typography and clock. Templates stay in this browser.
+        Use a template to preview it, then choose <strong>Apply changes</strong>.</p>
+
+      <!-- new template -->
+      <label class="ts-tpl-label" for="ts-tpl-name">Save what is on screen now</label>
+      <div class="ts-tpl-new">
+        <span class="ts-palette-art ts-tpl-now" aria-hidden="true" title="Current colours">
+          <span class="main" [style.background]="currentStrip().main"></span>
+          <span [style.background]="currentStrip().hover"></span>
+          <span [style.background]="currentStrip().pressed"></span>
+          <span [style.background]="currentStrip().tint"></span>
+        </span>
+        <input id="ts-tpl-name" type="text" class="ts-tpl-input" autocomplete="off" placeholder="e.g. Calm ocean · comfortable"
+               [attr.maxlength]="nameMax" [value]="templateName()" [disabled]="atTemplateLimit()"
+               (input)="onTemplateName($event)" (keydown.enter)="saveTemplate()" />
+        <button type="button" class="btn-primary ts-tpl-save" [disabled]="atTemplateLimit()" (click)="saveTemplate()">Save template</button>
+      </div>
+      @if (templateNote(); as n) {
+        <p class="ts-tpl-note" [attr.data-tone]="n.tone" role="status" aria-live="polite">{{ n.text }}</p>
+      } @else if (atTemplateLimit()) {
+        <p class="ts-tpl-note" data-tone="info">All {{ maxTemplates }} slots are used. Replace or delete a template to save another.</p>
+      }
+
+      <!-- saved templates -->
+      <div class="ts-tpl-list">
+        @for (t of templates(); track t.id) {
+          <article class="ts-tpl" [class.is-previewing]="previewingId() === t.id">
+            <!-- button · hover · pressed · selected tint - the same strip as the palettes above -->
+            <span class="ts-palette-art ts-tpl-art" aria-hidden="true">
+              <span class="main" [style.background]="templateStrip(t).main"></span>
+              <span [style.background]="templateStrip(t).hover"></span>
+              <span [style.background]="templateStrip(t).pressed"></span>
+              <span [style.background]="templateStrip(t).tint"></span>
+            </span>
+
+            <div class="ts-tpl-top">
+              @if (renamingId() === t.id) {
+                <div class="ts-tpl-rename">
+                  <input type="text" class="ts-tpl-input sm" [attr.maxlength]="nameMax" [value]="renameText()"
+                         aria-label="New template name" (input)="onRenameText($event)"
+                         (keydown.enter)="commitRename(t)" (keydown.escape)="cancelRename(); $event.stopPropagation()" />
+                  <button type="button" class="ts-tpl-btn" (click)="commitRename(t)">Save</button>
+                  <button type="button" class="ts-tpl-btn ghost" (click)="cancelRename()">Cancel</button>
+                </div>
+              } @else {
+                <strong class="ts-tpl-name">{{ t.name }}</strong>
+              }
+              @if (previewingId() === t.id) {
+                <span class="ts-tpl-flag is-live">Previewing</span>
+              } @else if (matchesPreview(t)) {
+                <span class="ts-tpl-flag">Matches preview</span>
+              }
+            </div>
+
+            <p class="ts-tpl-sub">{{ templateSubtitle(t) }} · {{ templateMeta(t) }} <span>· saved {{ savedOn(t) }}</span></p>
+
+            <div class="ts-tpl-actions">
+              <button type="button" class="ts-tpl-btn" (click)="useTemplate(t)">Use template</button>
+              <button type="button" class="ts-tpl-btn" (click)="replaceTemplate(t)">Replace</button>
+              <button type="button" class="ts-tpl-btn" [disabled]="renamingId() === t.id" (click)="startRename(t)">Rename</button>
+              <button type="button" class="ts-tpl-btn" [class.danger]="confirmDeleteId() === t.id" (click)="deleteTemplate(t)">
+                {{ confirmDeleteId() === t.id ? 'Confirm delete' : 'Delete' }}
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <div class="ts-tpl-empty">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('template')" /></svg>
+            <p><strong>No templates yet.</strong> Set up colours, layout and type, then save them here under a name.</p>
+          </div>
+        }
+      </div>
+
+      <!-- move templates between browsers / devices -->
+      <div class="ts-tpl-io">
+        <button type="button" class="ts-tpl-btn lg" [disabled]="!templates().length" (click)="exportTemplates()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('download')" /></svg>
+          Export templates
+        </button>
+        <label class="ts-tpl-btn lg" [class.is-disabled]="atTemplateLimit()"
+               [attr.title]="atTemplateLimit() ? 'All ' + maxTemplates + ' slots are used' : 'Choose a .json file made with Export templates'">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('upload')" /></svg>
+          Import templates
+          <input type="file" accept=".json,application/json" aria-label="Import templates from a file"
+                 [disabled]="atTemplateLimit()" (change)="importTemplates($event)" />
+        </label>
+      </div>
+      <p class="ts-hint">Export saves every template to a .json file. Import adds them in another browser; existing templates are kept and duplicate names get a number.</p>
+    </section>
+
+    </div>
+    }
+
+    <!-- =================================================================================================
+         LAYOUT TAB - navigation layout, content width, menu spacing, clock, motion
+         ================================================================================================= -->
+    @if (tab() === 'layout') {
+    <div class="ts-pane" role="tabpanel" id="ts-pane-layout" aria-labelledby="ts-tab-layout">
+  <!-- theme mode: light · dark · system (follows the device and switches live) -->
+    <section class="ts-card">
+      <div class="ts-card-head">
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('moon')" /></svg></span>
+        <div class="ts-sec-text"><h3>Theme Mode</h3><p>Light, dark, or follow this device</p></div>
+      </div>
+      <div class="ts-modes three">
+        @for (m of modeOptions; track m.id) {
+          <button type="button" class="ts-mode" [class.is-on]="prefs().mode === m.id"
+                  [attr.aria-pressed]="prefs().mode === m.id" (click)="set('mode', m.id)">
+            <span class="ts-mode-art" [class.light]="m.id === 'light'" [class.dark]="m.id === 'dark'"
+                  [class.system]="m.id === 'system'" aria-hidden="true"></span>
+            <span class="ts-mode-label">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path [attr.d]="iconPath(m.id === 'light' ? 'sun' : m.id === 'dark' ? 'moon' : 'monitor')" /></svg>
+              {{ m.label }}
+            </span>
+            <small class="ts-mode-note">{{ m.note }}</small>
           </button>
         }
-        <label class="ts-swatch ts-picker" title="Custom colour">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('pen')" /></svg>
-          <input type="color" [value]="prefs().secondaryColor" aria-label="Custom secondary colour"
-                 (input)="setSwatch('secondaryColor', $any($event.target).value)" />
-        </label>
       </div>
     </section>
 
@@ -148,53 +420,84 @@
       </div>
     </section>
 
-    <!-- sidebar background (images) -->
+    <!-- content width: compact · normal · wide -->
     <section class="ts-card">
       <div class="ts-card-head">
-        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('sidebar')" /></svg></span>
-        <div class="ts-sec-text"><h3>Sidebar Background</h3><p>Pick an image or upload your own</p></div>
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('columns')" /></svg></span>
+        <div class="ts-sec-text"><h3>Content Width</h3><p>How wide pages may grow on large screens</p></div>
       </div>
-      <div class="ts-bgs">
-        @for (bg of sidebarBgs; track bg.label) {
-          <button type="button" class="ts-bg" [class.is-on]="prefs().sidebarBg === bg.value"
-                  [attr.aria-pressed]="prefs().sidebarBg === bg.value" [attr.aria-label]="'Sidebar background ' + bg.label"
-                  (click)="set('sidebarBg', bg.value)">
-            <span class="ts-bg-art" [class.none]="bg.value === null" [style.background]="bg.value ?? ''">
-              @if (bg.value === null) {
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"
-                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('ban')" /></svg>
-              }
-            </span>
-            <small>{{ bg.label }}</small>
-            @if (prefs().sidebarBg === bg.value) {
-              <span class="ts-check" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6"
-                     stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath('check')" /></svg>
-              </span>
-            }
+      <div class="ts-modes three">
+        @for (w of widthOptions; track w.id) {
+          <button type="button" class="ts-mode" [class.is-on]="prefs().contentWidth === w.id"
+                  [attr.aria-pressed]="prefs().contentWidth === w.id" (click)="set('contentWidth', w.id)">
+            <span class="ts-width-art" [attr.data-w]="w.id" aria-hidden="true"><i></i></span>
+            <span class="ts-mode-label">{{ w.label }}</span>
+            <small class="ts-mode-note">{{ w.note }}</small>
           </button>
         }
-
-        <!-- upload your own -->
-        <label class="ts-bg ts-bg-upload" [class.is-on]="isCustomBg()" title="Upload image (max 2 MB)">
-          <span class="ts-bg-art" [class.dashed]="!isCustomBg()" [style.background]="isCustomBg() ? prefs().sidebarBg : ''">
-            @if (!isCustomBg()) {
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('upload')" /></svg>
-            }
-          </span>
-          <small>{{ isCustomBg() ? 'Custom' : 'Upload' }}</small>
-          @if (isCustomBg()) {
-            <span class="ts-check" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6"
-                   stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath('check')" /></svg>
-            </span>
-          }
-          <input type="file" accept="image/*" aria-label="Upload sidebar background"
-                 (change)="uploadSidebarBg($event)" />
-        </label>
       </div>
     </section>
+
+    <!-- navigation spacing -->
+    <section class="ts-card">
+      <div class="ts-card-head">
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('spacing')" /></svg></span>
+        <div class="ts-sec-text"><h3>Navigation Spacing</h3><p>Height of the sidebar menu rows</p></div>
+      </div>
+      <div class="ts-modes">
+        @for (d of densities; track d.id) {
+          <button type="button" class="ts-mode" [class.is-on]="prefs().navDensity === d.id"
+                  [attr.aria-pressed]="prefs().navDensity === d.id" (click)="set('navDensity', d.id)">
+            <span class="ts-density-art" [class.compact]="d.id === 'compact'" aria-hidden="true">
+              <i class="on"></i><i></i><i></i><i></i>
+            </span>
+            <span class="ts-mode-label">{{ d.label }}</span>
+            <small class="ts-mode-note">{{ d.note }}</small>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- clock presentation -->
+    <section class="ts-card">
+      <div class="ts-card-head">
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('clock')" /></svg></span>
+        <div class="ts-sec-text"><h3>Clock Presentation</h3><p>How the clock shows in the header</p></div>
+      </div>
+      <div class="ts-seg" role="group" aria-label="Clock presentation">
+        @for (o of clockOptions; track o.id) {
+          <button type="button" class="ts-seg-btn" [class.is-on]="clock.presentation() === o.id"
+                  [attr.aria-pressed]="clock.presentation() === o.id" (click)="setClock(o.id)">
+            {{ o.label }}
+          </button>
+        }
+      </div>
+      <p class="ts-hint">{{ clockNote() }} · applies straight away, the clock keeps its own settings.</p>
+    </section>
+
+    <!-- motion -->
+    <section class="ts-card">
+      <div class="ts-switch-row">
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('motion')" /></svg></span>
+        <div class="ts-sec-text">
+          <h3><label for="ts-motion">Reduce motion</label></h3>
+          <p>Turns off animations and slide effects across the app</p>
+        </div>
+        <span class="ts-switch">
+          <input id="ts-motion" type="checkbox" role="switch" [checked]="prefs().reduceMotion" (change)="toggleMotion($event)" />
+          <i aria-hidden="true"></i>
+        </span>
+      </div>
+    </section>
+
+    </div>
+    }
+
+    <!-- =================================================================================================
+         TYPOGRAPHY TAB - font families and type sizing
+         ================================================================================================= -->
+    @if (tab() === 'type') {
+    <div class="ts-pane" role="tabpanel" id="ts-pane-type" aria-labelledby="ts-tab-type">
 
     <!-- font family: one picker per surface -->
     <section class="ts-card">
@@ -265,91 +568,42 @@
       </div>
     </section>
 
-    <!-- theme mode -->
-    <section class="ts-card">
-      <div class="ts-card-head">
-        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('moon')" /></svg></span>
-        <div class="ts-sec-text"><h3>Theme Mode</h3><p>Light or dark surfaces</p></div>
-      </div>
-      <div class="ts-modes">
-        <button type="button" class="ts-mode" [class.is-on]="prefs().mode === 'light'"
-                [attr.aria-pressed]="prefs().mode === 'light'" (click)="set('mode', 'light')">
-          <span class="ts-mode-art light" aria-hidden="true"></span>
-          <span class="ts-mode-label">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('sun')" /></svg>
-            Light
-          </span>
-        </button>
-        <button type="button" class="ts-mode" [class.is-on]="prefs().mode === 'dark'"
-                [attr.aria-pressed]="prefs().mode === 'dark'" (click)="set('mode', 'dark')">
-          <span class="ts-mode-art dark" aria-hidden="true"></span>
-          <span class="ts-mode-label">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('moon')" /></svg>
-            Dark
-          </span>
-        </button>
-      </div>
-    </section>
+    </div>
+    }
 
-    <!-- icon colours -->
+    <!-- =================================================================================================
+         SHAPE TAB - corner presets, shadow and radius
+         ================================================================================================= -->
+    @if (tab() === 'shape') {
+    <div class="ts-pane" role="tabpanel" id="ts-pane-shape" aria-labelledby="ts-tab-shape">
+
+    <!-- corner style: one-click presets for card + button radius -->
     <section class="ts-card">
       <div class="ts-card-head">
-        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('star')" /></svg></span>
-        <div class="ts-sec-text"><h3>Icon Colors</h3><p>Menu and card icons</p></div>
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('shape')" /></svg></span>
+        <div class="ts-sec-text"><h3>Corner Style</h3><p>Sets card and button rounding together</p></div>
       </div>
-      <div class="ts-swatches">
-        @for (c of iconColors(); track c) {
-          <button type="button" class="ts-swatch" [class.is-on]="prefs().iconColor === c"
-                  [style.background]="c" [attr.aria-label]="'Icon color ' + c"
-                  [attr.aria-pressed]="prefs().iconColor === c" (click)="setSwatch('iconColor', c)">
-            @if (prefs().iconColor === c) {
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('check')" /></svg>
-            }
+      <div class="ts-modes three">
+        @for (c of cornerPresets; track c.id) {
+          <button type="button" class="ts-mode" [class.is-on]="activeCorner() === c.id"
+                  [attr.aria-pressed]="activeCorner() === c.id" (click)="setCorner(c)">
+            <span class="ts-corner-art" aria-hidden="true">
+              <i [style.border-radius.px]="c.radius"></i>
+              <b [style.border-radius.px]="c.button"></b>
+            </span>
+            <span class="ts-mode-label">{{ c.label }}</span>
+            <small class="ts-mode-note num">Card {{ c.radius }} · Button {{ c.button }} px</small>
           </button>
         }
-        <label class="ts-swatch ts-picker" title="Custom colour">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('pen')" /></svg>
-          <input type="color" [value]="prefs().iconColor" aria-label="Custom icon colour"
-                 (input)="setSwatch('iconColor', $any($event.target).value)" />
-        </label>
       </div>
-    </section>
-
-    <!-- heading colours -->
-    <section class="ts-card">
-      <div class="ts-card-head">
-        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('heading')" /></svg></span>
-        <div class="ts-sec-text"><h3>Heading Colors</h3><p>Page and section titles</p></div>
-      </div>
-      <div class="ts-swatches">
-        @for (c of headingColors(); track c) {
-          <button type="button" class="ts-swatch" [class.is-on]="prefs().headingColor === c"
-                  [style.background]="c" [attr.aria-label]="'Heading color ' + c"
-                  [attr.aria-pressed]="prefs().headingColor === c" (click)="setSwatch('headingColor', c)">
-            @if (prefs().headingColor === c) {
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('check')" /></svg>
-            }
-          </button>
-        }
-        <label class="ts-swatch ts-picker" title="Custom colour">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('pen')" /></svg>
-          <input type="color" [value]="prefs().headingColor" aria-label="Custom heading colour"
-                 (input)="setSwatch('headingColor', $any($event.target).value)" />
-        </label>
-      </div>
+      @if (!activeCorner()) { <p class="ts-hint">Custom rounding set with the sliders below.</p> }
     </section>
 
     <!-- shadow & radius -->
     <section class="ts-card">
       <div class="ts-card-head">
         <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('shadow')" /></svg></span>
-        <div class="ts-sec-text"><h3>Shadow &amp; Radius</h3><p>Depth and corner rounding</p></div>
+        <div class="ts-sec-text"><h3>Shadow &amp; Radius</h3><p>Fine-tune depth and corner rounding</p></div>
       </div>
 
       <div class="ts-fgroup">
@@ -377,6 +631,63 @@
         </div>
         <input class="ts-range" type="range" min="0" max="24" step="1" [value]="prefs().buttonRadius"
                aria-label="Button radius" (input)="set('buttonRadius', +$any($event.target).value)" />
+      </div>
+    </section>
+
+    </div>
+    }
+
+    <!-- =================================================================================================
+         IMAGES TAB - sidebar background and profile image
+         ================================================================================================= -->
+    @if (tab() === 'images') {
+    <div class="ts-pane" role="tabpanel" id="ts-pane-images" aria-labelledby="ts-tab-images">
+
+    <!-- sidebar background (images) -->
+    <section class="ts-card">
+      <div class="ts-card-head">
+        <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('sidebar')" /></svg></span>
+        <div class="ts-sec-text"><h3>Sidebar Background</h3><p>Pick an image or upload your own</p></div>
+      </div>
+      <div class="ts-bgs">
+        @for (bg of sidebarBgs; track bg.label) {
+          <button type="button" class="ts-bg" [class.is-on]="prefs().sidebarBg === bg.value"
+                  [attr.aria-pressed]="prefs().sidebarBg === bg.value" [attr.aria-label]="'Sidebar background ' + bg.label"
+                  (click)="set('sidebarBg', bg.value)">
+            <span class="ts-bg-art" [class.none]="bg.value === null" [style.background]="bg.value ?? ''">
+              @if (bg.value === null) {
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('ban')" /></svg>
+              }
+            </span>
+            <small>{{ bg.label }}</small>
+            @if (prefs().sidebarBg === bg.value) {
+              <span class="ts-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6"
+                     stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath('check')" /></svg>
+              </span>
+            }
+          </button>
+        }
+
+        <!-- upload your own -->
+        <label class="ts-bg ts-bg-upload" [class.is-on]="isCustomBg()" title="Upload image (max 2 MB)">
+          <span class="ts-bg-art" [class.dashed]="!isCustomBg()" [style.background]="isCustomBg() ? prefs().sidebarBg : ''">
+            @if (!isCustomBg()) {
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('upload')" /></svg>
+            }
+          </span>
+          <small>{{ isCustomBg() ? 'Custom' : 'Upload' }}</small>
+          @if (isCustomBg()) {
+            <span class="ts-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6"
+                   stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath('check')" /></svg>
+            </span>
+          }
+          <input type="file" accept="image/*" aria-label="Upload sidebar background"
+                 (change)="uploadSidebarBg($event)" />
+        </label>
       </div>
     </section>
 
@@ -426,93 +737,74 @@
     </div>
     }
 
-    <!-- =================================================================================================
-         WORKSPACE TAB - appearance palette, navigation spacing, clock presentation
-         ================================================================================================= -->
-    @if (tab() === 'workspace') {
-    <div class="ts-pane" role="tabpanel" id="ts-pane-workspace" aria-labelledby="ts-tab-workspace">
-
-      <!-- appearance palette -->
-      <section class="ts-card">
-        <div class="ts-card-head">
-          <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('brush')" /></svg></span>
-          <div class="ts-sec-text"><h3>Appearance Palette</h3><p>Header, main menu and submenus - selected, hover and pressed</p></div>
-        </div>
-
-        <div class="ts-palettes">
-          @for (p of palettes; track p.id) {
-            <button type="button" class="ts-palette" [class.is-on]="prefs().palette === p.id"
-                    [attr.aria-pressed]="prefs().palette === p.id" [attr.aria-label]="'Palette ' + p.name"
-                    (click)="setPalette(p)">
-              <!-- accent · hover · pressed · selected tint -->
-              <span class="ts-palette-art" aria-hidden="true">
-                <span class="main" [style.background]="p.accent"></span>
-                <span [style.background]="p.hover"></span>
-                <span [style.background]="p.pressed"></span>
-                <span [style.background]="selectedTint(p)"></span>
-              </span>
-              <span class="ts-palette-name">{{ p.name }}</span>
-              @if (prefs().palette === p.id) {
-                <span class="ts-check" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6"
-                       stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="iconPath('check')" /></svg>
-                </span>
-              }
-            </button>
-          }
-        </div>
-
-        <div class="ts-palette-foot">
-          @if (paletteName(); as name) {
-            <span>Using <strong>{{ name }}</strong></span>
-            <button type="button" class="ts-text-btn" (click)="clearPalette()">Use my Theme Color instead</button>
-          } @else {
-            <span>Using your own Theme Color · pick a palette for matching hover and pressed tones</span>
-          }
-        </div>
-      </section>
-
-      <!-- navigation spacing -->
-      <section class="ts-card">
-        <div class="ts-card-head">
-          <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('spacing')" /></svg></span>
-          <div class="ts-sec-text"><h3>Navigation Spacing</h3><p>Height of the sidebar menu rows</p></div>
-        </div>
-        <div class="ts-modes">
-          @for (d of densities; track d.id) {
-            <button type="button" class="ts-mode" [class.is-on]="prefs().navDensity === d.id"
-                    [attr.aria-pressed]="prefs().navDensity === d.id" (click)="set('navDensity', d.id)">
-              <span class="ts-density-art" [class.compact]="d.id === 'compact'" aria-hidden="true">
-                <i class="on"></i><i></i><i></i><i></i>
-              </span>
-              <span class="ts-mode-label">{{ d.label }}</span>
-              <small class="ts-mode-note">{{ d.note }}</small>
-            </button>
-          }
-        </div>
-      </section>
-
-      <!-- clock presentation -->
-      <section class="ts-card">
-        <div class="ts-card-head">
-          <span class="ts-sec-ico"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('clock')" /></svg></span>
-          <div class="ts-sec-text"><h3>Clock Presentation</h3><p>How the workspace clock shows in the header</p></div>
-        </div>
-        <div class="ts-seg" role="group" aria-label="Clock presentation">
-          @for (o of clockOptions; track o.id) {
-            <button type="button" class="ts-seg-btn" [class.is-on]="clock.presentation() === o.id"
-                    [attr.aria-pressed]="clock.presentation() === o.id" (click)="setClock(o.id)">
-              {{ o.label }}
-            </button>
-          }
-        </div>
-        <p class="ts-hint">{{ clockNote() }} · applies straight away, the clock keeps its own settings.</p>
-      </section>
-
-    </div>
-    }
-
   </div><!-- /.ts-body -->
+
+  <!-- built-in colour picker: one popover for every swatch, HEX first (fixed position, never clipped) -->
+  @if (pickerKey()) {
+    <div class="ts-cp" role="dialog" [attr.aria-label]="pickerLabel() + ' colour picker'"
+         [style.top.px]="pickerPos().top" [style.left.px]="pickerPos().left">
+
+      <div class="ts-cp-title">{{ pickerLabel() }}</div>
+
+      <!-- saturation (x) / brightness (y) -->
+      <div class="ts-cp-area" [style.background-color]="pkHueColor()" tabindex="0" role="slider"
+           aria-label="Saturation and brightness" [attr.aria-valuetext]="pkCurrent()"
+           (pointerdown)="onPkAreaDown($event)" (pointermove)="onPkAreaMove($event)" (keydown)="onPkAreaKey($event)">
+        <span class="ts-cp-thumb" [style.left]="pct(pkSat())" [style.top]="pct(1 - pkVal())" [style.background]="pkCurrent()"></span>
+      </div>
+
+      <!-- hue -->
+      <div class="ts-cp-hue" tabindex="0" role="slider" aria-label="Hue" aria-valuemin="0" aria-valuemax="360"
+           [attr.aria-valuenow]="round(pkHue())"
+           (pointerdown)="onPkHueDown($event)" (pointermove)="onPkHueMove($event)" (keydown)="onPkHueKey($event)">
+        <span class="ts-cp-thumb hue" [style.left]="pct(pkHue() / 360)" [style.background]="pkHueColor()"></span>
+      </div>
+
+      <!-- value: HEX by default, RGB on request -->
+      <div class="ts-cp-fields">
+        <div class="ts-cp-mode" role="group" aria-label="Value format">
+          <button type="button" [class.is-on]="pickerMode() === 'hex'" [attr.aria-pressed]="pickerMode() === 'hex'" (click)="pickerMode.set('hex')">HEX</button>
+          <button type="button" [class.is-on]="pickerMode() === 'rgb'" [attr.aria-pressed]="pickerMode() === 'rgb'" (click)="pickerMode.set('rgb')">RGB</button>
+        </div>
+        @if (pickerMode() === 'hex') {
+          <label class="ts-cp-hex" [class.is-bad]="pkHexBad()">
+            <input type="text" spellcheck="false" autocomplete="off" maxlength="7" aria-label="Hex colour"
+                   [value]="pkHexText()" (input)="onPkHexInput($event)" (blur)="onPkHexBlur()" (keydown.enter)="closePicker()" />
+            <button type="button" class="ts-cp-copy" title="Copy hex" aria-label="Copy hex" (click)="pkCopy()">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h11v11H9zM5 15H4V4h11v1" /></svg>
+            </button>
+          </label>
+        } @else {
+          <div class="ts-cp-rgb">
+            <label><input type="number" min="0" max="255" aria-label="Red" [value]="pkRgb().r" (input)="onPkRgbInput('r', $event)" /><small>R</small></label>
+            <label><input type="number" min="0" max="255" aria-label="Green" [value]="pkRgb().g" (input)="onPkRgbInput('g', $event)" /><small>G</small></label>
+            <label><input type="number" min="0" max="255" aria-label="Blue" [value]="pkRgb().b" (input)="onPkRgbInput('b', $event)" /><small>B</small></label>
+          </div>
+        }
+      </div>
+      @if (pkHexBad()) {
+        <p class="ts-cp-error">Use six hex digits, like #2f3a55.</p>
+      }
+
+      <!-- before / now -->
+      <div class="ts-cp-compare">
+        <span class="ts-cp-chip" [style.background]="pkOriginal()" title="Before"></span>
+        <span class="ts-cp-chip" [style.background]="pkCurrent()" title="Now"></span>
+        <span class="ts-cp-compare-text">Before · Now</span>
+        <button type="button" class="ts-cp-reset" [disabled]="pkCurrent() === pkOriginal()" (click)="pkPick(pkOriginal())">Reset</button>
+      </div>
+
+      @if (pkSwatches().length) {
+        <div class="ts-cp-swatches" role="group" aria-label="Quick picks">
+          @for (c of pkSwatches(); track c) {
+            <button type="button" class="ts-cp-swatch" [style.background]="c" [class.is-on]="c === pkCurrent()"
+                    [attr.aria-label]="'Use ' + c" (click)="pkPick(c)"></button>
+          }
+        </div>
+      }
+    </div>
+  }
 
   <!-- footer -->
   <footer class="ts-foot">
@@ -529,7 +821,7 @@
       <button type="button" class="ts-btn ts-save" (click)="save()">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('save')" /></svg>
-        Save
+        Apply changes
       </button>
     </div>
   </footer>

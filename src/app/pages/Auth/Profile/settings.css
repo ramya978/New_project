@@ -1,7 +1,7 @@
 /* =====================================================================================================
    THEME SETTINGS OFFCANVAS - page-scoped (.ts-*). Surfaces use the global tokens (--white, --line,
    --ink, --muted, --accent, --accentbg, --teal) so the panel follows light/dark mode and theme colour.
-   Tabs: Theme (existing cards) · Workspace (palette, navigation spacing, clock presentation).
+   Tabs: Colour · Layout · Type · Clock · Templates.
    ===================================================================================================== */
 
 /* ---- backdrop + sliding panel ---- */
@@ -26,7 +26,7 @@
   z-index: 91;
   display: flex;
   flex-direction: column;
-  width: min(460px, 100vw);
+  width: min(536px, 100vw);
   background: var(--white);
   border-left: 1px solid var(--line);
   box-shadow: -28px 0 70px #1e233433;
@@ -55,7 +55,7 @@
   height: 42px;
   border-radius: 11px;
   background: var(--accent);
-  color: #fff
+  color: var(--primary-on, #fff)
 }
 
 .ts-head-text {
@@ -63,10 +63,22 @@
   min-width: 0
 }
 
+/* small spaced caps line above the title */
+.ts-eyebrow {
+ display: block;
+    font-size: 10px;
+    line-height: 1.4;
+    letter-spacing: 1.25px;
+    text-transform: uppercase;
+    color: #181D2B;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
 .ts-head h2 {
   margin: 0;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 550;
   letter-spacing: -.3px;
   color: var(--heading-color, var(--ink))
 }
@@ -98,38 +110,94 @@
   transform: rotate(90deg)
 }
 
-/* ---- tabs: segmented control under the header ---- */
+/* ---- tabs: icon over label, equal widths; active tab in the accent colour with an underline ---- */
 .ts-tabbar {
-  padding: 12px 22px;
+  padding: 0 14px;
   border-bottom: 1px solid var(--line);
   background: var(--white)
 }
 
 .ts-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  background: color-mix(in srgb, var(--line) 35%, var(--white))
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none
+}
+
+.ts-tabs::-webkit-scrollbar {
+  display: none
 }
 
 .ts-tab {
-  display: inline-flex;
+  position: relative;
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 12px;
+  gap: 5px;
+  min-width: 64px;
+  padding: 12px 8px 11px;
   border: 0;
-  border-radius: 8px;
   background: none;
   color: var(--muted);
-  font-size: 13.5px;
-  font-weight: 550;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease
+  white-space: nowrap;
+  transition: color .15s ease
+}
+
+.ts-tab-ico {
+  display: block;
+  flex: none;
+  opacity: .7;
+  transition: opacity .15s ease, transform .15s ease
+}
+
+/* gradient tab icons: primary colour -> secondary colour, so picking a palette or a custom
+   primary / secondary colour repaints every icon at once */
+.ts-grad-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden
+}
+
+.ts-grad-a {
+  stop-color: var(--cc-btn, var(--accent))
+}
+
+.ts-grad-b {
+  stop-color: var(--teal, var(--accent))
+}
+
+.ts-tab-ico path {
+  stroke: url(#ts-tab-grad)
+}
+
+.ts-tab:hover .ts-tab-ico {
+  opacity: 1
+}
+
+.ts-tab.is-on .ts-tab-ico {
+  opacity: 1;
+  transform: translateY(-1px)
+}
+
+.ts-tab-label {
+  line-height: 1.2
+}
+
+.ts-tab::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: transparent;
+  transition: background-color .15s ease
 }
 
 .ts-tab:hover {
@@ -137,15 +205,18 @@
 }
 
 .ts-tab.is-on {
-  background: var(--white);
   color: var(--accent);
-  font-weight: 650;
-  box-shadow: 0 1px 3px #1e233414, inset 0 0 0 1px var(--line)
+  font-weight: 600
+}
+
+.ts-tab.is-on::after {
+  background: linear-gradient(90deg, var(--cc-btn, var(--accent)), var(--teal, var(--accent)))
 }
 
 .ts-tab:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 1px
+  outline-offset: -3px;
+  border-radius: 6px
 }
 
 /* ---- scrolling body ---- */
@@ -288,7 +359,7 @@
 .ts-pv-meta strong {
   display: block;
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 500;
   color: var(--ink)
 }
 
@@ -332,8 +403,8 @@
 
 .ts-sec-text h3 {
   margin: 0;
-  font-size: 15px;
-  font-weight: 650;
+  font-size: 14px;
+  font-weight: 500;
   letter-spacing: -.2px;
   color: var(--heading-color, var(--ink))
 }
@@ -372,7 +443,7 @@
   text-transform: none;
   letter-spacing: 0;
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink)
 }
 
@@ -394,7 +465,7 @@
   border: 2px solid var(--white);
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--primary-on, #fff);
   box-shadow: 0 2px 6px #0000002e
 }
 
@@ -553,7 +624,7 @@
   align-items: center;
   gap: 7px;
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink)
 }
 
@@ -659,7 +730,7 @@
 .ts-chip.is-on {
   border-color: var(--accent);
   background: var(--accent);
-  color: #fff;
+  color: var(--primary-on, #fff);
   font-weight: 600
 }
 
@@ -690,7 +761,7 @@
 
 .ts-size strong {
   font-size: 16px;
-  font-weight: 650;
+  font-weight: 500;
   line-height: 1.1
 }
 
@@ -703,7 +774,7 @@
 .ts-size.is-on {
   border-color: var(--accent);
   background: var(--accent);
-  color: #fff
+  color: var(--primary-on, #fff)
 }
 
 .ts-size.is-on small {
@@ -749,7 +820,7 @@
 .ts-weight.is-on {
   border-color: var(--accent);
   background: var(--accent);
-  color: #fff
+  color: var(--primary-on, #fff)
 }
 
 .ts-weight.is-on small {
@@ -844,12 +915,153 @@
   align-items: center;
   gap: 7px;
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink)
 }
 
 .ts-mode.is-on .ts-mode-label {
   color: var(--accent)
+}
+
+/* three-up option rows: theme mode, content width, corner style */
+.ts-modes.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px
+}
+
+.ts-mode-art.system {
+  background:
+    linear-gradient(#d9dde6, #d9dde6) 12px 12px / 30% 6px no-repeat,
+    linear-gradient(#3a4256, #3a4256) calc(50% + 12px) 12px / 30% 6px no-repeat,
+    linear-gradient(90deg, #f6f7fa 50%, #171c28 50%);
+  box-shadow: inset 0 0 0 1px #e3e6ec
+}
+
+/* content width: a page frame with the content block at its width */
+.ts-width-art {
+  display: flex;
+  justify-content: center;
+  height: 48px;
+  padding: 8px 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--line) 45%, var(--white));
+  box-shadow: inset 0 0 0 1px var(--line)
+}
+
+.ts-width-art i {
+  display: block;
+  border-radius: 4px;
+  background:
+    linear-gradient(color-mix(in srgb, var(--accent) 35%, var(--white)), color-mix(in srgb, var(--accent) 35%, var(--white))) 6px 6px / 45% 5px no-repeat,
+    linear-gradient(var(--line), var(--line)) 6px 16px / 70% 5px no-repeat,
+    var(--white);
+  box-shadow: inset 0 0 0 1px var(--line)
+}
+
+.ts-width-art[data-w="compact"] i { width: 46% }
+.ts-width-art[data-w="normal"] i { width: 68% }
+.ts-width-art[data-w="wide"] i { width: calc(100% - 12px) }
+
+.ts-mode.is-on .ts-width-art i {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, var(--line))
+}
+
+/* corner style: a card with a button inside, at the preset's radius */
+.ts-corner-art {
+  display: grid;
+  place-items: center;
+  height: 48px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--line) 45%, var(--white))
+}
+
+.ts-corner-art i {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 62%;
+  height: 34px;
+  border: 1px solid var(--line);
+  background: var(--white)
+}
+
+.ts-corner-art b {
+  position: absolute;
+  width: 34px;
+  height: 12px;
+  margin-top: 4px;
+  background: var(--accent)
+}
+
+.ts-mode.is-on .ts-corner-art i {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line))
+}
+
+/* switch row (Reduce motion) */
+.ts-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px
+}
+
+.ts-switch-row .ts-sec-text {
+  flex: 1;
+  min-width: 0
+}
+
+.ts-switch-row h3 label {
+  cursor: pointer
+}
+
+.ts-switch {
+  position: relative;
+  flex: none;
+  width: 38px;
+  height: 22px
+}
+
+.ts-switch input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer
+}
+
+.ts-switch i {
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--muted) 35%, var(--line));
+  transition: background-color .15s ease
+}
+
+.ts-switch i::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--white);
+  transition: transform .15s ease
+}
+
+.ts-switch input:checked + i {
+  background: var(--accent)
+}
+
+.ts-switch input:checked + i::after {
+  transform: translateX(16px)
+}
+
+.ts-switch input:focus-visible + i {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px
 }
 
 .ts-mode-note {
@@ -972,8 +1184,8 @@
 /* accent (wide) · hover · pressed · selected tint */
 .ts-palette-art {
   display: flex;
-  height: 38px;
-  border-radius: 7px;
+    height: 27px;
+    border-radius: 6px;
   overflow: hidden;
   box-shadow: inset 0 0 0 1px #00000012
 }
@@ -989,7 +1201,7 @@
 .ts-palette-name {
   min-height: 2.6em;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.3;
   color: var(--ink)
 }
@@ -1023,7 +1235,7 @@
   background: none;
   color: var(--accent);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer
 }
 
@@ -1090,8 +1302,1034 @@
 .ts-seg-btn.is-on {
   background: var(--white);
   color: var(--accent);
-  font-weight: 650;
+  font-weight: 500;
   box-shadow: 0 1px 3px #1e233414, inset 0 0 0 1px var(--line)
+}
+
+/* =====================================================================================================
+   CUSTOM COLOUR CONTROLS (Colour tab)
+   Flat & minimal: a preview table (Default · Hover · Pressed across; Button / Menu / Contrast down,
+   for Primary and Secondary), a dashed rule, the on/off checkbox, then the colour fields as a grouped
+   list - label on the left, swatch + hex on the right, hairlines between rows.
+   The preview only reads; every change goes through the same prefs the app renders from.
+   ===================================================================================================== */
+.ts-cc-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px
+}
+
+.ts-cc-head h3.ts-cc-title {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -.1px;
+  color: var(--heading-color, var(--ink))
+}
+
+/* small "live" marker: dot + text, no filled pill */
+.ts-cc-live {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  gap: 6px;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 500
+}
+
+.ts-cc-live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal, #157969);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal, #157969) 18%, transparent)
+}
+
+/* ---- preview table ---- */
+.ts-cx {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden
+}
+
+.ts-cx-row {
+  display: grid;
+  grid-template-columns: 76px repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px
+}
+
+/* column titles */
+.ts-cx-cols {
+  padding-top: 9px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--line) 25%, var(--white))
+}
+
+.ts-cx-cols span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-align: center;
+  text-transform: uppercase
+}
+
+/* "Primary  sidebar & buttons" band */
+.ts-cx-group {
+  padding: 12px 12px 4px;
+  color: var(--heading-color, var(--ink));
+  font-size: 13px;
+  font-weight: 600
+}
+
+.ts-cx-group small {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400
+}
+
+/* Secondary band gets a hairline above it */
+.ts-cx-ratio + .ts-cx-group {
+  border-top: 1px solid var(--line)
+}
+
+.ts-cx-label {
+  color: var(--muted);
+  font-size: 12px
+}
+
+.ts-cx-btn,
+.ts-cx-tint {
+  display: grid;
+  place-items: center;
+  height: 34px;
+  padding: 0 6px;
+  border-radius: var(--btn-radius, 7px);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.ts-cx-btn {
+  font-weight: 500
+}
+
+.ts-cx-tint {
+  height: 30px;
+  font-weight: 400;
+  box-shadow: inset 0 0 0 1px #00000012
+}
+
+.ts-cx-ratio {
+  padding-bottom: 12px
+}
+
+.ts-cx-ratio .num {
+  color: var(--ink);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: center
+}
+
+.ts-cc-rule {
+  margin: 18px 0;
+  border: 0;
+  border-top: 1px dashed var(--line)
+}
+
+/* ---- on / off checkbox + heading ---- */
+.ts-cc-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px
+}
+
+.ts-cc-box {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  border: 1.5px solid color-mix(in srgb, var(--muted) 70%, var(--line));
+  border-radius: 4px;
+  background: var(--white) no-repeat center / 12px 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: background-color .12s ease, border-color .12s ease
+}
+
+.ts-cc-box:checked {
+  border-color: var(--accent);
+  background-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")
+}
+
+.ts-cc-box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px
+}
+
+.ts-cc-toggle h3 {
+  margin: 0
+}
+
+.ts-cc-toggle h3 label {
+  cursor: pointer
+}
+
+/* ---- grouped colour tiles: two per row, group titles span the full width ---- */
+.ts-cc-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+  transition: opacity .15s ease
+}
+
+.ts-cc-list.is-off {
+  opacity: .55
+}
+
+.ts-cc-group {
+  grid-column: 1 / -1;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase
+}
+
+.ts-cc-group:first-child {
+  margin-top: 0
+}
+
+/* one colour: swatch + label over hex, the whole tile lights up on focus */
+.ts-cc-tile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 10px 8px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  transition: border-color .15s ease, box-shadow .15s ease
+}
+
+.ts-cc-tile:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line))
+}
+
+.ts-cc-tile:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent)
+}
+
+.ts-cc-tile.is-bad {
+  border-color: var(--red, #bd4d53)
+}
+
+.ts-cc-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0
+}
+
+.ts-cc-rlabel {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+/* kept for the commented-out single-field cards (Secondary / Icon / Heading) */
+.ts-cc-grid.solo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr)
+}
+
+.ts-cc-input {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 40px;
+  padding: 0 10px 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white)
+}
+
+.ts-cc-input:focus-within {
+  border-color: var(--accent)
+}
+
+.ts-cc-input.is-bad {
+  border-color: var(--red, #bd4d53)
+}
+
+/* swatch button: opens the built-in colour picker */
+.ts-cc-swatch {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px #00000026;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .12s ease
+}
+
+.ts-cc-swatch:hover:not(:disabled) {
+  transform: translateY(-1px)
+}
+
+.ts-cc-swatch.is-open,
+.ts-cc-swatch:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px #00000026, 0 0 0 2px var(--white), 0 0 0 4px var(--accent)
+}
+
+.ts-cc-hex {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  outline: none;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  height: 18px;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: lowercase
+}
+
+.ts-cc-hex:focus {
+  color: var(--ink)
+}
+
+.ts-cc-hex:disabled,
+.ts-cc-swatch:disabled {
+  cursor: not-allowed
+}
+
+/* =====================================================================================================
+   STATUS COLOURS (Colour tab) - the hex tiles reuse .ts-cc-tile; chips read the live --status-* tokens
+   set by applyTheme, so they update the moment a colour changes.
+   ===================================================================================================== */
+.ts-status-list {
+  margin-top: 0
+}
+
+.ts-status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px
+}
+
+.ts-status-chip {
+  --s-bg: var(--status-neutral-bg, #eef0f3);
+  --s-ink: var(--status-neutral-ink, #4b5266);
+  --s-line: var(--status-neutral-line, #c9cdd6);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--s-line);
+  border-radius: 6px;
+  background: var(--s-bg);
+  color: var(--s-ink);
+  font-size: 12px;
+  font-weight: 500
+}
+
+.ts-status-chip[data-tone="info"] {
+  --s-bg: var(--status-info-bg);
+  --s-ink: var(--status-info-ink);
+  --s-line: var(--status-info-line)
+}
+
+.ts-status-chip[data-tone="success"] {
+  --s-bg: var(--status-success-bg);
+  --s-ink: var(--status-success-ink);
+  --s-line: var(--status-success-line)
+}
+
+.ts-status-chip[data-tone="warning"] {
+  --s-bg: var(--status-warning-bg);
+  --s-ink: var(--status-warning-ink);
+  --s-line: var(--status-warning-line)
+}
+
+.ts-status-chip[data-tone="danger"] {
+  --s-bg: var(--status-danger-bg);
+  --s-ink: var(--status-danger-ink);
+  --s-line: var(--status-danger-line)
+}
+
+/* =====================================================================================================
+   TEMPLATES TAB - name field + Save template, then one card per saved template
+   ===================================================================================================== */
+.ts-tab-count {
+  position: absolute;
+  top: 7px;
+  left: calc(50% + 8px);
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1
+}
+
+.ts-tpl-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px
+}
+
+.ts-tpl-head h3 {
+  margin: 0;
+  color: var(--heading-color, var(--ink));
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -.2px
+}
+
+.ts-tpl-count {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums
+}
+
+.ts-tpl-count.is-full {
+  color: var(--status-warning-ink, #976821);
+  font-weight: 600
+}
+
+.ts-tpl-intro {
+  margin: 8px 0 16px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6
+}
+
+.ts-tpl-intro strong {
+  color: var(--ink);
+  font-weight: 600
+}
+
+.ts-tpl-label {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600
+}
+
+.ts-tpl-new {
+  display: flex;
+  gap: 10px
+}
+
+.ts-tpl-input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--btn-radius, 8px);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  transition: border-color .15s ease, box-shadow .15s ease
+}
+
+.ts-tpl-input::placeholder {
+  color: color-mix(in srgb, var(--muted) 72%, var(--white))
+}
+
+.ts-tpl-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)
+}
+
+.ts-tpl-input:disabled {
+  background: color-mix(in srgb, var(--line) 30%, var(--white));
+  cursor: not-allowed
+}
+
+.ts-tpl-input.sm {
+  height: 34px;
+  font-size: 13px
+}
+
+/* colours come from the global .btn-primary (custom colour controls included) */
+.ts-tpl-save {
+  flex: none;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: var(--btn-radius, 8px);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer
+}
+
+.ts-tpl-note {
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-size: 12.5px;
+  line-height: 1.5
+}
+
+.ts-tpl-note[data-tone="error"] {
+  color: var(--status-danger-ink, #b34455)
+}
+
+.ts-tpl-note[data-tone="info"] {
+  color: var(--status-info-ink, #3c62a3)
+}
+
+.ts-tpl-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+}
+
+.ts-tpl {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--white);
+  transition: border-color .15s ease
+}
+
+.ts-tpl:hover {
+  border-color: color-mix(in srgb, var(--ink) 30%, var(--line))
+}
+
+.ts-tpl.is-previewing {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent)
+}
+
+.ts-tpl-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px
+}
+
+.ts-tpl-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--heading-color, var(--ink));
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.ts-tpl-flag {
+  flex: none;
+  color: var(--ink);
+  font-size: 11.5px;
+  white-space: nowrap
+}
+
+.ts-tpl-flag.is-live {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accentbg);
+  color: var(--accent);
+  font-weight: 600
+}
+
+.ts-tpl-rename {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  min-width: 0
+}
+
+.ts-tpl-sub {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px
+}
+
+.ts-tpl-sub span {
+  color: color-mix(in srgb, var(--muted) 75%, var(--white))
+}
+
+/* template strip: the same four-band strip as the palettes (button · hover · pressed · tint) */
+.ts-tpl-art {
+  margin: 0 0 12px
+}
+
+/* current colours, beside the name field */
+.ts-tpl-now {
+  flex: none;
+  align-self: center;
+  width: 56px;
+  height: 34px !important;
+  border-radius: 7px
+}
+
+.ts-tpl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px
+}
+
+/* quiet outline buttons on the cards */
+.ts-tpl-btn {
+  height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--btn-radius, 7px);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease
+}
+
+.ts-tpl-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: color-mix(in srgb, var(--accent) 6%, var(--white));
+  color: var(--accent)
+}
+
+.ts-tpl-btn:active:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 12%, var(--white))
+}
+
+.ts-tpl-btn:disabled {
+  opacity: .5;
+  cursor: default
+}
+
+.ts-tpl-btn.ghost {
+  border-color: transparent
+}
+
+/* armed delete: the danger status colour */
+.ts-tpl-btn.danger,
+.ts-tpl-btn.danger:hover:not(:disabled) {
+  border-color: var(--status-danger, #b34455);
+  background: var(--status-danger, #b34455);
+  color: #fff
+}
+
+.ts-tpl-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px
+}
+
+.ts-tpl-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--muted)
+}
+
+.ts-tpl-empty p {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.55
+}
+
+.ts-tpl-empty strong {
+  color: var(--ink);
+  font-weight: 600
+}
+
+/* export / import row under the template list */
+.ts-tpl-io {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px
+}
+
+.ts-tpl-btn.lg {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  font-size: 13px
+}
+
+/* the file input covers the Import label, invisible */
+.ts-tpl-btn.lg input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer
+}
+
+.ts-tpl-btn.lg:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px
+}
+
+.ts-tpl-btn.is-disabled {
+  opacity: .5;
+  pointer-events: none
+}
+
+/* =====================================================================================================
+   BUILT-IN COLOUR PICKER - one fixed-position popover shared by every swatch. HEX is the default
+   view (the browser's own picker opens on RGB and cannot be changed).
+   Everything inside is reset first so the app's global button / input styles (padding, min-width,
+   heights, shadows) cannot stretch the popover.
+   ===================================================================================================== */
+.ts-cp {
+  position: fixed;
+  z-index: 120;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  box-sizing: border-box;
+  width: 272px;
+  max-width: calc(100vw - 16px);
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  box-shadow: 0 14px 36px #19374b2b, 0 2px 6px #19374b14;
+  color: var(--ink);
+  font: 12px/1.4 var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
+  animation: ts-cp-in .12s ease-out
+}
+
+/* neutralise global element styles inside the picker */
+.ts-cp *,
+.ts-cp *::before,
+.ts-cp *::after {
+  box-sizing: border-box
+}
+
+.ts-cp button,
+.ts-cp input {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  font: inherit;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  box-shadow: none
+}
+
+@keyframes ts-cp-in {
+  from { opacity: 0; transform: translateY(-3px) }
+}
+
+.ts-cp-title {
+  overflow: hidden;
+  color: var(--heading-color, var(--ink));
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+/* saturation / brightness */
+.ts-cp-area {
+  position: relative;
+  height: 156px;
+  border-radius: 8px;
+  background-image: linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent);
+  box-shadow: inset 0 0 0 1px #00000014;
+  cursor: crosshair;
+  touch-action: none
+}
+
+/* hue */
+.ts-cp-hue {
+  position: relative;
+  height: 12px;
+  margin: 0 7px; /* thumb stays inside the popover at both ends */
+  border-radius: 6px;
+  background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+  cursor: pointer;
+  touch-action: none
+}
+
+.ts-cp-thumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #00000047, 0 1px 3px #00000040;
+  transform: translate(-50%, -50%);
+  pointer-events: none
+}
+
+.ts-cp-thumb.hue {
+  top: 50%;
+  width: 16px;
+  height: 16px
+}
+
+.ts-cp-area:focus-visible,
+.ts-cp-hue:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px
+}
+
+/* HEX / RGB row: format switch + value */
+.ts-cp-fields {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 8px
+}
+
+.ts-cp-mode {
+  display: flex;
+  height: 34px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--line) 35%, var(--white))
+}
+
+.ts-cp .ts-cp-mode button {
+  height: 100%;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .4px;
+  cursor: pointer
+}
+
+.ts-cp .ts-cp-mode button.is-on {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line)
+}
+
+.ts-cp-hex {
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 3px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--white);
+  transition: border-color .15s ease, box-shadow .15s ease
+}
+
+.ts-cp-hex:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)
+}
+
+.ts-cp-hex.is-bad {
+  border-color: var(--status-danger, #b34455)
+}
+
+.ts-cp .ts-cp-hex input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  color: var(--ink);
+  font: 12.5px ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  text-transform: lowercase
+}
+
+.ts-cp .ts-cp-copy {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer
+}
+
+.ts-cp .ts-cp-copy:hover {
+  background: color-mix(in srgb, var(--accent) 8%, var(--white));
+  color: var(--ink)
+}
+
+.ts-cp-rgb {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px
+}
+
+.ts-cp-rgb label {
+  display: grid;
+  justify-items: center;
+  gap: 3px
+}
+
+.ts-cp .ts-cp-rgb input {
+  width: 100%;
+  height: 34px;
+  padding: 0 4px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--white);
+  color: var(--ink);
+  font: 12.5px ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  text-align: center;
+  -moz-appearance: textfield
+}
+
+.ts-cp-rgb input::-webkit-outer-spin-button,
+.ts-cp-rgb input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none
+}
+
+.ts-cp .ts-cp-rgb input:focus {
+  outline: none;
+  border-color: var(--accent)
+}
+
+.ts-cp-rgb small {
+  color: var(--muted);
+  font-size: 10px
+}
+
+.ts-cp-error {
+  margin: -6px 0 0;
+  color: var(--status-danger-ink, #b34455);
+  font-size: 11.5px
+}
+
+/* before / now + Reset - one row that can never overflow */
+.ts-cp-compare {
+  display: grid;
+  grid-template-columns: 22px 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line)
+}
+
+.ts-cp-chip {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px #00000026
+}
+
+.ts-cp-compare-text {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.ts-cp .ts-cp-reset {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 12px;
+  cursor: pointer
+}
+
+.ts-cp .ts-cp-reset:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent)
+}
+
+.ts-cp .ts-cp-reset:disabled {
+  opacity: .45;
+  cursor: default
+}
+
+/* quick picks: a fixed 10-column grid, square swatches that always fit the width */
+.ts-cp-swatches {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 5px
+}
+
+.ts-cp .ts-cp-swatch {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px #00000026;
+  cursor: pointer;
+  transition: transform .1s ease
+}
+
+.ts-cp .ts-cp-swatch:hover {
+  transform: scale(1.1)
+}
+
+.ts-cp .ts-cp-swatch.is-on {
+  box-shadow: inset 0 0 0 1px #00000026, 0 0 0 2px var(--white), 0 0 0 3.5px var(--ink)
+}
+
+.ts-cp .ts-cp-swatch:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px
 }
 
 /* ---- footer ---- */
@@ -1144,7 +2382,7 @@
   padding: 0 18px;
   border-radius: var(--btn-radius, 8px);
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer
 }
 
@@ -1163,7 +2401,7 @@
 .ts-save {
   border: 1px solid var(--accent);
   background: var(--accent);
-  color: #fff
+  color: var(--primary-on, #fff)
 }
 
 .ts-save:hover {
@@ -1205,6 +2443,38 @@
     grid-template-columns: repeat(2, minmax(0, 1fr))
   }
 
+  .ts-cx-row {
+    grid-template-columns: 58px repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    padding-inline: 8px
+  }
+
+  .ts-cc-list {
+    grid-template-columns: minmax(0, 1fr)
+  }
+
+  .ts-tpl-new {
+    flex-direction: column
+  }
+
+  .ts-tpl-now {
+    display: none
+  }
+
+  .ts-tab {
+    min-width: 58px;
+    padding-inline: 4px;
+    font-size: 11.5px
+  }
+
+  .ts-modes.three {
+    gap: 8px
+  }
+
+  .ts-tpl-rename {
+    flex-wrap: wrap
+  }
+
   .ts-foot {
     flex-direction: column;
     align-items: stretch
@@ -1215,8 +2485,17 @@
   }
 }
 
+/* the panel obeys the app's own Reduce motion switch as well as the device setting */
+html[data-motion="reduce"] .ts-overlay,
+html[data-motion="reduce"] .ts-panel,
+html[data-motion="reduce"] .ts-pane,
+html[data-motion="reduce"] .ts-cp {
+  animation: none
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ts-overlay,
   .ts-panel,
-  .ts-pane { animation: none }
+  .ts-pane,
+  .ts-cp { animation: none }
 }

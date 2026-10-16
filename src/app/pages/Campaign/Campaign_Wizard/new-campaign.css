@@ -6,31 +6,32 @@
    ===================================================================================================== */
 :host {
   --cp-primary: var(--primary, var(--accent, #087e8b));
-  --cp-soft: color-mix(in srgb, var(--cp-primary) 10%, #fff);
-  --cp-softer: color-mix(in srgb, var(--cp-primary) 5%, #fff);
-  --cp-hover: color-mix(in srgb, var(--theme-hover, var(--cp-primary)) 9%, #fff);
-  --cp-press: color-mix(in srgb, var(--theme-press, var(--cp-primary)) 16%, #fff);
-  --cp-strong: color-mix(in srgb, var(--cp-primary) 55%, #000);
+  --cp-soft: color-mix(in srgb, var(--cp-primary) 10%, var(--white));
+  --cp-softer: color-mix(in srgb, var(--cp-primary) 5%, var(--white));
+  --cp-hover: color-mix(in srgb, var(--theme-hover, var(--cp-primary)) 9%, var(--white));
+  --cp-press: color-mix(in srgb, var(--theme-press, var(--cp-primary)) 16%, var(--white));
+  --cp-strong: color-mix(in srgb, var(--cp-primary) 55%, var(--mix-ink, #000));
   --cp-ring: color-mix(in srgb, var(--cp-primary) 22%, transparent);
   --cp-font: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
-  --cp-ink: #24364a;
-  --cp-heading: #102b3f;
-  --cp-muted: #5b6d7d;
-  --cp-faint: #8a9aa8;
-  --cp-line: #e2e9ee;
-  --cp-row-line: #edf1f5;
-  --cp-field-line: #cbd7e0;
-  --cp-field-hover: #9fb1bf;
-  --cp-disabled: #f1f4f7;
-  --cp-danger: #b42335;
-  --cp-danger-soft: #fff4f5;
-  --cp-amber: #9a6a12;
-  --cp-amber-soft: #fffaf0;
-  --cp-amber-line: #f1e2c2;
+  --cp-ink: var(--ink);
+  --cp-heading: var(--heading-color, var(--ink));
+  --cp-muted: var(--muted);
+  --cp-faint: color-mix(in srgb, var(--muted) 72%, var(--white));
+  --cp-line: var(--line);
+  --cp-row-line: color-mix(in srgb, var(--line) 65%, var(--white));
+  --cp-field-line: color-mix(in srgb, var(--muted) 28%, var(--line));
+  --cp-field-hover: color-mix(in srgb, var(--muted) 55%, var(--line));
+  --cp-disabled: var(--chip);
+  --cp-danger: var(--status-danger-ink);
+  --cp-danger-soft: var(--status-danger-bg);
+  --cp-amber: var(--status-warning-ink);
+  --cp-amber-soft: var(--status-warning-bg);
+  --cp-amber-line: var(--status-warning-line);
 
   display: block;
   color: var(--cp-ink);
-  font: 14px/1.5 var(--cp-font)
+  font: calc(14px * var(--font-scale, 1))/var(--line-height, 1.5) var(--cp-font);
+  font-weight: var(--font-weight, 400)
 }
 
 :host *,
@@ -97,8 +98,8 @@
   gap: 8px;
   min-height: 38px;
   padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
+  border-radius: var(--btn-radius);
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 550;
   white-space: nowrap;
   transition: background-color .15s, color .15s, border-color .15s
@@ -106,17 +107,18 @@
 
 .cp-btn:not(.btn-primary):not(.btn-secondary) {
   border: 1px solid var(--cp-line);
-  background: #fff;
+  background: var(--white);
   color: var(--cp-ink)
 }
 
 .cp-btn:not(.btn-primary):not(.btn-secondary):hover {
-  background: var(--cp-hover);
-  border-color: color-mix(in srgb, var(--cp-primary) 20%, var(--cp-line))
+  background: var(--secondary-hover);
+  border-color: var(--secondary-line);
+  color: var(--secondary-ink)
 }
 
 .cp-btn:not(.btn-primary):not(.btn-secondary):active {
-  background: var(--cp-press)
+  background: var(--secondary-press)
 }
 
 .cp-link {
@@ -124,13 +126,13 @@
   background: transparent;
   padding: 4px 6px;
   border-radius: 6px;
-  color: var(--cp-strong);
-  font-size: 12px;
+  color: var(--secondary-ink);
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 550
 }
 
 .cp-link:hover {
-  background: var(--cp-hover)
+  background: var(--secondary-hover)
 }
 
 /* =====================================================================================================
@@ -146,7 +148,7 @@
 
 .cp-pagehead h1 {
   color: var(--cp-heading);
-  font-size: 30px;
+  font-size: calc(30px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.8px;
   line-height: 1.25
@@ -156,7 +158,7 @@
   max-width: 680px;
   margin-top: 8px;
   color: var(--cp-muted);
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 .cp-create {
@@ -166,16 +168,15 @@
   gap: 18px;
   padding: 24px 26px;
   margin-bottom: 20px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--cp-line);
-  border-radius: 12px
-}
+  border-radius: var(--radius)}
 
 .cp-eyebrow,
 .cp-index-title {
   display: block;
   color: var(--cp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1.2px;
   text-transform: uppercase
@@ -184,7 +185,7 @@
 .cp-create h2 {
   margin-top: 8px;
   color: var(--cp-heading);
-  font-size: 21px;
+  font-size: calc(21px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.4px;
   line-height: 1.3
@@ -193,7 +194,7 @@
 .cp-create p {
   margin-top: 6px;
   color: var(--cp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .cp-create-actions {
@@ -208,7 +209,7 @@
   border-radius: 6px;
   background: var(--cp-soft);
   color: var(--cp-strong);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600
 }
 
@@ -265,9 +266,9 @@
   height: 22px;
   margin-top: 1px;
   border-radius: 6px;
-  background: #f0f4f7;
+  background: var(--chip);
   color: var(--cp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   font-variant-numeric: tabular-nums
 }
@@ -290,14 +291,14 @@
 
 .cp-index-name {
   color: var(--cp-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   line-height: 1.4
 }
 
 .cp-index-copy small {
   margin-top: 2px;
   color: var(--cp-faint);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .cp-index-item.is-current {
@@ -311,7 +312,7 @@
 
 .cp-index-item.is-current .cp-index-no {
   background: var(--cp-primary);
-  color: #fff
+  color: var(--primary-on, #fff)
 }
 
 .cp-index-item.is-done .cp-index-no {
@@ -321,7 +322,7 @@
 
 .cp-index-item.is-current.is-done .cp-index-no {
   background: var(--cp-primary);
-  color: #fff
+  color: var(--primary-on, #fff)
 }
 
 .cp-index-item.has-error .cp-index-copy small {
@@ -330,16 +331,15 @@
 
 .cp-required {
   padding: 16px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--cp-line);
-  border-radius: 10px
-}
+  border-radius: var(--radius)}
 
 .cp-required-count {
   display: block;
   margin-top: 10px;
   color: var(--cp-strong);
-  font-size: 24px;
+  font-size: calc(24px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: -.3px;
   font-variant-numeric: tabular-nums
@@ -350,7 +350,7 @@
   height: 4px;
   margin-top: 10px;
   border-radius: 4px;
-  background: #edf1f5;
+  background: var(--chip);
   overflow: hidden
 }
 
@@ -365,7 +365,7 @@
 .cp-required p {
   margin-top: 10px;
   color: var(--cp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   line-height: 1.55
 }
 
@@ -379,10 +379,9 @@
 .cp-card {
   scroll-margin-top: 16px;
   padding: 22px 24px 24px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--cp-line);
-  border-radius: 12px
-}
+  border-radius: var(--radius)}
 
 .cp-card-head {
   display: flex;
@@ -399,14 +398,14 @@
   border-radius: 7px;
   background: var(--cp-soft);
   color: var(--cp-strong);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
   font-variant-numeric: tabular-nums
 }
 
 .cp-card-head h3 {
   color: var(--cp-heading);
-  font-size: 15px;
+  font-size: calc(15px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.15px;
   line-height: 1.35
@@ -415,7 +414,7 @@
 .cp-card-head p {
   margin-top: 2px;
   color: var(--cp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .cp-grid {
@@ -447,8 +446,8 @@
 }
 
 .cp-label {
-  color: #283f52;
-  font-size: 12px;
+  color: var(--ink);
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 600
 }
 
@@ -472,7 +471,7 @@
   border: 1px solid var(--cp-field-line);
   border-radius: 50%;
   color: var(--cp-faint);
-  font-size: 9px;
+  font-size: calc(9px * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1;
   cursor: help
@@ -488,9 +487,9 @@
   max-width: 230px;
   padding: 7px 10px;
   border-radius: 7px;
-  background: var(--cp-heading);
+  background: var(--inverse-bg);
   color: #fff;
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 400;
   line-height: 1.5;
   text-align: left;
@@ -522,10 +521,10 @@
   min-height: 40px;
   padding: 8px 12px;
   border: 1px solid var(--cp-field-line);
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--btn-radius);
+  background: var(--white);
   color: var(--cp-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   text-align: left;
   transition: border-color .15s, box-shadow .15s
 }
@@ -580,7 +579,7 @@ input.cp-input:focus,
 .cp-hint,
 .cp-error {
   margin-top: 6px;
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   line-height: 1.5
 }
 
@@ -598,8 +597,8 @@ input.cp-input:focus,
   align-items: center;
   min-height: 40px;
   border: 1px solid var(--cp-field-line);
-  border-radius: 8px;
-  background: #fff;
+  border-radius: var(--btn-radius);
+  background: var(--white);
   overflow: hidden;
   transition: border-color .15s, box-shadow .15s
 }
@@ -612,7 +611,7 @@ input.cp-input:focus,
   border: 0;
   outline: none;
   background: transparent;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-variant-numeric: tabular-nums
 }
 
@@ -622,9 +621,9 @@ input.cp-input:focus,
   align-items: center;
   align-self: stretch;
   padding: 0 11px;
-  background: #f8fafc;
+  background: var(--panel2);
   color: var(--cp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: .3px
 }
@@ -683,7 +682,7 @@ input.cp-input:focus,
   border: 0;
   outline: none;
   background: transparent;
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 /* chosen value shown as placeholder while searching - keep it dark */
@@ -707,9 +706,9 @@ input.cp-input:focus,
   overflow-y: auto;
   overscroll-behavior: contain;
   list-style: none;
-  background: #fff;
-  border: 1px solid #d9e3e9;
-  border-radius: 10px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   box-shadow: 0 12px 34px #19374b17, 0 2px 6px #19374b0a;
   animation: cp-pop .14s ease-out
 }
@@ -722,7 +721,7 @@ input.cp-input:focus,
   padding: 7px 10px;
   border-radius: 7px;
   color: var(--cp-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   cursor: pointer
 }
 
@@ -739,7 +738,7 @@ input.cp-input:focus,
 
 .cp-menu li.cp-empty {
   color: var(--cp-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   cursor: default
 }
 
@@ -760,7 +759,7 @@ input.cp-input:focus,
 
 .cp-opt-copy small {
   color: var(--cp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 400
 }
 
@@ -772,7 +771,7 @@ input.cp-input:focus,
   border-radius: 50%;
   background: var(--cp-soft);
   color: var(--cp-strong);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 650
 }
 
@@ -804,9 +803,9 @@ input.cp-input:focus,
   z-index: 25;
   width: 284px;
   padding: 12px;
-  background: #fff;
-  border: 1px solid #d9e3e9;
-  border-radius: 12px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   box-shadow: 0 12px 34px #19374b17, 0 2px 6px #19374b0a;
   animation: cp-pop .14s ease-out
 }
@@ -820,7 +819,7 @@ input.cp-input:focus,
 
 .cp-cal-head strong {
   color: var(--cp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600
 }
 
@@ -849,7 +848,7 @@ input.cp-input:focus,
 .cp-cal-wd {
   padding: 4px 0;
   color: var(--cp-faint);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   text-align: center;
   text-transform: uppercase
@@ -861,7 +860,7 @@ input.cp-input:focus,
   border-radius: 7px;
   background: transparent;
   color: var(--cp-ink);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   font-variant-numeric: tabular-nums
 }
 
@@ -882,14 +881,14 @@ input.cp-input:focus,
 .cp-cal-day.is-selected,
 .cp-cal-day.is-selected:hover {
   background: var(--cp-primary);
-  color: #fff;
+  color: var(--primary-on, #fff);
   font-weight: 600
 }
 
 .cp-cal-day:disabled {
-  color: #c4cfd8;
+  color: color-mix(in srgb, var(--muted) 72%, var(--white));
   text-decoration: line-through;
-  text-decoration-color: #dbe3e9
+  text-decoration-color: var(--line)
 }
 
 .cp-cal-foot {
@@ -916,7 +915,7 @@ input.cp-input:focus,
   padding: 14px 16px;
   border: 1px solid var(--cp-line);
   border-radius: 10px;
-  background: #fff;
+  background: var(--white);
   text-align: left;
   transition: background-color .15s, border-color .15s
 }
@@ -937,13 +936,13 @@ input.cp-input:focus,
   margin-top: 2px;
   border: 1.5px solid var(--cp-field-hover);
   border-radius: 50%;
-  background: #fff;
+  background: var(--white);
   transition: border-color .15s, box-shadow .15s
 }
 
 .cp-choice.is-selected .cp-radio {
   border-color: var(--cp-primary);
-  box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 8px var(--cp-primary)
+  box-shadow: inset 0 0 0 3px var(--white), inset 0 0 0 8px var(--cp-primary)
 }
 
 .cp-choice-copy {
@@ -954,13 +953,13 @@ input.cp-input:focus,
 
 .cp-choice-copy b {
   color: var(--cp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600
 }
 
 .cp-choice-copy small {
   color: var(--cp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 /* =====================================================================================================
@@ -974,8 +973,8 @@ input.cp-input:focus,
   min-height: 40px;
   padding: 3px;
   border: 1px solid var(--cp-field-line);
-  border-radius: 8px;
-  background: #fff
+  border-radius: var(--btn-radius);
+  background: var(--white)
 }
 
 .cp-time-part {
@@ -987,7 +986,7 @@ input.cp-input:focus,
   border: 0;
   border-radius: 6px;
   background: transparent;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-variant-numeric: tabular-nums
 }
 
@@ -1021,7 +1020,7 @@ input.cp-input:focus,
   margin-left: 6px;
   padding: 2px;
   border-radius: 6px;
-  background: #f0f4f7
+  background: var(--chip)
 }
 
 .cp-seg button {
@@ -1031,7 +1030,7 @@ input.cp-input:focus,
   border-radius: 5px;
   background: transparent;
   color: var(--cp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600
 }
 
@@ -1040,7 +1039,7 @@ input.cp-input:focus,
 }
 
 .cp-seg button.is-on {
-  background: #fff;
+  background: var(--white);
   color: var(--cp-strong);
   box-shadow: 0 1px 2px #19374b1a
 }
@@ -1055,10 +1054,10 @@ input.cp-input:focus,
   height: 26px;
   padding: 0 9px;
   border: 1px solid var(--cp-line);
-  border-radius: 6px;
-  background: #fff;
+  border-radius: var(--btn-radius);
+  background: var(--white);
   color: var(--cp-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .cp-preview-btn .cp-ico {
@@ -1080,7 +1079,7 @@ input.cp-input:focus,
 .cp-rt {
   border: 1px solid var(--cp-field-line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--white);
   transition: border-color .15s, box-shadow .15s
 }
 
@@ -1091,7 +1090,7 @@ input.cp-input:focus,
 
 .cp-rt.is-preview {
   border-style: dashed;
-  background: #fbfcfd
+  background: var(--panel2)
 }
 
 .cp-rt-bar {
@@ -1102,7 +1101,7 @@ input.cp-input:focus,
   padding: 7px 8px;
   border-bottom: 1px solid var(--cp-line);
   border-radius: 8px 8px 0 0;
-  background: #f8fafc
+  background: var(--panel2)
 }
 
 .cp-tb {
@@ -1117,7 +1116,7 @@ input.cp-input:focus,
   border-radius: 6px;
   background: transparent;
   color: var(--cp-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   transition: background-color .12s, border-color .12s
 }
 
@@ -1127,12 +1126,12 @@ input.cp-input:focus,
 }
 
 .cp-tb-text {
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .cp-tb:hover,
 .cp-tb.is-open {
-  background: #fff;
+  background: var(--white);
   border-color: var(--cp-line)
 }
 
@@ -1167,7 +1166,7 @@ input.cp-input:focus,
   overflow-y: auto;
   outline: none;
   color: var(--cp-ink);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   line-height: 1.65;
   overflow-wrap: anywhere
 }
@@ -1188,7 +1187,7 @@ input.cp-input:focus,
 
 .cp-rt-area h3 {
   color: var(--cp-heading);
-  font-size: 15px;
+  font-size: calc(15px * var(--font-scale, 1));
   font-weight: 650
 }
 
@@ -1212,7 +1211,7 @@ input.cp-input:focus,
 .cp-count {
   margin-top: 6px;
   color: var(--cp-muted);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   white-space: nowrap;
   font-variant-numeric: tabular-nums
 }
@@ -1237,8 +1236,7 @@ input.cp-input:focus,
   padding: 16px 18px;
   border: 1px solid var(--cp-line);
   border-left: 3px solid var(--cp-primary);
-  border-radius: 10px
-}
+  border-radius: var(--radius)}
 
 .cp-summary-id {
   min-width: 0
@@ -1246,7 +1244,7 @@ input.cp-input:focus,
 
 .cp-summary h4 {
   color: var(--cp-heading);
-  font-size: 17px;
+  font-size: calc(17px * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -.25px;
   overflow-wrap: anywhere
@@ -1259,15 +1257,15 @@ input.cp-input:focus,
   gap: 6px 14px;
   margin-top: 6px;
   color: var(--cp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .cp-code-chip {
   padding: 1px 7px;
   border-radius: 5px;
-  background: #f0f4f7;
+  background: var(--chip);
   color: var(--cp-ink);
-  font-size: 11px;
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: .3px
 }
@@ -1308,7 +1306,7 @@ input.cp-input:focus,
 
 .cp-stats dt {
   color: var(--cp-muted);
-  font-size: 10px;
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase
@@ -1317,7 +1315,7 @@ input.cp-input:focus,
 .cp-stats dd {
   margin-top: 4px;
   color: var(--cp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600;
   white-space: nowrap;
   font-variant-numeric: tabular-nums
@@ -1331,7 +1329,7 @@ input.cp-input:focus,
 
 .cp-rcard {
   border: 1px solid var(--cp-line);
-  border-radius: 10px;
+  border-radius: var(--radius);
   overflow: hidden
 }
 
@@ -1351,13 +1349,13 @@ input.cp-input:focus,
   border: 1px solid var(--cp-field-line);
   border-radius: 50%;
   color: var(--cp-muted);
-  font-size: 11px
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
 .cp-rcard h5 {
   flex: 1;
   color: var(--cp-heading);
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale, 1));
   font-weight: 600
 }
 
@@ -1367,7 +1365,7 @@ input.cp-input:focus,
   gap: 12px;
   padding: 10px 14px;
   border-bottom: 1px solid var(--cp-row-line);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .cp-rows > div:last-child {
@@ -1387,7 +1385,7 @@ input.cp-input:focus,
 .cp-rtext {
   padding: 12px 14px;
   color: var(--cp-ink);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   line-height: 1.65;
   overflow-wrap: anywhere
 }
@@ -1404,15 +1402,15 @@ input.cp-input:focus,
   justify-content: space-between;
   gap: 16px;
   padding: 14px 18px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--cp-line);
-  border-radius: 12px;
+  border-radius: var(--radius);
   box-shadow: 0 6px 22px #19374b0d
 }
 
 .cp-actionbar p {
   color: var(--cp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .cp-actionbar-btns {
@@ -1428,10 +1426,9 @@ input.cp-input:focus,
   position: sticky;
   top: 16px;
   padding: 20px;
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--cp-line);
-  border-radius: 12px
-}
+  border-radius: var(--radius)}
 
 .cp-info section {
   padding-bottom: 16px;
@@ -1444,7 +1441,7 @@ input.cp-input:focus,
   align-items: center;
   gap: 8px;
   color: var(--cp-heading);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 650
 }
 
@@ -1455,7 +1452,7 @@ input.cp-input:focus,
 .cp-info p {
   margin-top: 8px;
   color: var(--cp-muted);
-  font-size: 12px;
+  font-size: calc(12px * var(--font-scale, 1));
   line-height: 1.7
 }
 
@@ -1472,7 +1469,7 @@ input.cp-input:focus,
   align-items: center;
   gap: 9px;
   color: var(--cp-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
 .cp-connects .cp-ico {
@@ -1487,7 +1484,7 @@ input.cp-input:focus,
   padding: 14px;
   background: var(--cp-amber-soft);
   border: 1px solid var(--cp-amber-line);
-  border-radius: 10px;
+  border-radius: var(--radius);
   color: var(--cp-amber)
 }
 
@@ -1513,17 +1510,17 @@ input.cp-input:focus,
   gap: 9px;
   max-width: calc(100vw - 32px);
   padding: 12px 18px;
-  border-radius: 10px;
-  background: var(--cp-heading);
+  border-radius: var(--radius);
+  background: var(--inverse-bg);
   color: #fff;
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   box-shadow: 0 8px 26px #102b3f33;
   transform: translateX(-50%);
   animation: cp-toast .2s ease-out
 }
 
 .cp-toast .cp-ico {
-  color: color-mix(in srgb, var(--cp-primary) 45%, #fff)
+  color: color-mix(in srgb, var(--cp-primary) 45%, var(--white))
 }
 
 .cp-toast.is-warn .cp-ico {
@@ -1622,7 +1619,7 @@ input.cp-input:focus,
   }
 
   .cp-pagehead h1 {
-    font-size: 26px
+    font-size: calc(26px * var(--font-scale, 1))
   }
 
   .cp-create {

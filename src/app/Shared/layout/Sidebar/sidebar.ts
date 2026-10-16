@@ -1,9 +1,13 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, HostListener, computed, effect, inject, input, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { MENU_ICONS, MENU_ICON_FALLBACK } from '../menu-icons';
 import { MENU_DATA, MenuItem } from '../menu.data';
+import { ThemeSettingsService } from '../../../pages/Auth/Profile/theme-settings';
+
+/** Width of a horizontal-menu dropdown (keeps it inside the screen). */
+const DROP_W = 260;
 
 const MENU_TONES: Record<string, string> = {
   DASHBOARD: 'green',
@@ -42,9 +46,10 @@ export interface MenuSection {
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
-  host: { '[class.is-collapsed]': 'collapsed()' }
+  // the icon rail only exists in the vertical layout; the horizontal menu is always full
+  host: { '[class.is-collapsed]': 'collapsed() && !horizontal()', '[class.is-horizontal]': 'horizontal()' }
 })
-export class Sidebar {
+export class Sidebar implements AfterViewInit {
   readonly menu = input<MenuItem[]>(MENU_DATA);
 
   readonly collapsed = input(false);
@@ -61,6 +66,20 @@ export class Sidebar {
 
   private readonly expanded = signal<ReadonlySet<string>>(new Set());
 
+  private readonly theme = inject(ThemeSettingsService);
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+
+  /** Appearance studio -> Layout -> Horizontal: the menu runs across the top with dropdowns. */
+  protected readonly horizontal = computed(() => this.theme.prefs().layout === 'horizontal');
+
+  /** Horizontal layout: the one top-level menu whose dropdown is open, and where it sits. */
+  private readonly dropId = signal<string | null>(null);
+  protected readonly dropPos = signal({ left: 0, top: 0 });
+
+  /** Horizontal layout: the menu row slides; these show the left / right arrows. */
+  protected readonly canLeft = signal(false);
+  protected readonly canRight = signal(false);
+
   protected readonly items = computed(() => this.sorted(this.menu()));
 
   protected readonly sections = computed<MenuSection[]>(() => {
@@ -75,6 +94,9 @@ export class Sidebar {
     return sections;
   });
 
+  /** Ids of the rows shown on the top level (those open as dropdowns in the horizontal layout). */
+  private readonly topIds = computed(() => new Set(this.sections().flatMap((s) => s.items.map((i) => i.id))));
+
   constructor() {
     effect(() => {
       const parents = this.parentsOf(this.url());
@@ -82,6 +104,83 @@ export class Sidebar {
         this.expanded.update((set) => new Set([...set, ...parents]));
       }
     });
+    // a page change, or switching layout, closes the horizontal dropdown
+    effect(() => {
+      this.url();
+      this.horizontal();
+      this.dropId.set(null);
+    });
+    // switching layout (or the menu changing) re-measures the slider once the DOM has updated
+    effect(() => {
+      this.horizontal();
+      this.sections();
+      setTimeout(() => this.updateSlide());
+    });
+    // the dropdown is position: fixed - close it when the page scrolls under it
+    const onScroll = (event: Event): void => {
+      if (!this.dropId()) return;
+      const drop = this.host.nativeElement.querySelector('.nav-children.is-drop');
+      if (!drop?.contains(event.target as Node)) this.dropId.set(null);
+    };
+    document.addEventListener('scroll', onScroll, true);
+    inject(DestroyRef).onDestroy(() => document.removeEventListener('scroll', onScroll, true));
+  }
+
+  /** Horizontal layout: a click outside the menu closes the dropdown. */
+  @HostListener('document:click', ['$event'])
+  protected onDocClick(event: MouseEvent): void {
+    if (this.dropId() && !this.host.nativeElement.contains(event.target as Node)) this.dropId.set(null);
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscape(): void {
+    this.dropId.set(null);
+  }
+
+  @HostListener('window:resize')
+  protected onResize(): void {
+    this.dropId.set(null);
+    this.updateSlide();
+  }
+
+  ngAfterViewInit(): void {
+    this.updateSlide();
+  }
+
+  // ---- horizontal slider ----------------------------------------------------------------------
+
+  private navEl(): HTMLElement | null {
+    return this.host.nativeElement.querySelector<HTMLElement>('.nav');
+  }
+
+  /** Shows an arrow only on the side that has more menus to reveal. */
+  protected updateSlide(): void {
+    const nav = this.navEl();
+    if (!nav || !this.horizontal()) {
+      this.canLeft.set(false);
+      this.canRight.set(false);
+      return;
+    }
+    const max = nav.scrollWidth - nav.clientWidth;
+    this.canLeft.set(nav.scrollLeft > 2);
+    this.canRight.set(nav.scrollLeft < max - 2);
+  }
+
+  /** Arrow click: slide about three quarters of the visible row. */
+  protected slide(dir: 1 | -1): void {
+    const nav = this.navEl();
+    if (!nav) return;
+    this.dropId.set(null);
+    nav.scrollBy({ left: dir * Math.max(160, nav.clientWidth * 0.75), behavior: 'smooth' });
+  }
+
+  /** Mouse wheel over the row scrolls it sideways (horizontal layout only). */
+  protected onNavWheel(event: WheelEvent): void {
+    const nav = this.navEl();
+    if (!nav || !this.horizontal() || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+    if (nav.scrollWidth <= nav.clientWidth) return;
+    event.preventDefault();
+    nav.scrollLeft += event.deltaY;
   }
 
   protected iconPath(name?: string): string {
@@ -101,9 +200,26 @@ export class Sidebar {
     return this.sorted(item.children);
   }
   protected toggle(item: MenuItem, event?: Event): void {
+    // horizontal: a top-level menu opens a dropdown under itself (one at a time)
+    if (this.horizontal() && this.topIds().has(item.id)) {
+      const row = event?.currentTarget as HTMLElement | undefined;
+      event?.preventDefault();
+      event?.stopPropagation();
+      if (this.dropId() === item.id) {
+        this.dropId.set(null);
+        return;
+      }
+      if (row) {
+        const r = row.getBoundingClientRect();
+        const left = Math.max(8, Math.min(r.left, window.innerWidth - DROP_W - 8));
+        this.dropPos.set({ left, top: r.bottom + 6 });
+      }
+      this.dropId.set(item.id);
+      return;
+    }
     event?.preventDefault();
     event?.stopPropagation();
-    if (this.collapsed()) {
+    if (this.collapsed() && !this.horizontal()) {
       this.expandRequest.emit();
       this.expanded.update((set) => new Set([...set, item.id]));
       return;
@@ -117,7 +233,13 @@ export class Sidebar {
   }
 
   protected isExpanded(item: MenuItem): boolean {
+    if (this.horizontal() && this.topIds().has(item.id)) return this.dropId() === item.id;
     return this.expanded().has(item.id);
+  }
+
+  /** Sub-pages are listed when the menu is open - in the vertical layout only off the icon rail. */
+  protected showChildren(item: MenuItem): boolean {
+    return this.hasChildren(item) && this.isExpanded(item) && (this.horizontal() || !this.collapsed());
   }
 
   protected hasActiveChild(item: MenuItem): boolean {
@@ -141,6 +263,7 @@ export class Sidebar {
 
   protected closeMobileMenu(): void {
     document.getElementById('sidebar')?.classList.remove('open');
+    this.dropId.set(null);
   }
 
   // ---------------------------------------------------------------------------------------------

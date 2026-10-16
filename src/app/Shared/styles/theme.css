@@ -1,0 +1,228 @@
+/* =====================================================================================================
+   THEME - global hooks for Appearance studio (Profile -> Appearance). Imported once from styles.css.
+
+   applyTheme() (pages/Auth/Profile/theme-settings.ts) writes on <html>:
+     data-mode="light|dark"            System is resolved to light / dark and follows the device live
+     data-width="compact|normal|wide"  + --content-max (1080px / 1320px / none)
+     data-motion="reduce"              while Reduce motion is on
+     data-cc="on"                      while Custom colour controls are on
+     --radius / --btn-radius / --shadow, --font-*, --status-*, --cc-* ...
+
+   Every page stylesheet reads the shared tokens below (--white, --ink, --muted, --line, --panel2,
+   --chip, --heading-color, --status-*), so one change here reaches the whole app.
+   ===================================================================================================== */
+
+/* ---- defaults (applyTheme overrides them inline on <html>) ---- */
+:root {
+  /* the colour "strong" text tones are mixed with: black on light surfaces, white on dark */
+  --mix-ink: #000;
+  /* accent as text (eyebrows, links on tints): darker on light, lighter on dark */
+  --accent-ink: color-mix(in srgb, var(--accent) 62%, var(--mix-ink));
+
+  /* inverse surface for toasts and tooltips (white text on it in both modes) */
+  --inverse-bg: #24364a;
+
+  /* SECONDARY colour (Appearance studio -> Secondary button / palette 2nd tone, set as --teal).
+     Every page uses it for links and for the hover / pressed state of its neutral outline buttons;
+     the primary colour keeps the main buttons, selected tabs and the current menu. */
+  --secondary: var(--teal, #138879);
+  /* text ON a primary / secondary fill - applyTheme writes a shade of the same colour */
+  --primary-on: #fff;
+  --secondary-on: #fff;
+  --secondary-ink: color-mix(in srgb, var(--secondary) 62%, var(--mix-ink));
+  --secondary-hover: color-mix(in srgb, var(--cc-sec-hover, var(--secondary)) 10%, var(--white));
+  --secondary-press: color-mix(in srgb, var(--cc-sec-press, var(--secondary)) 18%, var(--white));
+  --secondary-line: color-mix(in srgb, var(--secondary) 38%, var(--line));
+
+  /* Typography -> Font size: every px font size is calc(Npx * var(--font-scale)); 13 px = 1 */
+  --font-scale: 1;
+
+  /* page width - Normal */
+  --content-max: 1320px;
+
+  /* status colours: base, light wash, readable text shade, hairline */
+  --status-info: #3c62a3;
+  --status-info-bg: #ecf0f6;
+  --status-info-ink: #3c62a3;
+  --status-info-line: #b5c3db;
+  --status-success: #3d7a68;
+  --status-success-bg: #ecf2f0;
+  --status-success-ink: #35695a;
+  --status-success-line: #b6cdc6;
+  --status-warning: #976821;
+  --status-warning-bg: #f5f0e9;
+  --status-warning-ink: #7d561b;
+  --status-warning-line: #d6c4a8;
+  --status-danger: #b34455;
+  --status-danger-bg: #f7ecee;
+  --status-danger-ink: #a23c4c;
+  --status-danger-line: #e1b6bd;
+  --status-neutral: #5a637a;
+  --status-neutral-bg: #eeeff2;
+  --status-neutral-ink: #5a637a;
+  --status-neutral-line: #c2c6cf
+}
+
+html[data-mode="dark"] {
+  --mix-ink: #fff;
+  --accent-ink: color-mix(in srgb, var(--accent) 55%, #fff);
+  --secondary-ink: color-mix(in srgb, var(--secondary) 55%, #fff);
+  --inverse-bg: #343c50;
+
+  /* status defaults for dark (applyTheme writes the picked colours over these) */
+  --status-info-bg: #222f45;
+  --status-info-ink: #9db1d1;
+  --status-info-line: #34507a;
+  --status-success-bg: #1f3130;
+  --status-success-ink: #9ebdb4;
+  --status-success-line: #2f5a4f;
+  --status-warning-bg: #312b25;
+  --status-warning-ink: #cbb390;
+  --status-warning-line: #5f4a2c;
+  --status-danger-bg: #36232c;
+  --status-danger-ink: #d9a1aa;
+  --status-danger-line: #6c3542;
+  --status-neutral-bg: #262b38;
+  --status-neutral-ink: #acb1bc;
+  --status-neutral-line: #424a5c
+}
+
+/* ---- content width -------------------------------------------------------------------------------
+   .content wraps both the routed page and the studio content (app.html). Compact / Normal centre
+   the page at a max width; Wide lets it use the full screen. */
+.main > .content {
+  width: 100%;
+  max-width: var(--content-max, 1320px);
+  margin-inline: auto;
+  transition: max-width .2s ease
+}
+
+html[data-width="wide"] .main > .content {
+  max-width: none
+}
+
+/* the top bar keeps the full width so its controls stay at the screen edges */
+
+/* ---- dark mode: surfaces the legacy rules still paint light ------------------------------------- */
+html[data-mode="dark"] ::selection {
+  background: color-mix(in srgb, var(--accent) 45%, #000);
+  color: #fff
+}
+
+html[data-mode="dark"] input,
+html[data-mode="dark"] select,
+html[data-mode="dark"] textarea {
+  color: var(--ink)
+}
+
+html[data-mode="dark"] input::placeholder,
+html[data-mode="dark"] textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent)
+}
+
+html[data-mode="dark"] img:not([src$=".svg"]) {
+  filter: brightness(.94)
+}
+
+html[data-mode="dark"] dialog {
+  background: var(--white);
+  color: var(--ink)
+}
+
+html[data-mode="dark"] * {
+  scrollbar-color: #3a4152 transparent
+}
+
+/* ---- custom colour controls: card outlines on the page components ---------------------------------
+   The component stylesheets are encapsulated ([_ngcontent] = 0,2,0); html[..] .x is 0,2,1, so the
+   picked outline wins without !important. Fills never change - only the hairline. */
+html[data-cc="on"] .pf-card,
+html[data-cc="on"] .pf-hero,
+html[data-cc="on"] .pf-strip,
+html[data-cc="on"] .pr-card,
+html[data-cc="on"] .pr-stat,
+html[data-cc="on"] .lp-hero,
+html[data-cc="on"] .lp-card,
+html[data-cc="on"] .lp-table-wrap,
+html[data-cc="on"] .cp-card,
+html[data-cc="on"] .cp-create,
+html[data-cc="on"] .cp-summary,
+html[data-cc="on"] .cp-rcard,
+html[data-cc="on"] .cp-actionbar {
+  border-color: var(--cc-card-outline)
+}
+
+/* ---- Shape -> Shadow: page cards take the same depth as the studio cards ----------------------------
+   (0 = flat; the default 12 is a barely-there 4 % shadow) */
+html .pf-card,
+html .pf-hero,
+html .pf-strip,
+html .pr-card,
+html .pr-stat,
+html .lp-hero,
+html .lp-card,
+html .cp-card,
+html .cp-create,
+html .cp-summary,
+html .cp-rcard {
+  box-shadow: var(--shadow)
+}
+
+/* ---- status helpers (usable on any page) ---------------------------------------------------------- */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border: 1px solid var(--s-line, var(--status-neutral-line));
+  border-radius: 5px;
+  background: var(--s-bg, var(--status-neutral-bg));
+  color: var(--s-ink, var(--status-neutral-ink));
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap
+}
+
+.status-alert {
+  padding: 10px 12px;
+  border: 1px solid var(--s-line, var(--status-info-line));
+  border-left-width: 3px;
+  border-left-color: var(--s-base, var(--status-info));
+  border-radius: var(--btn-radius, 8px);
+  background: var(--s-bg, var(--status-info-bg));
+  color: var(--s-ink, var(--status-info-ink))
+}
+
+[data-tone="info"] { --s-base: var(--status-info); --s-bg: var(--status-info-bg); --s-ink: var(--status-info-ink); --s-line: var(--status-info-line) }
+[data-tone="success"] { --s-base: var(--status-success); --s-bg: var(--status-success-bg); --s-ink: var(--status-success-ink); --s-line: var(--status-success-line) }
+[data-tone="warning"] { --s-base: var(--status-warning); --s-bg: var(--status-warning-bg); --s-ink: var(--status-warning-ink); --s-line: var(--status-warning-line) }
+[data-tone="danger"] { --s-base: var(--status-danger); --s-bg: var(--status-danger-bg); --s-ink: var(--status-danger-ink); --s-line: var(--status-danger-line) }
+[data-tone="neutral"] { --s-base: var(--status-neutral); --s-bg: var(--status-neutral-bg); --s-ink: var(--status-neutral-ink); --s-line: var(--status-neutral-line) }
+
+/* form validation follows the Danger / Success colours */
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--status-danger) !important
+}
+
+.field-error {
+  color: var(--status-danger-ink);
+  font-size: 12px
+}
+
+.field-ok {
+  color: var(--status-success-ink);
+  font-size: 12px
+}
+
+/* ---- reduce motion (app switch) ------------------------------------------------------------------- */
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation-duration: .001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important;
+  scroll-behavior: auto !important
+}

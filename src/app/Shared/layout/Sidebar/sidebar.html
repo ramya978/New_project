@@ -17,7 +17,14 @@
          toggle(item)          show / hide the sub-items          isExpanded(item)  sub-items are shown
          hasActiveChild(item)  a sub-item is the page on screen   openOrGo(item)    open first, then follow
          targetOf(item)        "_blank" when opensInNewTab        closeMobileMenu() closes the phone overlay -->
-  <nav class="nav" id="nav" aria-label="Main navigation">
+  <!-- horizontal layout: the menus stay on one line and slide left / right (arrows, wheel, swipe);
+       the arrows are sticky inside the row so they always sit on its edges -->
+  <nav class="nav" id="nav" aria-label="Main navigation" (scroll)="updateSlide()" (wheel)="onNavWheel($event)">
+    @if (horizontal() && canLeft()) {
+      <button type="button" class="nav-slide prev" aria-label="Scroll menu left" (click)="slide(-1)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </button>
+    }
     @for (section of sections(); track section.label + $index) {
       <!-- main heading: uppercase grey label (on the icon rail: a thin divider) -->
       <div class="nav-heading" role="presentation">
@@ -40,7 +47,7 @@
             </a>
           } @else {
             <button type="button" class="nav-link" [attr.aria-expanded]="isExpanded(item)"
-                    [attr.aria-controls]="'nav-sub-' + item.id" [attr.title]="collapsed() ? item.name : null" (click)="toggle(item)">
+                    [attr.aria-controls]="'nav-sub-' + item.id" [attr.title]="collapsed() ? item.name : null" (click)="toggle(item, $event)">
               <span class="nav-ico" [class]="toneOf(item)">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="iconPath(item.icon)" /></svg>
               </span>
@@ -57,8 +64,10 @@
         </div>
 
         <!-- its pages, indented under the menu -->
-        @if (hasChildren(item) && isExpanded(item) && !collapsed()) {
-          <div class="nav-children" [id]="'nav-sub-' + item.id">
+        <!-- vertical: indented under the menu · horizontal: a dropdown under the menu (fixed position) -->
+        @if (showChildren(item)) {
+          <div class="nav-children" [id]="'nav-sub-' + item.id" [class.is-drop]="horizontal()"
+               [style.left.px]="horizontal() ? dropPos().left : null" [style.top.px]="horizontal() ? dropPos().top : null">
             @for (child of childrenOf(item); track child.id) {
               @if (hasChildren(child)) {
                 <!-- a page with its own pages (Organisations -> Create / Approval Queue) -->
@@ -105,6 +114,11 @@
           </div>
         }
       }
+    }
+    @if (horizontal() && canRight()) {
+      <button type="button" class="nav-slide next" aria-label="Scroll menu right" (click)="slide(1)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+      </button>
     }
   </nav>
 </aside>

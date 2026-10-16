@@ -11,7 +11,7 @@ const flatten = (items: readonly MenuItem[]): MenuItem[] => items.flatMap((item)
 /** Menu routes that have a real screen (key = route without the leading slash). */
 const REAL_SCREENS: Record<string, unknown> = {
   'app/donations/payment-event-queue': PaymentsReceipts,
-  'app/fundraising/campaigns/campaign-register': NewCampaign
+  'app/fundraising/campaigns/campaign-wizard': NewCampaign
 };
 
 const menuRoutes: Routes = flatten(MENU_DATA)

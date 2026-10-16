@@ -1,41 +1,72 @@
 /* =====================================================================================================
-   AUTH · PROFILE
-   Typography follows the OtoSolve reference: Inter / Segoe UI · 14px base · 13px row text ·
-   11–12px captions · 10px uppercase labels · navy ink, slate muted text, hairline lines.
+   AUTH · MY PROFILE
+   Inter / Segoe UI · 14px base · 13px row text · 11–12px captions · 10px uppercase labels.
+   Flat surfaces: hairline borders, no shadows. Every accent comes from --primary.
    ===================================================================================================== */
 :host {
   --pf-primary: var(--primary, var(--accent));
-  --pf-primary-soft: color-mix(in srgb, var(--pf-primary) 14%, #fff);
-  --pf-primary-ink: color-mix(in srgb, var(--pf-primary) 50%, #000);
-  --pf-hover: color-mix(in srgb, var(--pf-primary) 9%, #fff);
+  --pf-primary-soft: color-mix(in srgb, var(--pf-primary) 12%, var(--white));
+  --pf-primary-tint: color-mix(in srgb, var(--pf-primary) 6%, var(--white));
+  --pf-primary-ink: color-mix(in srgb, var(--pf-primary) 50%, var(--mix-ink, #000));
+  --pf-hover: color-mix(in srgb, var(--pf-primary) 8%, var(--white));
   --pf-font: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
-  --pf-ink: #24364a;
-  --pf-heading: #102b3f;
-  --pf-muted: #5b6d7d;
-  --pf-line: #e2e9ee;
-  --pf-row-line: #edf1f5;
-  --pf-field-line: #8295a4;
+  --pf-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --pf-ink: var(--ink);
+  --pf-heading: var(--heading-color, var(--ink));
+  --pf-muted: var(--muted);
+  --pf-faint: color-mix(in srgb, var(--muted) 72%, var(--white));
+  --pf-line: var(--line);
+  --pf-row-line: color-mix(in srgb, var(--line) 65%, var(--white));
+  --pf-chip-bg: var(--chip);
+  --pf-green: var(--status-success-ink);
+  --pf-green-bg: var(--status-success-bg);
+  --pf-amber: var(--status-warning-ink);
 
   display: block;
   color: var(--pf-ink);
-  font: 14px/1.5 var(--pf-font)
+  font: calc(14px * var(--font-scale, 1))/var(--line-height, 1.5) var(--pf-font);
+  font-weight: var(--font-weight, 400)
 }
 
 :host button,
-:host input,
-:host select {
+:host input {
   font: inherit
 }
 
+:host svg {
+  flex: none
+}
+
+:host button:focus-visible,
+:host input:focus-visible {
+  outline: 2px solid var(--pf-primary-ink);
+  outline-offset: 2px
+}
+
+.num {
+  font-variant-numeric: tabular-nums
+}
+
+/* small uppercase labels */
+.pf-eyebrow {
+  display: block;
+  color: var(--pf-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 650;
+  letter-spacing: 1.2px;
+  line-height: 1.5;
+  text-transform: uppercase
+}
+
 /* =====================================================================================================
-   PAGE HEADER (outside card)
+   PAGE HEADER
    ===================================================================================================== */
 .pf-pagehead {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 28px
+  margin-bottom: 26px
 }
 
 .pf-pagehead-text {
@@ -44,11 +75,11 @@
 
 .pf-kicker {
   display: block;
-  margin-bottom: 10px;
-  color: var(--pf-primary-ink);
-  font-size: 10px;
-  font-weight: 650;
-  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+  color: var(--pf-heading);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 1.4px;
   text-transform: uppercase
 }
 
@@ -56,19 +87,17 @@
   margin: 0;
   color: var(--pf-heading);
   font-family: inherit;
-  font-size: 30px;
+  font-size: calc(30px * var(--font-scale, 1));
   font-weight: 650;
-  letter-spacing: -.8px;
-  line-height: 1.25;
-  word-break: break-word
+  letter-spacing: -.6px;
+  line-height: 1.2
 }
 
 .pf-sub {
-  max-width: 680px;
-  margin: 9px 0 0;
+  margin: 6px 0 0;
   color: var(--pf-muted);
-  font-size: 13px;
-  line-height: 1.7
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.6
 }
 
 .pf-head-actions {
@@ -78,16 +107,16 @@
   flex-shrink: 0
 }
 
-/* shared button — header + card actions */
+/* header buttons (colours come from the global .btn-primary / .btn-secondary) */
 .pf-hbtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  /* min-height: 39px; */
-  padding: 8px 12px;
-  border-radius: 7px;
-  font-size: 11px;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: var(--btn-radius);
+  font-size: calc(12px * var(--font-scale, 1));
   font-weight: 550;
   white-space: nowrap;
   cursor: pointer;
@@ -95,127 +124,363 @@
 }
 
 .pf-hbtn svg {
-  flex: none;
-  stroke-width: 1.5;
-  color: currentColor
-}
-
-
-
-.pf-hbtn.primary {
-  border-color: var(--pf-primary-ink);
-  background: var(--pf-primary-ink);
-  color: #fff
-}
-
-.pf-hbtn.primary:hover {
-  background: color-mix(in srgb, var(--pf-primary) 40%, #000);
-  color: #fff
-}
-
-.pf-hbtn:focus-visible {
-  outline: 2px solid var(--pf-primary-ink);
-  outline-offset: 3px
+  stroke-width: 1.5
 }
 
 /* =====================================================================================================
-   CARD
+   SHARED PIECES
    ===================================================================================================== */
 .pf-card {
-  overflow: hidden;
-  padding: 0;
   border: 1px solid var(--pf-line);
-  border-radius: 14px;
-  background: var(--panel, #fff)
+  border-radius: var(--radius);
+  background: var(--panel, var(--white))
 }
 
-/* small uppercase labels inside the card */
-.pf-card .eyebrow {
-  display: block;
+.pf-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--pf-chip-bg);
   color: var(--pf-muted);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.2px;
-  line-height: 1.5;
-  text-transform: uppercase
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 550;
+  line-height: 1.4;
+  white-space: nowrap
 }
 
-/* ---------- status strip ---------- */
+.pf-chip.green {
+  background: var(--pf-green-bg);
+  color: var(--pf-green)
+}
+
+.pf-chip.primary {
+  background: var(--pf-primary-soft);
+  color: var(--pf-primary-ink)
+}
+
+/* square icon tile */
+.pf-tile {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--pf-line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--pf-heading)
+}
+
+.pf-tile.sm {
+  flex-basis: 32px;
+  width: 32px;
+  height: 32px
+}
+
+.pf-tile svg {
+  stroke-width: 1.5
+}
+
+/* text link with arrow */
+.pf-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--pf-heading);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer
+}
+
+.pf-link svg {
+  stroke-width: 1.6;
+  transition: transform .16s ease
+}
+
+.pf-link:hover {
+  color: var(--secondary-ink)
+}
+
+.pf-link:hover svg {
+  transform: translateX(2px)
+}
+
+/* outline button */
+.pf-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--pf-line);
+  border-radius: var(--btn-radius);
+  background: var(--white);
+  color: var(--pf-heading);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease
+}
+
+.pf-outline:hover {
+  border-color: var(--secondary-line);
+  background: var(--secondary-hover);
+  color: var(--secondary-ink)
+}
+
+.pf-outline.sm {
+  width: auto;
+  min-height: 34px;
+  padding: 6px 10px
+}
+
+.pf-outline svg {
+  stroke-width: 1.6
+}
+
+/* pencil button in card heads */
+.pf-iconbtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--btn-radius);
+  background: none;
+  color: var(--pf-heading);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease
+}
+
+.pf-iconbtn:hover {
+  background: var(--secondary-hover);
+  color: var(--secondary-ink)
+}
+
+.pf-footnote {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 20px;
+  padding: 14px 0 16px;
+  border-top: 1px solid var(--pf-row-line);
+  color: var(--pf-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.5
+}
+
+/* =====================================================================================================
+   IDENTITY HERO
+   ===================================================================================================== */
+.pf-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+  padding: 24px 24px;
+  border: 1px solid var(--pf-line);
+  border-radius: var(--radius);
+  background: var(--panel, var(--white))
+}
+
+.pf-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: var(--pf-primary-soft);
+  color: var(--pf-heading);
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.3px
+}
+
+.pf-hero-main {
+  flex: 1;
+  min-width: 0
+}
+
+.pf-hero-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px
+}
+
+.pf-hero-name h2 {
+  margin: 0;
+  color: var(--pf-heading);
+  font-family: inherit;
+  font-size: calc(22px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.4px;
+  line-height: 1.3
+}
+
+.pf-hero-role {
+  margin: 4px 0 0;
+  color: var(--pf-muted);
+  font-size: calc(13px * var(--font-scale, 1))
+}
+
+.pf-hero-role code {
+  color: var(--pf-muted);
+  font-family: var(--pf-mono);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+.pf-dot {
+  margin: 0 4px
+}
+
+.pf-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin: 8px 0 0;
+  color: var(--pf-muted);
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+.pf-hero-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow-wrap: anywhere
+}
+
+.pf-hero-side {
+  flex: 0 0 auto;
+  min-width: 210px;
+  padding-left: 24px;
+  border-left: 1px solid var(--pf-line)
+}
+
+.pf-hero-side strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--pf-heading);
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.2px
+}
+
+.pf-hero-side small {
+  display: block;
+  margin-top: 4px;
+  color: var(--pf-muted);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+/* =====================================================================================================
+   STAT STRIP
+   ===================================================================================================== */
 .pf-strip {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  background: var(--panel, #fff)
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 18px;
+  border: 1px solid var(--pf-line);
+  border-radius: var(--radius);
+  background: var(--panel, var(--white))
 }
 
-.pf-cell {
+.pf-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   min-width: 0;
-  padding: 19px 22px 21px;
+  padding: 16px 20px;
   border-right: 1px solid var(--pf-line)
 }
 
-.pf-cell:last-child {
+.pf-stat:last-child {
   border-right: 0
 }
 
-.pf-cell .eyebrow {
-  margin-bottom: 8px
-}
-
-.pf-cell strong {
-  display: block;
-  color: var(--pf-heading);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -.1px;
-  line-height: 1.45;
-  word-break: break-word
-}
-
-.pf-cell strong.pf-warn {
-  color: #a9691b
-}
-
-.pf-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4
-}
-
-/* ---------- body layout ---------- */
-.pf-body {
+.pf-stat-ico {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  border-top: 1px solid var(--pf-line)
+  place-items: center;
+  color: var(--pf-heading)
 }
 
-.pf-main {
-  min-width: 0;
-  padding: 0 26px 26px
+.pf-stat-ico svg {
+  stroke-width: 1.5
 }
 
-/* ---------- tabs ---------- */
+.pf-stat-text {
+  min-width: 0
+}
+
+.pf-stat-text p {
+  margin: 3px 0 0;
+  overflow-wrap: anywhere
+}
+
+.pf-stat-text strong {
+  color: var(--pf-heading);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-stat-text strong.amber {
+  color: var(--pf-amber)
+}
+
+.pf-stat-text small {
+  margin-left: 3px;
+  color: var(--pf-muted);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+/* =====================================================================================================
+   TABS
+   ===================================================================================================== */
+.pf-tabbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--pf-line)
+}
+
 .pf-tabs {
   display: flex;
-  gap: 26px;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--pf-line)
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none
 }
 
 .pf-tabs button {
   position: relative;
-  padding: 17px 0 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px 13px;
   border: 0;
   background: none;
   color: var(--pf-muted);
-  font-size: 13px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 400;
+  white-space: nowrap;
   cursor: pointer;
   transition: color .15s ease
+}
+
+.pf-tabs button svg {
+  stroke-width: 1.5
 }
 
 .pf-tabs button:hover {
@@ -223,7 +488,7 @@
 }
 
 .pf-tabs button.active {
-  color: var(--pf-primary-ink);
+  color: var(--pf-heading);
   font-weight: 600
 }
 
@@ -234,578 +499,554 @@
   right: 0;
   bottom: -1px;
   height: 2px;
-  border-radius: 2px;
   background: var(--pf-primary-ink)
 }
 
-.pf-tab-meta {
-  margin-left: 5px;
-  color: var(--pf-muted);
-  font-size: 11px;
-  font-weight: 400
-}
-
-.pf-tabs button.active .pf-tab-meta {
-  color: var(--pf-primary-ink)
-}
-
-/* ---------- section titles ---------- */
-.pf-title {
-  margin: 0 0 16px;
-  color: var(--pf-heading);
-  font-family: inherit;
-  font-size: 19px;
-  font-weight: 650;
-  letter-spacing: -.35px;
-  line-height: 1.3
-}
-
-.pf-title.plain {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 0
-}
-
-.pf-count {
+.pf-tab-count {
   display: inline-grid;
   place-items: center;
-  min-width: 24px;
-  height: 22px;
-  padding: 0 7px;
-  border-radius: 5px;
-  background: #f0f4f7;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--pf-primary-soft);
+  color: var(--pf-primary-ink);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-tabbar-note {
+  flex: none;
   color: var(--pf-muted);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
-/* ---------- identity / organisation panels ---------- */
-.pf-panels {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 64px
-}
-
-/* centre divider between Identity and Organisation */
-.pf-panels::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  background: var(--pf-line);
-  transform: translateX(-50%);
-  pointer-events: none
-}
-
-.pf-panel-head {
+/* security banner */
+.pf-banner {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
-  padding-bottom: 11px;
-  border-bottom: 1px solid var(--pf-line);
+  margin-bottom: 20px;
+  padding: 13px 18px;
+  border: 1px solid var(--pf-line);
+  border-radius: var(--radius);
+  background: var(--panel, var(--white));
   color: var(--pf-heading);
-  font-family: inherit;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.2px;
-  text-transform: uppercase
+  font-size: calc(12px * var(--font-scale, 1))
 }
 
-.pf-panel-ico {
+.pf-banner p {
+  margin: 0;
+  line-height: 1.55
+}
+
+.pf-banner strong {
+  font-weight: 650
+}
+
+/* =====================================================================================================
+   BODY LAYOUT
+   ===================================================================================================== */
+.pf-body {
   display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: var(--pf-primary-soft);
-  color: var(--pf-primary-ink)
+  grid-template-columns: minmax(0, 1fr) 310px;
+  align-items: start;
+  gap: 20px
 }
 
-.pf-panel-ico svg {
-  stroke-width: 1.5
+.pf-main,
+.pf-rail {
+  display: grid;
+  gap: 16px;
+  min-width: 0
 }
 
-.pf-row {
+/* card head: title + one-line hint, action on the right */
+.pf-card-head {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 12px 2px;
-  border-bottom: 1px dashed var(--pf-row-line);
-  font-size: 13px;
-  line-height: 1.45
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid var(--pf-line)
 }
 
-.pf-row:last-child {
+.pf-card-head h3 {
+  margin: 0;
+  color: var(--pf-heading);
+  font-family: inherit;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.1px;
+  line-height: 1.4
+}
+
+.pf-card-head p {
+  margin: 4px 0 0;
+  color: var(--pf-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.5
+}
+
+/* ---------- label / value grid ---------- */
+.pf-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 40px;
+  padding: 0 20px
+}
+
+.pf-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--pf-row-line);
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+/* last row of each column has no line */
+.pf-fields > .pf-field:nth-last-child(-n+2) {
   border-bottom: 0
 }
 
-.pf-row-ico {
-  display: grid;
-  place-items: center;
-  flex: 0 0 16px;
+.pf-field-label {
   color: var(--pf-muted)
 }
 
-.pf-row-ico svg {
-  width: 16px;
-  height: 16px;
-  stroke-width: 1.5
-}
-
-.pf-row-label {
-  color: var(--pf-muted);
-  white-space: nowrap
-}
-
-.pf-row-label small {
-  display: block;
-  margin-top: 2px;
-  font-size: 11px;
-  line-height: 1.5;
-  white-space: normal
-}
-
-.pf-row-value {
-  margin-left: auto;
-  color: var(--pf-ink);
-  font-weight: 600;
+.pf-field-value {
+  min-width: 0;
+  color: var(--pf-heading);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 550;
   text-align: right;
-  word-break: break-word
+  overflow-wrap: anywhere
 }
 
-.pf-row-value.notset {
-  color: #8a99a6;
+.pf-field-value.mono {
+  font-family: var(--pf-mono);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-field-value.notset {
+  color: var(--pf-muted);
   font-style: italic;
   font-weight: 400
 }
 
-.pf-state {
-  margin-left: auto;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap
+/* ---------- access at a glance ---------- */
+.pf-glance {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 18px
 }
 
-.pf-state.green { color: #157969 }
-.pf-state.amber { color: #a9691b }
-
-.pf-panel-wide {
-  max-width: 760px
+.pf-glance .pf-tile {
+  border: 0;
+  background: var(--pf-primary-soft);
+  color: var(--pf-primary-ink)
 }
 
-/* ---------- assigned roles ---------- */
-.pf-roles {
-  margin-top: 32px
+.pf-glance-text {
+  flex: 1;
+  min-width: 0
 }
 
-.pf-roles-head {
+.pf-glance-text strong {
+  display: block;
+  color: var(--pf-heading);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-glance-text small {
+  display: block;
+  margin-top: 2px;
+  color: var(--pf-muted);
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+/* ---------- access: toolbar + table ---------- */
+.pf-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 14px;
-  margin-bottom: 16px
-}
-
-.pf-tools {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap
+  padding: 14px 20px
 }
 
 .pf-search {
   position: relative;
-  display: inline-flex;
-  align-items: center
-}
-
-.pf-search input {
-  width: 260px;
-  height: 39px;
-  padding: 6px 36px 6px 11px;
-  border: 1px solid var(--pf-field-line);
-  border-radius: 7px;
-  background: #fff;
-  color: var(--pf-ink);
-  font-size: 12px
-}
-
-.pf-search input::placeholder { color: #8a99a6 }
-
-.pf-search input:focus {
-  outline: none;
-  border-color: var(--pf-primary-ink);
-  box-shadow: 0 0 0 3px var(--pf-primary-soft)
+  display: flex;
+  align-items: center;
+  width: 320px;
+  max-width: 100%;
+  color: var(--pf-muted)
 }
 
 .pf-search svg {
   position: absolute;
-  right: 11px;
-  color: var(--pf-muted);
+  left: 12px;
   stroke-width: 1.5;
   pointer-events: none
 }
 
-.pf-sort {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 39px;
-  padding: 0 8px 0 11px;
-  border: 1px solid var(--pf-field-line);
-  border-radius: 7px;
-  background: #fff;
-  color: var(--pf-muted);
-  font-size: 12px
-}
-
-.pf-sort svg {
-  stroke-width: 1.5
-}
-
-.pf-sort select {
-  padding-right: 4px;
-  border: 0;
-  background: none;
-  color: var(--pf-ink);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer
-}
-
-/* roles table */
-.pf-table {
+.pf-search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 36px;
   border: 1px solid var(--pf-line);
-  border-radius: 11px;
-  overflow: hidden
+  border-radius: var(--btn-radius);
+  background: var(--white);
+  color: var(--pf-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  transition: border-color .15s ease, box-shadow .15s ease
+}
+
+.pf-search input::placeholder {
+  color: var(--pf-faint)
+}
+
+:host .pf-search input:focus,
+:host .pf-search input:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--pf-primary) 40%, var(--white));
+  box-shadow: 0 0 0 3px var(--pf-primary-soft)
+}
+
+.pf-toolbar-count {
+  color: var(--pf-muted);
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+.pf-table {
+  overflow-x: auto
 }
 
 .pf-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px
+  font-size: calc(13px * var(--font-scale, 1))
 }
 
 .pf-table th {
-  padding: 13px 20px;
-  background: #f8fafc;
+  padding: 11px 20px;
+  background: var(--pf-primary-tint);
+  border-top: 1px solid var(--pf-line);
   border-bottom: 1px solid var(--pf-line);
-  color: var(--pf-muted);
-  font-size: 10px;
+  color: var(--pf-heading);
+  font-size: calc(10px * var(--font-scale, 1));
   font-weight: 600;
-  letter-spacing: 1.2px;
-  line-height: 1.5;
+  letter-spacing: 1.1px;
   text-align: left;
-  text-transform: uppercase
+  text-transform: uppercase;
+  white-space: nowrap
 }
 
 .pf-table td {
-  padding: 15px 20px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--pf-row-line);
-  color: var(--pf-ink);
-  font-size: 13px;
-  line-height: 1.45;
   vertical-align: middle
 }
 
-.pf-table tbody tr:last-child td {
-  border-bottom: 0
-}
-
-.pf-table tbody tr:hover td {
-  background: color-mix(in srgb, var(--pf-primary) 3%, #fff)
-}
-
-.pf-table td.empty {
-  padding: 30px 20px;
-  color: var(--pf-muted);
-  font-size: 12px;
-  text-align: center
-}
-
-.pf-role {
-  display: flex;
-  align-items: center;
-  gap: 12px
-}
-
-.pf-role-mark {
-  display: grid;
-  place-items: center;
-  flex: 0 0 36px;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px;
-  background: var(--pf-primary-soft);
-  color: var(--pf-primary-ink);
-  font-size: 12px;
-  font-weight: 650
-}
-
-.pf-role strong {
+.pf-table td strong,
+.pf-cell-main {
   display: block;
-  color: var(--pf-ink);
-  font-size: 13px;
-  font-weight: 600
-}
-
-.pf-role small {
-  display: block;
-  margin-top: 2px;
-  color: var(--pf-muted);
-  font-size: 11px;
-  line-height: 1.5
-}
-
-.pf-inline {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--pf-ink);
-  white-space: nowrap
-}
-
-.pf-inline svg {
-  color: var(--pf-muted);
-  stroke-width: 1.5
-}
-
-.pf-term {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #157969;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap
-}
-
-.pf-term::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor
-}
-
-/* ---------- right rail ---------- */
-.pf-rail {
-  padding: 24px 24px 26px;
-  border-left: 1px solid var(--pf-line);
-  background: #ffffff
-}
-
-.pf-rail-block + .pf-rail-block {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid var(--pf-line)
-}
-
-.pf-rail-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 14px
-}
-
-.pf-ring {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%
-}
-
-.pf-ring::before {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 50%;
-  background: #f8fafc
-}
-
-.pf-ring-num {
-  position: relative;
-  z-index: 1;
   color: var(--pf-heading);
-  font-size: 14px;
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600
 }
 
-.pf-ring-num small {
-  color: var(--pf-muted);
-  font-size: 11px;
+.pf-cell-main {
   font-weight: 400
 }
 
-.pf-checks {
-  display: grid;
-  gap: 9px;
-  margin: 0;
-  padding: 0;
-  list-style: none
+.pf-table td small {
+  display: block;
+  margin-top: 3px;
+  color: var(--pf-muted);
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
-.pf-checks li {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 12px 13px;
-  border: 1px solid var(--pf-line);
-  border-radius: 10px;
-  background: #fff
-}
-
-.pf-check-ico {
-  display: grid;
-  place-items: center;
-  flex: 0 0 33px;
-  width: 33px;
-  height: 33px;
-  border-radius: 8px;
-  background: var(--pf-primary-soft);
+.pf-table td small.pf-accent {
   color: var(--pf-primary-ink)
 }
 
-.pf-check-ico svg {
-  width: 17px;
-  height: 17px;
-  stroke-width: 1.5
+.pf-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--pf-primary) 3%, var(--white))
 }
 
-.pf-check-text {
+.pf-table .pf-empty {
+  padding: 28px 20px;
+  color: var(--pf-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  text-align: center
+}
+
+.pf-table + .pf-footnote {
+  border-top: 0
+}
+
+/* ---------- access: numbered assignment details ---------- */
+.pf-steps {
+  margin: 0;
+  padding: 0 20px;
+  list-style: none
+}
+
+.pf-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--pf-row-line)
+}
+
+.pf-steps li:last-child {
+  border-bottom: 0
+}
+
+.pf-step-num {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--pf-primary-soft);
+  color: var(--pf-primary-ink);
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-steps strong {
+  display: block;
+  color: var(--pf-heading);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-steps p {
+  margin: 4px 0 0;
+  color: var(--pf-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+/* ---------- security / session rows ---------- */
+.pf-list {
+  padding: 0 20px
+}
+
+.pf-sec {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--pf-row-line)
+}
+
+.pf-sec:last-child {
+  border-bottom: 0
+}
+
+.pf-sec-text {
   flex: 1;
   min-width: 0
 }
 
-.pf-check-text strong {
+.pf-sec-text strong {
   display: block;
-  color: var(--pf-ink);
-  font-size: 13px;
+  color: var(--pf-heading);
+  font-size: calc(13px * var(--font-scale, 1));
   font-weight: 600
 }
 
-.pf-check-text small {
-  display: block;
-  margin-top: 2px;
+.pf-sec-text p {
+  margin: 3px 0 0;
   color: var(--pf-muted);
-  font-size: 11px;
-  line-height: 1.5
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.55;
+  overflow-wrap: anywhere
 }
 
-.pf-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 14px;
-  padding: 5px 0;
-  border: 0;
-  background: none;
-  color: var(--pf-primary-ink);
-  font-size: 11px;
-  font-weight: 550;
-  cursor: pointer
+.pf-sec-text small {
+  display: block;
+  margin-top: 3px;
+  color: var(--pf-muted);
+  font-size: calc(11px * var(--font-scale, 1))
 }
 
-.pf-link svg {
-  stroke-width: 1.5;
-  transition: transform .16s ease
+/* =====================================================================================================
+   RIGHT RAIL
+   ===================================================================================================== */
+.pf-rail-card {
+  padding: 20px
 }
 
-.pf-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 4px
+.pf-rail-card h3 {
+  margin: 0;
+  color: var(--pf-heading);
+  font-family: inherit;
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  line-height: 1.4
 }
 
-.pf-link:hover svg {
-  transform: translateX(2px)
-}
-
-.pf-sessions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.pf-rail-text {
   margin: 10px 0 0;
   color: var(--pf-muted);
-  font-size: 12px
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.65
 }
 
-.pf-sessions svg {
-  stroke-width: 1.5
+/* complete your profile */
+.pf-complete-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px
 }
 
-.pf-sessions strong {
+.pf-complete-head strong {
   color: var(--pf-heading);
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -.8px;
-  line-height: 1.2
-}
-
-.pf-score {
-  color: var(--pf-heading);
-  font-size: 15px;
+  font-size: calc(17px * var(--font-scale, 1));
   font-weight: 600
-}
-
-.pf-score small {
-  color: var(--pf-muted);
-  font-size: 11px;
-  font-weight: 400
 }
 
 .pf-progress {
-  height: 7px;
-  border-radius: 7px;
-  background: #e6ecf0;
+  height: 6px;
+  margin-top: 14px;
+  border-radius: 6px;
+  background: var(--chip);
   overflow: hidden
 }
 
 .pf-progress span {
   display: block;
   height: 100%;
-  border-radius: 7px;
-  background: var(--pf-primary-ink)
+  border-radius: 6px;
+  background: var(--pf-primary-ink);
+  transition: width .3s ease
 }
 
-.pf-rail-note {
-  margin: 10px 0 0;
+.pf-missing,
+.pf-ticks {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none
+}
+
+.pf-missing li,
+.pf-ticks li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--pf-ink);
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+.pf-missing svg {
+  color: var(--pf-muted)
+}
+
+.pf-ticks svg {
+  color: var(--pf-heading);
+  stroke-width: 2
+}
+
+.pf-more {
+  margin: 12px 0 0;
   color: var(--pf-muted);
-  font-size: 12px;
-  line-height: 1.6
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+.pf-rail-card .pf-outline {
+  margin-top: 18px
+}
+
+.pf-rail-card > .pf-link {
+  margin-top: 12px
+}
+
+/* icon + title on one line (Account protection) */
+.pf-rail-title {
+  display: flex;
+  align-items: center;
+  gap: 12px
+}
+
+/* stacked rail cards (Current organisation / Protect your account) */
+.pf-rail-label {
+  display: block;
+  margin-top: 16px;
+  color: var(--pf-heading);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-rail-card h3.pf-rail-big {
+  margin-top: 10px;
+  font-size: calc(15px * var(--font-scale, 1))
+}
+
+.pf-rail-card h3.pf-rail-h {
+  margin-top: 16px
+}
+
+/* plain note under the rail cards */
+.pf-note {
+  display: flex;
+  gap: 10px;
+  padding: 4px 4px 0;
+  color: var(--pf-heading)
+}
+
+.pf-note svg {
+  margin-top: 1px;
+  stroke-width: 1.5
+}
+
+.pf-note strong {
+  display: block;
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 600
+}
+
+.pf-note p {
+  margin: 6px 0 0;
+  color: var(--pf-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.65
 }
 
 /* =====================================================================================================
    RESPONSIVE
    ===================================================================================================== */
-@media (max-width: 1280px) {
+@media (max-width: 1200px) {
   .pf-body {
     grid-template-columns: 1fr
   }
 
   .pf-rail {
-    border-left: 0;
-    border-top: 1px solid var(--pf-line)
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))
   }
 
   .pf-strip {
-    grid-template-columns: repeat(3, minmax(0, 1fr))
+    grid-template-columns: repeat(2, minmax(0, 1fr))
   }
 
-  .pf-cell:nth-child(3n) {
+  .pf-stat:nth-child(2n) {
     border-right: 0
   }
 
-  .pf-cell:nth-child(-n+3) {
+  .pf-stat:nth-child(-n+2) {
     border-bottom: 1px solid var(--pf-line)
   }
 }
@@ -817,65 +1058,74 @@
   }
 
   .pf-pagehead h1 {
-    font-size: 26px
+    font-size: calc(26px * var(--font-scale, 1))
   }
 
   .pf-head-actions {
     flex-wrap: wrap
   }
 
-  .pf-panels {
-    grid-template-columns: 1fr;
-    gap: 22px
+  .pf-hero {
+    flex-wrap: wrap
   }
 
-  /* stacked on small screens - no centre line */
-  .pf-panels::before {
+  .pf-hero-side {
+    flex-basis: 100%;
+    padding: 16px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--pf-line)
+  }
+
+  .pf-tabbar-note {
     display: none
   }
 
-  .pf-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr))
+  .pf-fields {
+    grid-template-columns: 1fr
   }
 
-  .pf-cell:nth-child(3n) {
-    border-right: 1px solid var(--pf-line)
+  .pf-fields > .pf-field:nth-last-child(2) {
+    border-bottom: 1px solid var(--pf-row-line)
   }
 
-  .pf-cell:nth-child(2n) {
-    border-right: 0
-  }
-
-  .pf-cell:nth-child(-n+4) {
-    border-bottom: 1px solid var(--pf-line)
-  }
-
-  .pf-main {
-    padding: 0 18px 22px
-  }
-
-  .pf-rail {
-    padding: 22px 18px 24px
-  }
-
-  .pf-tools {
-    width: 100%
-  }
-
-  .pf-search {
-    flex: 1
-  }
-
-  .pf-search input {
-    width: 100%
-  }
-
-  .pf-table {
-    overflow-x: auto
+  .pf-fields > .pf-field-blank {
+    display: none
   }
 
   .pf-table table {
-    min-width: 640px
+    min-width: 620px
+  }
+
+  .pf-search {
+    width: 100%
+  }
+}
+
+@media (max-width: 600px) {
+  .pf-strip {
+    grid-template-columns: 1fr
+  }
+
+  .pf-stat {
+    border-right: 0;
+    border-bottom: 1px solid var(--pf-line)
+  }
+
+  .pf-stat:last-child {
+    border-bottom: 0
+  }
+
+  .pf-sec {
+    flex-wrap: wrap
+  }
+
+  .pf-sec > .pf-outline,
+  .pf-sec > .pf-chip {
+    margin-left: 48px
+  }
+
+  .pf-card-head {
+    flex-wrap: wrap
   }
 }
 

@@ -17,8 +17,8 @@
   justify-content: center;
   gap: 9px;
   padding: 8px 12px;
-  border-radius: 7px;
-  font-size: 11px;
+  border-radius: var(--btn-radius, 7px);
+  font-size: calc(11px * var(--font-scale, 1));
   font-weight: 550;
   white-space: nowrap;
   cursor: pointer;
@@ -26,26 +26,39 @@
 }
 
 
-/* ---------- positive button (primary colour) ---------- */
+/* ---------- positive button (primary colour) ----------
+   Custom colour controls (Theme Settings -> Workspace) override the three states through
+   --cc-btn / --cc-btn-hover / --cc-btn-press; their *-ink siblings flip the label for
+   contrast automatically. Without the controls the fallbacks keep the current look. */
 .btn-primary {
-  background: var(--btn-primary);
-  border: 1px solid var(--btn-primary);
-  color: #fff
+  background: var(--cc-btn, var(--btn-primary));
+  border: 1px solid var(--cc-btn, var(--btn-primary));
+  color: var(--cc-btn-ink, var(--primary-on, #fff))
 }
 
 .btn-primary:hover {
-  background: var(--btn-primary-hover);
-  border-color: var(--btn-primary-hover);
-  color: #fff
+  background: var(--cc-btn-hover, var(--btn-primary-hover));
+  border-color: var(--cc-btn-hover, var(--btn-primary-hover));
+  color: var(--cc-btn-hover-ink, var(--primary-on, #fff))
 }
 
 .btn-primary:active {
-  background: var(--btn-primary-press);
-  border-color: var(--btn-primary-press);
-  color: #fff
+  background: var(--cc-btn-press, var(--btn-primary-press));
+  border-color: var(--cc-btn-press, var(--btn-primary-press));
+  color: var(--cc-btn-press-ink, var(--primary-on, #fff))
 }
 
-/* ---------- negative button (secondary colour) ---------- */
+/* ---------- negative button (secondary colour): outline button that fills solid
+   on hover / press.
+   Custom colour controls (Theme Settings -> Colour) override the two filled states
+   through --cc-sec-hover / --cc-sec-press, with --cc-sec-hover-ink /
+   --cc-sec-press-ink flipping the label for contrast automatically.
+   Without the controls the fallbacks keep the current derived look. */
+.btn-primary,
+.btn-secondary {
+  border-radius: var(--btn-radius, 8px)
+}
+
 .btn-secondary {
   background: none;
   border: 1px solid var(--btn-secondary);
@@ -53,15 +66,15 @@
 }
 
 .btn-secondary:hover {
-  background: var(--btn-secondary-hover);
-  border-color: var(--btn-secondary-hover);
-  color: #fff
+  background: var(--cc-sec-hover, var(--btn-secondary-hover));
+  border-color: var(--cc-sec-hover, var(--btn-secondary-hover));
+  color: var(--cc-sec-hover-ink, var(--secondary-on, #fff))
 }
 
 .btn-secondary:active {
-  background: var(--btn-secondary-press);
-  border-color: var(--btn-secondary-press);
-  color: #fff
+  background: var(--cc-sec-press, var(--btn-secondary-press));
+  border-color: var(--cc-sec-press, var(--btn-secondary-press));
+  color: var(--cc-sec-press-ink, var(--secondary-on, #fff))
 }
 
 /* ---------- shared disabled state for both variants ---------- */
