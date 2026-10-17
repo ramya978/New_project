@@ -1,0 +1,364 @@
+<!-- =====================================================================================================
+     NEW CURRENCY / EDIT - create page (currency-form.ts · currency-form.css · config: currencies.config.ts)
+     Workspace Kit horizontal register (create-organisation.html): live preview, required progress,
+     section links, numbered sections with left labels and right-hand controls, error summary, actions.
+     ===================================================================================================== -->
+<section class="mf-view" aria-labelledby="mf-title-currency">
+
+  <!-- page heading -->
+  <div class="m-heading">
+    <div>
+     
+      <span class="m-eyebrow">Master data / Finance</span>
+      <h1 class="m-title" id="mf-title-currency">{{ editing ? 'Edit currency' : 'New currency' }}</h1>
+      <p class="m-subtitle">Add an ISO 4217 currency with its symbol, display format and rounding rule.</p>
+    </div>
+    <div class="m-actions">
+    
+      <button type="button" class="m-btn" (click)="cancel()">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('back')" /></svg>
+        Back 
+      </button>
+    </div>
+  </div>
+
+  <form class="mf-form" novalidate (submit)="$event.preventDefault(); save()">
+
+    <!-- live preview of the record being entered -->
+    <div class="mf-intro">
+      <div class="mf-intro-id">
+        <span class="mf-mark" aria-hidden="true">{{ preview().mark }}</span>
+        <div class="mf-intro-copy">
+          <span class="mf-intro-label">Preview</span>
+          <strong [class.is-empty]="!dirty() && !editing">{{ preview().title }}</strong>
+          <p>{{ preview().sub }}</p>
+        </div>
+      </div>
+      <dl class="mf-facts">
+        @for (f of preview().facts; track f.label) {
+          <div>
+            <dt>{{ f.label }}</dt>
+            <dd [class]="f.tone ? 'is-' + f.tone : ''">{{ f.value }}</dd>
+          </div>
+        }
+      </dl>
+      <span class="mf-state">{{ editing ? 'Editing' : dirty() ? 'Unsaved entry' : 'New entry' }}</span>
+    </div>
+
+    <!-- register note + readiness -->
+    <div class="mf-meta">
+      <div class="mf-meta-ref">
+        <span>Currency register</span>
+        <strong>The preview shows 12,345.678 in the format you choose. <span class="mf-req" aria-hidden="true">*</span> Required</strong>
+      </div>
+      <div class="mf-readiness">
+        <span>{{ filledRequired() }} of {{ requiredFields.length }} required values entered</span>
+        <span class="mf-bar" role="progressbar" aria-label="Required values entered" aria-valuemin="0" aria-valuemax="100"
+              [attr.aria-valuenow]="progress()"><i [style.width.%]="progress()"></i></span>
+      </div>
+    </div>
+
+  
+
+    <div class="m-card mf-ledger">
+
+      <!-- 01 Identity -->
+      <section class="mf-section" id="mf-sec-currency-01" aria-labelledby="mf-h-currency-01">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">01</span>
+            <h2 id="mf-h-currency-01">Identity</h2>
+          </div>
+          <p>The ISO 4217 code and the name shown on documents.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Currency code -->
+          <div class="mf-field" data-field="code">
+            <label for="mf-currency-code">
+              Currency code <span class="mf-req" aria-hidden="true">*</span>
+              <small>ISO 4217 · 3 letters</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-currency-code" type="text" class="is-short" maxlength="3" required autocomplete="off" spellcheck="false" [readOnly]="isLocked('code')"
+                     [value]="value('code')" [placeholder]="placeholderFor('code')"
+                     [attr.aria-invalid]="!!err('code') || null" [attr.aria-describedby]="err('code') ? 'mf-currency-code-err' : null"
+                     (input)="onInput('code', $event)" (blur)="touch('code')" />
+              @if (isLocked('code')) {
+                <small class="mf-lock"><svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('lock')" /></svg> Locked after creation</small>
+              }
+              @if (err('code'); as e) { <small class="mf-error" id="mf-currency-code-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Currency name -->
+          <div class="mf-field" data-field="name">
+            <label for="mf-currency-name">
+              Currency name <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <input id="mf-currency-name" type="text" maxlength="80" required autocomplete="off" spellcheck="false"
+                     [value]="value('name')" [placeholder]="placeholderFor('name')"
+                     [attr.aria-invalid]="!!err('name') || null" [attr.aria-describedby]="err('name') ? 'mf-currency-name-err' : null"
+                     (input)="onInput('name', $event)" (blur)="touch('name')" />
+              @if (err('name'); as e) { <small class="mf-error" id="mf-currency-name-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Numeric code -->
+          <div class="mf-field" data-field="numeric">
+            <label for="mf-currency-numeric">
+              Numeric code
+              <small>ISO 4217 · 0–999</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-currency-numeric" type="text" class="is-short" maxlength="3" autocomplete="off" spellcheck="false"
+                     [value]="value('numeric')" [placeholder]="placeholderFor('numeric')"
+                     [attr.aria-invalid]="!!err('numeric') || null" [attr.aria-describedby]="err('numeric') ? 'mf-currency-numeric-err' : null"
+                     (input)="onInput('numeric', $event)" (blur)="touch('numeric')" />
+              @if (err('numeric'); as e) { <small class="mf-error" id="mf-currency-numeric-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Currency type -->
+          <div class="mf-field" data-field="type">
+            <label for="mf-currency-type">
+              Currency type <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <ms-select inputId="mf-currency-type" [options]="optionsFor('type')" [value]="value('type')" [placeholder]="placeholderFor('type')"
+                         [disabled]="isWaiting('type') || isLocked('type')" [invalid]="!!err('type')"
+                         [describedBy]="err('type') ? 'mf-currency-type-err' : null" (valueChange)="pick('type', $event)" />
+              @if (err('type'); as e) { <small class="mf-error" id="mf-currency-type-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 Symbol & format -->
+      <section class="mf-section" id="mf-sec-currency-02" aria-labelledby="mf-h-currency-02">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">02</span>
+            <h2 id="mf-h-currency-02">Symbol &amp; format</h2>
+          </div>
+          <p>How an amount is written on screens, receipts and exports.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Symbol -->
+          <div class="mf-field" data-field="symbol">
+            <label for="mf-currency-symbol">
+              Symbol
+            </label>
+            <div class="mf-control">
+              <input id="mf-currency-symbol" type="text" class="is-short" maxlength="4" autocomplete="off" spellcheck="false"
+                     [value]="value('symbol')" [placeholder]="placeholderFor('symbol')"
+                     [attr.aria-invalid]="!!err('symbol') || null" [attr.aria-describedby]="err('symbol') ? 'mf-currency-symbol-err' : null"
+                     (input)="onInput('symbol', $event)" (blur)="touch('symbol')" />
+              @if (err('symbol'); as e) { <small class="mf-error" id="mf-currency-symbol-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Symbol position -->
+          <div class="mf-field" data-field="symbolPosition">
+            <label id="mf-currency-symbolPosition-label">
+              Symbol position <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-currency-symbolPosition-label" [class.is-invalid]="!!err('symbolPosition')"
+                   (keydown)="onChoiceKey('symbolPosition', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('symbolPosition') === 'prefix'"
+                        [attr.aria-checked]="value('symbolPosition') === 'prefix'" [attr.tabindex]="choiceTab('symbolPosition', 'prefix', true)"
+                        (click)="pick('symbolPosition', 'prefix')"><i aria-hidden="true"></i>Prefix</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('symbolPosition') === 'suffix'"
+                        [attr.aria-checked]="value('symbolPosition') === 'suffix'" [attr.tabindex]="choiceTab('symbolPosition', 'suffix', false)"
+                        (click)="pick('symbolPosition', 'suffix')"><i aria-hidden="true"></i>Suffix</button>
+              </div>
+              @if (err('symbolPosition'); as e) { <small class="mf-error" id="mf-currency-symbolPosition-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Display format -->
+          <div class="mf-field is-wide" data-field="displayFormat">
+            <label for="mf-currency-displayFormat">
+              Display format
+              <small>Use {{ '{' }}amount{{ '}' }}</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-currency-displayFormat" type="text" maxlength="40" autocomplete="off" spellcheck="false"
+                     [value]="value('displayFormat')" [placeholder]="placeholderFor('displayFormat')"
+                     [attr.aria-invalid]="!!err('displayFormat') || null" [attr.aria-describedby]="err('displayFormat') ? 'mf-currency-displayFormat-err' : null"
+                     (input)="onInput('displayFormat', $event)" (blur)="touch('displayFormat')" />
+              @if (err('displayFormat'); as e) { <small class="mf-error" id="mf-currency-displayFormat-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 Decimals & rounding -->
+      <section class="mf-section" id="mf-sec-currency-03" aria-labelledby="mf-h-currency-03">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">03</span>
+            <h2 id="mf-h-currency-03">Decimals &amp; rounding</h2>
+          </div>
+          <p>Amounts are stored in the minor unit; rounding applies to cash and conversions.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Decimal places -->
+          <div class="mf-field" data-field="decimals">
+            <label id="mf-currency-decimals-label">
+              Decimal places <span class="mf-req" aria-hidden="true">*</span>
+              <small>2 for most · 0 for JPY</small>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-currency-decimals-label" [class.is-invalid]="!!err('decimals')"
+                   (keydown)="onChoiceKey('decimals', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('decimals') === '0'"
+                        [attr.aria-checked]="value('decimals') === '0'" [attr.tabindex]="choiceTab('decimals', '0', true)"
+                        (click)="pick('decimals', '0')"><i aria-hidden="true"></i>0</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('decimals') === '1'"
+                        [attr.aria-checked]="value('decimals') === '1'" [attr.tabindex]="choiceTab('decimals', '1', false)"
+                        (click)="pick('decimals', '1')"><i aria-hidden="true"></i>1</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('decimals') === '2'"
+                        [attr.aria-checked]="value('decimals') === '2'" [attr.tabindex]="choiceTab('decimals', '2', false)"
+                        (click)="pick('decimals', '2')"><i aria-hidden="true"></i>2</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('decimals') === '3'"
+                        [attr.aria-checked]="value('decimals') === '3'" [attr.tabindex]="choiceTab('decimals', '3', false)"
+                        (click)="pick('decimals', '3')"><i aria-hidden="true"></i>3</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('decimals') === '4'"
+                        [attr.aria-checked]="value('decimals') === '4'" [attr.tabindex]="choiceTab('decimals', '4', false)"
+                        (click)="pick('decimals', '4')"><i aria-hidden="true"></i>4</button>
+              </div>
+              @if (err('decimals'); as e) { <small class="mf-error" id="mf-currency-decimals-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Minor unit -->
+          <div class="mf-field" data-field="minor">
+            <label for="mf-currency-minor">
+              Minor unit
+            </label>
+            <div class="mf-control">
+              <input id="mf-currency-minor" type="text" maxlength="30" autocomplete="off" spellcheck="false"
+                     [value]="value('minor')" [placeholder]="placeholderFor('minor')"
+                     [attr.aria-invalid]="!!err('minor') || null" [attr.aria-describedby]="err('minor') ? 'mf-currency-minor-err' : null"
+                     (input)="onInput('minor', $event)" (blur)="touch('minor')" />
+              @if (err('minor'); as e) { <small class="mf-error" id="mf-currency-minor-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Rounding mode -->
+          <div class="mf-field" data-field="rounding">
+            <label for="mf-currency-rounding">
+              Rounding mode <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <ms-select inputId="mf-currency-rounding" [options]="optionsFor('rounding')" [value]="value('rounding')" [placeholder]="placeholderFor('rounding')"
+                         [disabled]="isWaiting('rounding') || isLocked('rounding')" [invalid]="!!err('rounding')"
+                         [describedBy]="err('rounding') ? 'mf-currency-rounding-err' : null" (valueChange)="pick('rounding', $event)" />
+              @if (err('rounding'); as e) { <small class="mf-error" id="mf-currency-rounding-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Rounding step -->
+          <div class="mf-field" data-field="step">
+            <label id="mf-currency-step-label">
+              Rounding step
+              <small>For cash rounding</small>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-currency-step-label" [class.is-invalid]="!!err('step')"
+                   (keydown)="onChoiceKey('step', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('step') === 'none'"
+                        [attr.aria-checked]="value('step') === 'none'" [attr.tabindex]="choiceTab('step', 'none', true)"
+                        (click)="pick('step', 'none')"><i aria-hidden="true"></i>None</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('step') === '0.01'"
+                        [attr.aria-checked]="value('step') === '0.01'" [attr.tabindex]="choiceTab('step', '0.01', false)"
+                        (click)="pick('step', '0.01')"><i aria-hidden="true"></i>0.01</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('step') === '0.05'"
+                        [attr.aria-checked]="value('step') === '0.05'" [attr.tabindex]="choiceTab('step', '0.05', false)"
+                        (click)="pick('step', '0.05')"><i aria-hidden="true"></i>0.05</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('step') === '0.10'"
+                        [attr.aria-checked]="value('step') === '0.10'" [attr.tabindex]="choiceTab('step', '0.10', false)"
+                        (click)="pick('step', '0.10')"><i aria-hidden="true"></i>0.10</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('step') === '1.00'"
+                        [attr.aria-checked]="value('step') === '1.00'" [attr.tabindex]="choiceTab('step', '1.00', false)"
+                        (click)="pick('step', '1.00')"><i aria-hidden="true"></i>1.00</button>
+              </div>
+              @if (err('step'); as e) { <small class="mf-error" id="mf-currency-step-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 Status & notes -->
+      <section class="mf-section" id="mf-sec-currency-04" aria-labelledby="mf-h-currency-04">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">04</span>
+            <h2 id="mf-h-currency-04">Status &amp; notes</h2>
+          </div>
+          <p>Drafts are kept out of payment forms until activated.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Status -->
+          <div class="mf-field" data-field="status">
+            <label id="mf-currency-status-label">
+              Status <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-currency-status-label" [class.is-invalid]="!!err('status')"
+                   (keydown)="onChoiceKey('status', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'active'"
+                        [attr.aria-checked]="value('status') === 'active'" [attr.tabindex]="choiceTab('status', 'active', true)"
+                        (click)="pick('status', 'active')"><i aria-hidden="true"></i>Active</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'draft'"
+                        [attr.aria-checked]="value('status') === 'draft'" [attr.tabindex]="choiceTab('status', 'draft', false)"
+                        (click)="pick('status', 'draft')"><i aria-hidden="true"></i>Draft</button>
+              </div>
+              @if (err('status'); as e) { <small class="mf-error" id="mf-currency-status-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Notes -->
+          <div class="mf-field is-wide" data-field="notes">
+            <label for="mf-currency-notes">
+              Notes
+              <small>Internal only</small>
+            </label>
+            <div class="mf-control">
+              <textarea id="mf-currency-notes" rows="3" maxlength="500" [value]="value('notes')" [placeholder]="placeholderFor('notes')"
+                        [attr.aria-invalid]="!!err('notes') || null" [attr.aria-describedby]="err('notes') ? 'mf-currency-notes-err' : null"
+                        (input)="onInput('notes', $event)" (blur)="touch('notes')"></textarea>
+              @if (err('notes'); as e) { <small class="mf-error" id="mf-currency-notes-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+ 
+
+    <!-- action bar -->
+    <div class="mf-footer">
+      <div class="mf-footer-left">
+        <button type="button" class="m-btn" (click)="cancel()">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('x')" /></svg>
+          Cancel
+        </button>
+        <button type="button" class="m-text-btn" [disabled]="!dirty()" (click)="reset()">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('reset')" /></svg>
+          {{ editing ? 'Undo changes' : 'Start new' }}
+        </button>
+      </div>
+      <button type="submit" class="m-btn m-btn-primary">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(editing ? 'save' : 'check')" /></svg>
+        {{ editing ? 'Save changes' : 'Create currency' }}
+      </button>
+    </div>
+  </form>
+</section>
+
+<!-- leave with unsaved changes -->
+@if (confirmLeave()) {
+  <div class="mf-overlay" (click)="confirmLeave.set(false)"></div>
+  <div class="mf-dialog" role="alertdialog" aria-modal="true" aria-labelledby="mf-leave-title-currency" aria-describedby="mf-leave-text-currency">
+    <h2 id="mf-leave-title-currency">Discard this entry?</h2>
+    <p id="mf-leave-text-currency">The values entered on this currency have not been saved. Leaving now discards them.</p>
+    <div class="mf-dialog-foot">
+      <button type="button" class="m-btn" (click)="confirmLeave.set(false)">Keep editing</button>
+      <button type="button" class="m-btn m-btn-danger" (click)="leave()">Discard and leave</button>
+    </div>
+  </div>
+}

@@ -1,0 +1,406 @@
+/* =====================================================================================================
+   MASTERS - shared styles (list + form). Typography, spacing and controls follow the OtoSolve
+   Workspace Kit (12.OtoSolve_Workspace_Kit: base.css, payments.css, organisation-layout.css):
+   Inter / Segoe UI · 14px base · 34px page title · 13px row text · 11–12px captions · 10px eyebrows.
+   Colours come from the app theme (Appearance studio): --primary, --ink, --muted, --line, --white,
+   status colours; the kit names (accent-ink, tint, hover, pressed) are derived from them here.
+   ===================================================================================================== */
+:host {
+  --k-accent: var(--primary, var(--accent, #087e8b));
+  --k-accent-ink: color-mix(in srgb, var(--k-accent) 55%, var(--mix-ink, #000));
+  --k-tint: color-mix(in srgb, var(--k-accent) 9%, var(--white, #fff));
+  --k-hover: color-mix(in srgb, var(--theme-hover, var(--k-accent)) 11%, var(--white, #fff));
+  --k-hover-ink: color-mix(in srgb, var(--theme-hover, var(--k-accent)) 60%, var(--mix-ink, #000));
+  --k-pressed: color-mix(in srgb, var(--theme-press, var(--k-accent)) 20%, var(--white, #fff));
+  --k-pressed-ink: color-mix(in srgb, var(--theme-press, var(--k-accent)) 65%, var(--mix-ink, #000));
+  --k-ink: var(--ink, #20364a);
+  --k-heading: var(--heading-color, var(--ink, #153348));
+  --k-muted: var(--muted, #536777);
+  --k-line: var(--line, #e2e9ee);
+  --k-row-line: color-mix(in srgb, var(--line, #e2e9ee) 70%, var(--white, #fff));
+  --k-field-line: color-mix(in srgb, var(--muted, #536777) 70%, var(--line, #e2e9ee));
+  --k-outline: var(--cc-card-outline, var(--line, #e2e9ee));
+  --k-font: var(--font-body, Inter, "Segoe UI", Arial, sans-serif);
+
+  display: block;
+  color: var(--k-ink);
+  font: calc(14px * var(--font-scale, 1))/1.55 var(--k-font);
+  font-weight: var(--font-weight, 400);
+  text-rendering: optimizeLegibility
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box
+}
+
+:host button,
+:host input,
+:host textarea {
+  font: inherit
+}
+
+:host h1,
+:host h2,
+:host h3,
+:host p {
+  margin: 0
+}
+
+/* ---------- icons (thin line, kit .m-ico) ---------- */
+.m-ico {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+/* ---------- page heading (kit .m-heading) ---------- */
+.m-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px
+}
+
+.m-heading > div {
+  min-width: 0
+}
+
+.m-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--k-accent-ink);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 1.25px;
+  line-height: 1.4;
+  text-transform: uppercase
+}
+
+.m-title {
+  color: var(--k-heading);
+  font-family: var(--font-heading, var(--k-font));
+  font-size: calc(clamp(26px, 2.1vw, 34px) * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.8px;
+  line-height: 1.2
+}
+
+.m-subtitle {
+  max-width: 800px;
+  margin-top: 9px;
+  color: var(--k-muted);
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.7
+}
+
+.m-actions {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px
+}
+
+.m-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--k-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  cursor: pointer
+}
+
+.m-back .m-ico {
+  width: 15px;
+  height: 15px
+}
+
+.m-back:hover {
+  color: var(--k-accent-ink)
+}
+
+/* ---------- buttons (kit .m-btn / .m-btn-primary / .m-icon-btn / .m-text-btn) ---------- */
+.m-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 39px;
+  padding: 8px 13px;
+  border: 1px solid color-mix(in srgb, var(--k-muted) 40%, var(--k-line));
+  border-radius: var(--btn-radius, 7px);
+  background: var(--white, #fff);
+  color: var(--k-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: 1.5;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 140ms, color 140ms, border-color 140ms
+}
+
+.m-btn:hover {
+  border-color: var(--k-hover-ink);
+  background: var(--k-hover);
+  color: var(--k-hover-ink)
+}
+
+.m-btn:active {
+  background: var(--k-pressed);
+  color: var(--k-pressed-ink)
+}
+
+.m-btn .m-ico {
+  width: 17px;
+  height: 17px
+}
+
+.m-btn-primary {
+  border-color: var(--cc-btn, var(--k-accent));
+  background: var(--cc-btn, var(--k-accent));
+  color: var(--cc-btn-ink, var(--primary-on, #fff))
+}
+
+.m-btn-primary:hover {
+  border-color: var(--cc-btn-hover, color-mix(in srgb, var(--theme-hover, var(--k-accent)) 88%, #000));
+  background: var(--cc-btn-hover, color-mix(in srgb, var(--theme-hover, var(--k-accent)) 88%, #000));
+  color: var(--cc-btn-hover-ink, var(--primary-on, #fff))
+}
+
+.m-btn-primary:active {
+  border-color: var(--cc-btn-press, color-mix(in srgb, var(--theme-press, var(--k-accent)) 78%, #000));
+  background: var(--cc-btn-press, color-mix(in srgb, var(--theme-press, var(--k-accent)) 78%, #000));
+  color: var(--cc-btn-press-ink, var(--primary-on, #fff))
+}
+
+.m-btn-danger {
+  border-color: var(--status-danger, #b42335);
+  background: var(--status-danger, #b42335);
+  color: #fff
+}
+
+.m-btn-danger:hover {
+  border-color: color-mix(in srgb, var(--status-danger, #b42335) 82%, #000);
+  background: color-mix(in srgb, var(--status-danger, #b42335) 82%, #000);
+  color: #fff
+}
+
+.m-btn:disabled {
+  opacity: .5;
+  cursor: default;
+  pointer-events: none
+}
+
+/* the plus turns a quarter on hover / focus / press (kit gesture) */
+.m-btn .m-ico-plus {
+  transition: transform 180ms ease
+}
+
+.m-btn:is(:hover, :focus-visible, :active) .m-ico-plus {
+  transform: rotate(90deg)
+}
+
+.m-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--btn-radius, 7px);
+  background: transparent;
+  color: var(--k-muted);
+  cursor: pointer;
+  transition: background-color 140ms, color 140ms
+}
+
+.m-icon-btn .m-ico {
+  width: 18px;
+  height: 18px
+}
+
+.m-icon-btn:hover {
+  background: var(--k-hover);
+  color: var(--k-hover-ink)
+}
+
+.m-icon-btn:active {
+  background: var(--k-pressed);
+  color: var(--k-pressed-ink)
+}
+
+.m-icon-btn:disabled {
+  opacity: .4;
+  cursor: default;
+  pointer-events: none
+}
+
+.m-text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--k-accent-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 500;
+  cursor: pointer
+}
+
+.m-text-btn:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px
+}
+
+.m-text-btn .m-ico {
+  width: 14px;
+  height: 14px
+}
+
+:host :is(button, a, input, textarea):focus-visible {
+  outline: 2px solid var(--k-accent-ink);
+  outline-offset: 2px
+}
+
+/* kit icon gestures: the eye's pupil glances, the bin lid lifts, the power ring turns */
+.eye-pupil {
+  transform-origin: center;
+  transition: transform 180ms ease
+}
+
+.m-icon-btn:hover .eye-pupil {
+  transform: translateX(1.4px)
+}
+
+.trash-lid {
+  transform-origin: 5px 6px;
+  transition: transform 180ms ease
+}
+
+.m-icon-btn:hover .trash-lid {
+  transform: rotate(-16deg)
+}
+
+.m-icon-btn.is-danger:hover {
+  background: var(--status-danger-bg, #fff0f1);
+  color: var(--status-danger-ink, #a12336)
+}
+
+/* ---------- tags (kit .m-tag) ---------- */
+.m-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap
+}
+
+.m-tag::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor
+}
+
+.m-tag.active { background: var(--status-success-bg, #e7f4ef); color: var(--status-success-ink, #17634e) }
+.m-tag.draft { background: var(--status-warning-bg, #fff3dc); color: var(--status-warning-ink, #885000) }
+.m-tag.inactive { background: var(--status-neutral-bg, #f0f4f7); color: var(--status-neutral-ink, #4b6072) }
+
+/* ---------- card (kit .m-card, white interior, hairline outline) ---------- */
+.m-card {
+  min-width: 0;
+  border: 1px solid var(--k-outline);
+  border-radius: var(--radius, 12px);
+  background: var(--white, #fff);
+  box-shadow: var(--shadow, 0 2px 9px #213e5105)
+}
+
+.m-mono {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: .92em;
+  overflow-wrap: anywhere
+}
+
+.m-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0
+}
+
+/* ---------- toast (kit .as-toast) ---------- */
+.ms-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  max-width: calc(100vw - 32px);
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: var(--inverse-bg, #153348);
+  color: #fff;
+  font-size: calc(12px * var(--font-scale, 1));
+  box-shadow: 0 5px 25px #15334826;
+  transform: translateX(-50%);
+  animation: ms-toast-in 180ms ease-out
+}
+
+.ms-toast .m-ico {
+  width: 16px;
+  height: 16px
+}
+
+@keyframes ms-toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px) }
+}
+
+@media (max-width: 1000px) {
+  .m-heading {
+    align-items: flex-start;
+    flex-wrap: wrap
+  }
+}
+
+@media (max-width: 760px) {
+  .m-title {
+    font-size: calc(26px * var(--font-scale, 1))
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host *,
+  :host *::before,
+  :host *::after {
+    animation: none !important;
+    transition: none !important
+  }
+}

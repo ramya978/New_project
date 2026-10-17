@@ -1,0 +1,23 @@
+/* =====================================================================================================
+   COUNTRIES - list page styles
+   Shared register styles: app/Shared/Masters/masters-shared.css + app/Shared/Masters/master-list.css.
+   This file holds what belongs to this page only: its column widths and the overview grid.
+   ===================================================================================================== */
+
+/* overview: one row of metric cards (count set from the component) */
+.ml-metrics {
+  grid-template-columns: repeat(var(--ml-metric-count, 5), minmax(0, 1fr))
+}
+
+/* search wider, then one lane per filter */
+.ml-filters {
+  grid-template-columns: minmax(240px, 1.6fr) repeat(2, minmax(150px, .7fr))
+}
+
+/* column widths (the actions column is fixed in master-list.css) */
+.col-name { width: 30.95% }
+.col-iso { width: 13.10% }
+.col-region { width: 16.67% }
+.col-phone { width: 11.90% }
+.col-currency { width: 13.10% }
+.col-status { width: 14.29% }

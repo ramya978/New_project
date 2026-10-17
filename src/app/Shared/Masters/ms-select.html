@@ -1,0 +1,39 @@
+<button type="button" class="ms-trigger" [attr.id]="inputId() || null" [disabled]="disabled()" [class.is-invalid]="invalid()"
+        [class.is-placeholder]="!selected() || (selected()!.value === '' && !allLabel())"
+        aria-haspopup="listbox" [attr.aria-expanded]="open()" [attr.aria-controls]="uid + '-list'"
+        [attr.aria-label]="ariaLabel() || null" [attr.aria-invalid]="invalid() || null" [attr.aria-describedby]="describedBy()"
+        (click)="toggle()" (keydown)="onTriggerKey($event)">
+  <span class="ms-value">{{ selected()?.label ?? placeholder() }}</span>
+  @if (selected()?.hint && selected()!.value) {
+    <span class="ms-value-hint">{{ selected()!.hint }}</span>
+  }
+  <svg class="ms-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+</button>
+
+@if (open()) {
+  <div class="ms-panel" [class.is-up]="up()" (keydown)="onListKey($event)">
+    @if (searchable()) {
+      <label class="ms-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></svg>
+        <input type="text" [value]="query()" (input)="onSearch($event)" placeholder="Search" autocomplete="off"
+               [attr.aria-controls]="uid + '-list'" aria-label="Search options" />
+      </label>
+    }
+    <ul class="ms-list" role="listbox" [id]="uid + '-list'" tabindex="-1"
+        [attr.aria-activedescendant]="shown().length ? uid + '-o' + active() : null">
+      @for (o of shown(); track o.value; let i = $index) {
+        <li class="ms-option" role="option" [id]="uid + '-o' + i" [class.is-active]="i === active()"
+            [class.is-selected]="o.value === value()" [attr.aria-selected]="o.value === value()"
+            (pointerenter)="active.set(i)" (click)="pick(o)">
+          <span class="ms-option-label">{{ o.label }}</span>
+          @if (o.hint) { <span class="ms-option-hint">{{ o.hint }}</span> }
+          @if (o.value === value()) {
+            <svg class="ms-tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+          }
+        </li>
+      } @empty {
+        <li class="ms-empty">No match for “{{ query() }}”</li>
+      }
+    </ul>
+  </div>
+}

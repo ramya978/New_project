@@ -1,0 +1,21 @@
+import { Component } from '@angular/core';
+import { MasterListBase } from '../../../Shared/Masters/master-list.base';
+import { MsSelect } from '../../../Shared/Masters/ms-select';
+import { CITY } from './cities.config';
+
+/**
+ * Cities - list page (/app/masters/city).
+ * Search, filters, sorting, paging, row actions, view drawer and CSV export come from
+ * MasterListBase; the table columns and filters are written out in cities.html and
+ * described in cities.config.ts.
+ */
+@Component({
+  selector: 'app-cities',
+  imports: [MsSelect],
+  templateUrl: './cities.html',
+  styleUrls: ['../../../Shared/Masters/masters-shared.css', '../../../Shared/Masters/master-list.css', './cities.css'],
+  host: { '[style.--ml-metric-count]': 'metrics().length' }
+})
+export class Cities extends MasterListBase {
+  protected override readonly cfg = CITY;
+}

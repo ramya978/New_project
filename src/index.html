@@ -6,23 +6,17 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <!-- <link rel="alternate icon" type="image/x-icon" href="favicon.ico"> -->
-  <!-- Theme Settings font choices (fall back to the UI sans when offline) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Lato&family=Montserrat&family=Nunito&family=Poppins&family=Roboto&display=swap" rel="stylesheet">
 
-  <!-- Legacy inline copy of the studio styles removed: everything now lives in styles.css + the
-       component stylesheets, so the theme tokens (dark mode, colours, radius, fonts) apply everywhere. -->
+ 
   <style>
-    /* first paint, before Angular loads: matches the saved mode so the page never flashes white */
     html { background: #f6f7fa }
     html[data-mode="dark"] { background: #14171f; color-scheme: dark }
     body { margin: 0 }
   </style>
   <script>
-    /* Appearance studio pre-boot: apply the saved light / dark mode, width and motion before the
-       app starts (theme-settings.ts applies everything else and takes over once loaded). */
     (function () {
       try {
         var p = JSON.parse(localStorage.getItem('ydot-theme-settings') || '{}');
@@ -30,7 +24,9 @@
           : p.mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         var el = document.documentElement;
         el.setAttribute('data-mode', mode);
-        if (p.contentWidth) el.setAttribute('data-width', p.contentWidth);
+        /* content width: default Wide (Theme Settings -> Workspace -> Content Width) */
+        el.setAttribute('data-width',
+          p.contentWidth === 'compact' || p.contentWidth === 'normal' || p.contentWidth === 'wide' ? p.contentWidth : 'wide');
         if (p.reduceMotion === true) el.setAttribute('data-motion', 'reduce');
       } catch (e) { /* storage blocked: light defaults */ }
     })();

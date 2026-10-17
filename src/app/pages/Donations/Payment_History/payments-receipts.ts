@@ -30,7 +30,7 @@ const utc = (y: number, m: number, d: number, hh: number, mm: number) => Date.UT
 
 const FIRST_ROWS: ReceiptRow[] = [
   { ref: 'evt_CPLj3ZZ3Nsm8lV', subRef: 'INT-5BHBfHDB8EFR', donor: 'Sharmila Dipankar', email: 'sharmila.dipankar@mail.test', amount: 2000, status: 'pending', receivedAt: new Date(utc(2026, 10, 14, 21, 45)) },
-  { ref: 'evt_zJo8CNh3fAXODy', subRef: 'INT-J9WXR9A5DAX4', donor: 'Kiran Manoj', email: 'kiran.manoj@mail.test', amount: 4500, status: 'pending', receivedAt: new Date(utc(2026, 10, 14, 21, 25)) },
+  { ref: 'evt_PAYrcvd7K2mQ9X', subRef: 'INT-8K2M4Q9X7P2R', donor: 'Kiran Manoj', email: 'kiran.manoj@mail.test', amount: 4500, status: 'successful', receivedAt: new Date(utc(2026, 10, 14, 21, 25)) },
   { ref: 'evt_donFLCgw81ePYP', subRef: 'INT-S77STPK4VQ9Q', donor: 'Ishita Rakesh', email: 'ishita.rakesh@mail.test', amount: 10000, status: 'pending', receivedAt: new Date(utc(2026, 10, 14, 20, 28)) },
   { ref: 'evt_Nvx3YUdYmpq2t0', subRef: null, donor: null, email: null, amount: 2500, status: 'pending', receivedAt: new Date(utc(2026, 10, 14, 19, 3)) },
   { ref: 'RCPT/2026-27/00072', subRef: 'RCPT/2026-27/00072', donor: 'Abhijit Tarun', email: 'abhijit.tarun@mail.test', amount: 12000, status: 'successful', receivedAt: new Date(utc(2026, 10, 14, 11, 59)) },
@@ -253,23 +253,48 @@ export class PaymentsReceipts {
     return status === 'successful' ? 'teal' : status === 'pending' ? 'amber' : 'red';
   }
 
-  receiptTitle(status: PaymentStatus): string {
-    return status === 'successful' ? 'Receipt issued' : 'Not issued';
+  /** Receipt state derived from payment + receipt number.
+   *  - successful + RCPT ref  -> Issued (green)
+   *  - successful + evt_ ref  -> Awaiting issue (brown) : payment received, receipt not yet generated
+   *  - pending               -> Not issued (dark) : awaiting payment
+   *  - failed                -> Not applicable (grey) : payment failed */
+  receiptState(r: ReceiptRow): 'issued' | 'awaiting-issue' | 'not-issued' | 'not-applicable' {
+    if (r.status === 'successful') {
+      return r.ref.startsWith('RCPT') ? 'issued' : 'awaiting-issue';
+    }
+    return r.status === 'pending' ? 'not-issued' : 'not-applicable';
   }
 
-  receiptSub(status: PaymentStatus): string {
-    return status === 'successful'
-      ? 'Sent to the donor e-mail'
-      : status === 'pending'
-        ? 'Awaiting payment confirmation'
-        : 'Payment failed · retry required';
+  receiptTitle(r: ReceiptRow): string {
+    const s = this.receiptState(r);
+    return s === 'issued'
+      ? 'Issued'
+      : s === 'awaiting-issue'
+        ? 'Awaiting issue'
+        : s === 'not-issued'
+          ? 'Not issued'
+          : 'Not applicable';
   }
 
-  receiptNote(status: PaymentStatus): string {
-    return status === 'successful'
-      ? 'Issued and sent to the donor'
-      : status === 'pending'
-        ? 'Not issued yet - awaiting payment'
-        : 'Not issued - payment failed, retry required';
+  receiptSub(r: ReceiptRow): string {
+    const s = this.receiptState(r);
+    return s === 'issued'
+      ? r.ref
+      : s === 'awaiting-issue'
+        ? 'Payment received'
+        : s === 'not-issued'
+          ? 'Awaiting payment'
+          : 'Payment failed';
+  }
+
+  receiptNote(r: ReceiptRow): string {
+    const s = this.receiptState(r);
+    return s === 'issued'
+      ? `Issued - ${r.ref} · sent to the donor`
+      : s === 'awaiting-issue'
+        ? 'Payment received - receipt awaiting issue'
+        : s === 'not-issued'
+          ? 'Not issued yet - awaiting payment'
+          : 'Not applicable - payment failed, retry required';
   }
 }

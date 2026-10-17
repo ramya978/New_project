@@ -23,6 +23,15 @@
       <!-- the engine writes the page name here; kept for screen readers only -->
       <strong class="sr-only" id="crumb" aria-live="polite">Commercial overview</strong>
 
+      <!-- brand logo: first in the header, ahead of the organisation switcher -->
+      <div class="hd-brand">
+        <span class="hd-mark" aria-hidden="true">O</span>
+        <div class="hd-brand-text">
+          <strong>OtoSolve</strong>
+          <small>Workspace</small>
+        </div>
+      </div>
+
       <!-- organisation switcher -->
       <div class="hd-org-wrap">
         <button type="button" class="hd-org" [class.is-open]="orgListOpen()" aria-haspopup="listbox"
@@ -287,7 +296,7 @@
                 <span class="hd-row-text"><strong>My security</strong><small>Password and account protection</small></span>
                 <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
               </button>
-              <button type="button" class="hd-menu-row" role="menuitem" (click)="closeUserMenu()">
+              <button type="button" class="hd-menu-row" role="menuitem" (click)="openPreferences()">
                 <svg class="hd-row-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sliders')" /></svg>
                 <span class="hd-row-text"><strong>Preferences</strong><small>Appearance and workspace clock</small></span>
                 <svg class="hd-row-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
@@ -317,6 +326,11 @@
 
     <div class="content route-page"><router-outlet /></div>
     <main class="content" id="content" tabindex="-1"></main>
+
+    <!-- shared Appearance studio: opened from Preferences in the account menu (and the profile page) -->
+    @if (theme.studioOpen()) {
+      <app-theme-settings (closed)="theme.studioOpen.set(false)" />
+    }
   </div>
 </div>
 <dialog id="modal" aria-labelledby="modal-title"></dialog>

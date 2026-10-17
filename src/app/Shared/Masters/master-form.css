@@ -1,0 +1,744 @@
+
+.mf-form {
+  container: mf-register / inline-size
+}
+
+.mf-intro {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 18px;
+  padding: 15px 18px;
+  border: 1px solid color-mix(in srgb, var(--k-accent) 16%, var(--k-line));
+  border-radius: 12px;
+  background: var(--k-tint)
+}
+
+.mf-intro-id {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 14px;
+  min-width: 0
+}
+
+.mf-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 46px;
+  height: 46px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--cc-btn, var(--k-accent));
+  color: var(--cc-btn-ink, var(--primary-on, #fff));
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: .3px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap
+}
+
+.mf-intro-copy {
+  min-width: 0
+}
+
+.mf-intro-label {
+  display: block;
+  color: var(--k-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase
+}
+
+.mf-intro-copy strong {
+  display: block;
+  overflow: hidden;
+  color: var(--k-heading);
+  font-size: calc(16px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.2px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.mf-intro-copy strong.is-empty {
+  color: color-mix(in srgb, var(--k-muted) 75%, var(--white, #fff));
+  font-style: italic;
+  font-weight: 400
+}
+
+.mf-intro-copy p {
+  overflow: hidden;
+  color: var(--k-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.mf-facts {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0
+}
+
+.mf-facts > div {
+  min-width: 78px;
+  padding: 2px 18px;
+  border-left: 1px solid color-mix(in srgb, var(--k-accent) 20%, var(--k-line))
+}
+
+.mf-facts dt {
+  color: var(--k-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase
+}
+
+.mf-facts dd {
+  margin: 3px 0 0;
+  color: var(--k-ink);
+  font-size: calc(13px * var(--font-scale, 1));
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap
+}
+
+.mf-facts dd.is-ok,
+.mf-facts dd.is-warn,
+.mf-facts dd.is-muted {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px
+}
+
+.mf-facts dd.is-ok::before,
+.mf-facts dd.is-warn::before,
+.mf-facts dd.is-muted::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor
+}
+
+.mf-facts dd.is-ok { color: var(--status-success-ink, #17634e) }
+.mf-facts dd.is-warn { color: var(--status-warning-ink, #885000) }
+.mf-facts dd.is-muted { color: var(--k-muted) }
+
+.mf-state {
+  flex: none;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--k-accent) 34%, var(--k-line));
+  border-radius: 999px;
+  background: var(--white, #fff);
+  color: var(--k-accent-ink);
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 600;
+  white-space: nowrap
+}
+
+/* ---------- reference + readiness (kit .cf-entry-meta) ---------- */
+.mf-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 17px;
+  padding: 0 2px
+}
+
+.mf-meta-ref {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0
+}
+
+.mf-meta-ref > span {
+  color: var(--k-muted);
+  font-size: calc(10px * var(--font-scale, 1));
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  white-space: nowrap
+}
+
+.mf-meta-ref strong {
+  color: var(--k-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 400
+}
+
+.mf-readiness {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--k-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+  white-space: nowrap
+}
+
+.mf-bar {
+  display: block;
+  width: 100px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--k-accent) 18%, var(--k-line))
+}
+
+.mf-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cc-btn, var(--k-accent));
+  transition: width 200ms ease
+}
+
+.mf-req {
+  color: var(--status-danger, #a92839)
+}
+
+/* ---------- section links (kit .cf-section-links) ---------- */
+.mf-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px
+}
+
+.mf-links button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border: 1px solid color-mix(in srgb, var(--k-accent) 24%, var(--k-line));
+  border-radius: var(--btn-radius, 7px);
+  background: var(--white, #fff);
+  color: var(--k-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  cursor: pointer;
+  transition: background-color 160ms, color 160ms, border-color 160ms
+}
+
+/* the step number sits in a primary tint chip */
+.mf-links button > span {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--k-accent) 12%, var(--white, #fff));
+  color: var(--k-accent-ink);
+  font-size: calc(10px * var(--font-scale, 1));
+  font-variant-numeric: tabular-nums
+}
+
+.mf-links button:hover {
+  border-color: var(--k-accent-ink);
+  background: var(--k-tint);
+  color: var(--k-accent-ink)
+}
+
+/* ---------- error summary (kit .error-summary) ---------- */
+.mf-errors {
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--status-danger-line, #d68591);
+  border-radius: 8px;
+  background: var(--white, #fff);
+  color: var(--status-danger-ink, #8d2030);
+  font-size: calc(13px * var(--font-scale, 1));
+  outline: none
+}
+
+.mf-errors ul {
+  margin: 6px 0 0;
+  padding-left: 18px
+}
+
+.mf-errors button {
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: calc(12px * var(--font-scale, 1));
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer
+}
+
+/* ---------- ledger (kit .org-ledger) - white card under a PRIMARY top rule ---------- */
+.mf-ledger {
+  overflow: visible;
+  box-shadow: none;
+  border-top: 3px solid var(--cc-btn, var(--k-accent))
+}
+
+.mf-section {
+  min-width: 0;
+  padding: 22px 25px 14px;
+  scroll-margin-top: 150px
+}
+
+.mf-section + .mf-section {
+  border-top: 1px solid var(--k-line)
+}
+
+.mf-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin-bottom: 8px;
+  padding-bottom: 15px;
+     border-bottom: 1px dashed 
+color-mix(in srgb, var(--k-accent) 12%, var(--k-line));
+}
+
+.mf-section-title {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 11px
+}
+
+/* the numbered primary badge (PRIMARY colour, as the theme gives selected tabs) -
+   font stays exactly as the original: 11px / weight 500 */
+.mf-section-no {
+display: inline-grid;
+    place-items: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 7px;
+    border-radius: 7px;
+    background: var(--cc-btn, var(--k-accent));
+    background: 
+color-mix(in srgb, var(--k-accent) 12%, white);
+    color: var(--k-accent);
+    font-size: calc(11px * var(--font-scale, 1));
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+
+.mf-section-title h2 {
+  color: var(--k-heading);
+  font-family: var(--font-heading, var(--k-font));
+  font-size: calc(14px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.1px;
+  line-height: 1.5
+}
+
+.mf-section-head p {
+  max-width: 440px;
+  color: var(--k-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.65;
+  text-align: right
+}
+
+.mf-lanes {
+  display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(436px, 1fr));
+  column-gap: 32px;
+  align-items: stretch;
+  min-width: 0
+}
+
+/* one row: label left, control right (kit .org-field) */
+.mf-field {
+  display: grid;
+  grid-template-columns: 174px minmax(0, 1fr);
+  gap: 6px 18px;
+  align-items: start;
+  min-width: 0;
+  padding: 13px 0;
+  /* border-bottom: 1px solid var(--k-line) */
+}
+
+.mf-field:last-child {
+  border-bottom: 0
+}
+
+.mf-field > label {
+  display: block;
+  min-width: 0;
+  padding: 10px 0 0;
+  color: var(--k-ink);
+  font-size: calc(12px * var(--font-scale, 1));
+  font-weight: 550;
+  line-height: 1.55
+}
+
+.mf-field > label small {
+  display: block;
+  margin-top: 1px;
+  color: var(--k-muted);
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 400;
+  line-height: 1.5
+}
+
+.mf-control {
+  display: grid;
+  gap: 5px;
+  min-width: 0
+}
+
+.mf-control input,
+.mf-control textarea {
+  width: 100%;
+  min-height: 41px;
+  padding: 9px 11px;
+    border: 1px solid #80808085;
+  border-radius: var(--btn-radius, 7px);
+  background: var(--white, #fff);
+  color: var(--k-ink);
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.5;
+  transition: border-color 140ms, box-shadow 140ms
+}
+
+.mf-control textarea {
+  min-height: 91px;
+  resize: vertical
+}
+
+.mf-control input.is-short {
+  /* max-width: 220px */
+}
+
+.mf-control input.mono {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: calc(12.5px * var(--font-scale, 1))
+}
+
+.mf-control input::placeholder,
+.mf-control textarea::placeholder {
+  color: color-mix(in srgb, var(--k-muted) 70%, var(--white, #fff))
+}
+
+
+.mf-control input:focus,
+.mf-control textarea:focus {
+  outline: none;
+  border-color: var(--k-accent-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--k-accent) 18%, transparent)
+}
+
+.mf-control input:read-only {
+  background: var(--chip, #f5f8fa);
+  color: var(--k-muted);
+  cursor: not-allowed
+}
+
+.mf-control [aria-invalid="true"],
+.mf-choices.is-invalid {
+  border-color: var(--status-danger, #b42335) !important
+}
+
+.mf-error {
+  color: var(--status-danger-ink, #a12336);
+  font-size: calc(11px * var(--font-scale, 1));
+  line-height: 1.6
+}
+
+.mf-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--k-muted);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+.mf-lock .m-ico {
+  width: 13px;
+  height: 13px
+}
+
+/* segmented choice (kit .ap-choices) */
+.mf-choices {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-self: start;
+  justify-self: start;
+  gap: 3px;
+  padding: 3px;
+    border: 1px dashed #b9b9b9;
+  border-radius: var(--btn-radius, 8px)
+}
+
+.mf-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 33px;
+  padding: 5px 11px;
+  border: 1px solid transparent;
+  border-radius: calc(var(--btn-radius, 8px) - 2px);
+  background: transparent;
+  color: var(--k-muted);
+  font-size: calc(12.5px * var(--font-scale, 1));
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 140ms, color 140ms, border-color 140ms
+}
+
+.mf-choice i {
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%
+}
+
+.mf-choice:hover {
+  background: var(--k-hover);
+  color: var(--k-hover-ink)
+}
+
+/* selected choice = solid PRIMARY fill with the auto-flipped label (theme: primary keeps
+   selected tabs); the radio dot follows currentColor */
+.mf-choice.is-on {
+  border-color: var(--cc-btn, var(--k-accent));
+  background: var(--cc-btn, var(--k-accent));
+  color: var(--cc-btn-ink, var(--primary-on, #fff));
+  font-weight: 550
+}
+
+.mf-choice.is-on i::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor
+}
+
+/* ---------- note + action bar (kit .org-register-note / .cf-form-footer) ----------
+   The supporting note is a SECONDARY-tinted callout (theme: secondary = supporting copy) */
+.mf-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  max-width: 1100px;
+  margin-top: 17px;
+  padding: 13px 15px;
+  border: 1px solid color-mix(in srgb, var(--secondary, #138879) 30%, var(--k-line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--secondary, #138879) 6%, var(--white, #fff));
+  color: var(--k-muted);
+  font-size: calc(12px * var(--font-scale, 1));
+  line-height: 1.75
+}
+
+.mf-note .m-ico {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+  color: var(--secondary, #138879)
+}
+
+.mf-note strong {
+  color: var(--k-ink);
+  font-weight: 600
+}
+
+.mf-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 17px;
+  padding-top: 18px;
+  border-top: 1px solid var(--k-line)
+}
+
+.mf-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 14px
+}
+
+.mf-footer .m-text-btn:disabled {
+  opacity: .45;
+  cursor: default;
+  text-decoration: none
+}
+
+/* ---------- leave dialog ---------- */
+.mf-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: #16324740
+}
+
+.mf-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 901;
+  width: 430px;
+  max-width: calc(100vw - 24px);
+  padding: 24px;
+  border: 1px solid var(--k-line);
+  border-radius: 14px;
+  background: var(--white, #fff);
+  box-shadow: 0 20px 80px #15334826;
+  transform: translate(-50%, -50%)
+}
+
+.mf-dialog h2 {
+  color: var(--k-heading);
+  font-size: calc(19px * var(--font-scale, 1));
+  font-weight: 600;
+  letter-spacing: -.4px
+}
+
+.mf-dialog p {
+  margin-top: 10px;
+  color: var(--k-muted);
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.75
+}
+
+.mf-dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px
+}
+
+/* ---------- THEME COLOUR ROLES (primary + secondary on every create page) ----------
+   Neutrals like Load example / Back to list / Cancel / Keep editing become the theme's
+   SECONDARY outline button (Shared/styles/common-buttons.css .btn-secondary), and the
+   links (m-back, m-text-btn) take the secondary ink; the submit keeps the PRIMARY fill.
+   Scoped by .mf-view / .mf-dialog so the shared m-btn base in masters-shared.css
+   (used by the list pages too) is untouched. */
+.mf-view .m-btn:not(.m-btn-primary):not(.m-btn-danger),
+.mf-dialog .m-btn:not(.m-btn-primary):not(.m-btn-danger) {
+  border-color: var(--btn-secondary, var(--secondary, #138879));
+  background: none;
+  color: var(--btn-secondary, var(--secondary, #138879))
+}
+
+.mf-view .m-btn:not(.m-btn-primary):not(.m-btn-danger):is(:hover, :focus-visible),
+.mf-dialog .m-btn:not(.m-btn-primary):not(.m-btn-danger):is(:hover, :focus-visible) {
+  border-color: var(--cc-sec-hover, var(--btn-secondary-hover, color-mix(in srgb, var(--secondary, #138879) 88%, #000)));
+  background: var(--cc-sec-hover, var(--btn-secondary-hover, color-mix(in srgb, var(--secondary, #138879) 88%, #000)));
+  color: var(--cc-sec-hover-ink, var(--secondary-on, #fff))
+}
+
+.mf-view .m-btn:not(.m-btn-primary):not(.m-btn-danger):active,
+.mf-dialog .m-btn:not(.m-btn-primary):not(.m-btn-danger):active {
+  border-color: var(--cc-sec-press, var(--btn-secondary-press, color-mix(in srgb, var(--secondary, #138879) 78%, #000)));
+  background: var(--cc-sec-press, var(--btn-secondary-press, color-mix(in srgb, var(--secondary, #138879) 78%, #000)));
+  color: var(--cc-sec-press-ink, var(--secondary-on, #fff))
+}
+
+.mf-view .m-back,
+.mf-view .m-text-btn {
+  color: var(--btn-secondary, var(--secondary, #138879))
+}
+
+.mf-view .m-back:hover,
+.mf-view .m-text-btn:hover {
+  color: var(--btn-secondary-hover, color-mix(in srgb, var(--secondary, #138879) 82%, #000))
+}
+
+/* ---------- widths (container queries on the form, like the kit) ---------- */
+@container mf-register (min-width: 1100px) {
+  .mf-lanes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 36px
+  }
+
+  .mf-field {
+    grid-template-columns: 152px minmax(0, 1fr);
+    column-gap: 16px
+  }
+
+  .mf-field.is-wide {
+    grid-column: 1 / -1
+  }
+
+  /* the last two half-width rows close the section without a double hairline */
+  .mf-field:nth-last-child(2):not(.is-wide):not(:has(+ .is-wide)) {
+    border-bottom: 0
+  }
+
+  .mf-section {
+    padding-inline: 27px
+  }
+}
+
+@container mf-register (max-width: 900px) {
+  .mf-intro {
+    flex-wrap: wrap
+  }
+
+  .mf-facts > div:first-child {
+    border-left: 0;
+    padding-left: 0
+  }
+}
+
+@container mf-register (max-width: 720px) {
+  .mf-section-head {
+    display: block
+  }
+
+  .mf-section-head p {
+    max-width: none;
+    margin: 5px 0 0 35px;
+    text-align: left
+  }
+
+  .mf-field {
+    grid-template-columns: 145px minmax(0, 1fr);
+    gap: 6px 14px
+  }
+
+  .mf-section {
+    padding: 18px 19px 10px
+  }
+
+  .mf-meta {
+    flex-wrap: wrap;
+    gap: 10px
+  }
+
+  .mf-state {
+    display: none
+  }
+}
+
+@container mf-register (max-width: 480px) {
+  .mf-field {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 7px;
+    padding: 15px 0
+  }
+
+  .mf-field > label {
+    padding: 0
+  }
+
+  .mf-section {
+    padding: 16px 16px 7px
+  }
+
+  .mf-footer {
+    flex-wrap: wrap
+  }
+
+  .mf-control input.is-short {
+    max-width: none
+  }
+}

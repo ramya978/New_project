@@ -27,7 +27,7 @@
 
   <!-- tabs: icon over label, active tab in the accent colour with an underline -->
   <div class="ts-tabbar">
-    <!-- one shared gradient for the tab icons: primary colour -> secondary colour (settings.css) -->
+    <!-- gradient defs for the ACTIVE tab icon only (light theme-colour chip); inactive icons are var(--muted) (settings.css) -->
     <svg class="ts-grad-defs" width="0" height="0" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="ts-tab-grad" gradientUnits="userSpaceOnUse" x1="2" y1="2" x2="22" y2="22">
@@ -818,7 +818,7 @@
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('reset')" /></svg>
         Reset
       </button>
-      <button type="button" class="ts-btn ts-save" (click)="save()">
+      <button type="button" class="cp-btn btn-primary " (click)="save()" style="padding-left: 10px;padding-right: 10px;">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9"
              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="iconPath('save')" /></svg>
         Apply changes

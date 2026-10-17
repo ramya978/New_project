@@ -65,12 +65,12 @@
 
 /* small spaced caps line above the title */
 .ts-eyebrow {
- display: block;
+    display: block;
     font-size: 10px;
     line-height: 1.4;
     letter-spacing: 1.25px;
     text-transform: uppercase;
-    color: #181D2B;
+    color: #181d2b;
     font-weight: 600;
     margin-bottom: 8px;
 }
@@ -84,9 +84,9 @@
 }
 
 .ts-head p {
-  margin: 3px 0 0;
-  font-size: 13px;
-  color: var(--muted)
+     font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
 }
 
 .ts-close {
@@ -144,18 +144,17 @@
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: color .15s ease
+  transition: color .15s ease, background-color .15s ease
 }
 
 .ts-tab-ico {
   display: block;
   flex: none;
-  opacity: .7;
-  transition: opacity .15s ease, transform .15s ease
+  transition: transform .15s ease
 }
 
-/* gradient tab icons: primary colour -> secondary colour, so picking a palette or a custom
-   primary / secondary colour repaints every icon at once */
+/* active icon only: one shared gradient with the current theme colour, shaded (settings.css).
+   Inactive icons do not use it - they are plain var(--muted) */
 .ts-grad-defs {
   position: absolute;
   width: 0;
@@ -164,24 +163,29 @@
 }
 
 .ts-grad-a {
-  stop-color: var(--cc-btn, var(--accent))
+  stop-color: var(--accent)
 }
 
 .ts-grad-b {
-  stop-color: var(--teal, var(--accent))
+  stop-color: color-mix(in srgb, var(--accent) 72%, #000)
 }
 
+/* inactive tabs: muted grey icon (no theme colour) */
 .ts-tab-ico path {
-  stroke: url(#ts-tab-grad)
+  stroke: var(--muted)
 }
 
-.ts-tab:hover .ts-tab-ico {
-  opacity: 1
+.ts-tab:hover .ts-tab-ico path {
+  stroke: var(--ink)
 }
 
+/* active tab: light tint of the theme colour across the FULL tab (icon + label) */
 .ts-tab.is-on .ts-tab-ico {
-  opacity: 1;
   transform: translateY(-1px)
+}
+
+.ts-tab.is-on .ts-tab-ico path {
+  stroke: url(#ts-tab-grad)
 }
 
 .ts-tab-label {
@@ -204,13 +208,17 @@
   color: var(--ink)
 }
 
+/* active tab: light theme colour applied to the FULL tab (icon + label), muted grey icon elsewhere */
 .ts-tab.is-on {
-  color: var(--accent);
-  font-weight: 600
+color: var(--accent);
+    font-weight: 500;
+    background: 
+color-mix(in srgb, var(--accent) 4%, transparent);
+outline: none;
 }
 
 .ts-tab.is-on::after {
-  background: linear-gradient(90deg, var(--cc-btn, var(--accent)), var(--teal, var(--accent)))
+  background:var(--accent);
 }
 
 .ts-tab:focus-visible {

@@ -1,0 +1,367 @@
+<!-- =====================================================================================================
+     NEW STATE / EDIT - create page (state-form.ts · state-form.css · config: states.config.ts)
+     Workspace Kit horizontal register (create-organisation.html): live preview, required progress,
+     section links, numbered sections with left labels and right-hand controls, error summary, actions.
+     ===================================================================================================== -->
+<section class="mf-view" aria-labelledby="mf-title-state">
+
+  <!-- page heading -->
+  <div class="m-heading">
+    <div>
+   
+      <span class="m-eyebrow">Master data / Geography</span>
+      <h1 class="m-title" id="mf-title-state">{{ editing ? 'Edit state' : 'New state' }}</h1>
+      <p class="m-subtitle">Add a state, province or territory under its country, with tax and postal rules.</p>
+    </div>
+    <div class="m-actions">
+   
+      <button type="button" class="m-btn" (click)="cancel()">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('back')" /></svg>
+        Back
+      </button>
+    </div>
+  </div>
+
+  <form class="mf-form" novalidate (submit)="$event.preventDefault(); save()">
+
+    <!-- live preview of the record being entered -->
+    <div class="mf-intro">
+      <div class="mf-intro-id">
+        <span class="mf-mark" aria-hidden="true">{{ preview().mark }}</span>
+        <div class="mf-intro-copy">
+          <span class="mf-intro-label">Preview</span>
+          <strong [class.is-empty]="!dirty() && !editing">{{ preview().title }}</strong>
+          <p>{{ preview().sub }}</p>
+        </div>
+      </div>
+      <dl class="mf-facts">
+        @for (f of preview().facts; track f.label) {
+          <div>
+            <dt>{{ f.label }}</dt>
+            <dd [class]="f.tone ? 'is-' + f.tone : ''">{{ f.value }}</dd>
+          </div>
+        }
+      </dl>
+      <span class="mf-state">{{ editing ? 'Editing' : dirty() ? 'Unsaved entry' : 'New entry' }}</span>
+    </div>
+
+    <!-- register note + readiness -->
+    <div class="mf-meta">
+      <div class="mf-meta-ref">
+        <span>State register</span>
+        <strong>Choose the country first; postal and tax rules belong to the region. <span class="mf-req" aria-hidden="true">*</span> Required</strong>
+      </div>
+      <div class="mf-readiness">
+        <span>{{ filledRequired() }} of {{ requiredFields.length }} required values entered</span>
+        <span class="mf-bar" role="progressbar" aria-label="Required values entered" aria-valuemin="0" aria-valuemax="100"
+              [attr.aria-valuenow]="progress()"><i [style.width.%]="progress()"></i></span>
+      </div>
+    </div>
+
+
+
+
+    <div class="m-card mf-ledger">
+
+      <!-- 01 Identity -->
+      <section class="mf-section" id="mf-sec-state-01" aria-labelledby="mf-h-state-01">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">01</span>
+            <h2 id="mf-h-state-01">Identity</h2>
+          </div>
+          <p>The short code and the names people see.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Code -->
+          <div class="mf-field" data-field="code">
+            <label for="mf-state-code">
+              Code <span class="mf-req" aria-hidden="true">*</span>
+              <small>Letters, digits, _ and -</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-code" type="text" class="is-short" maxlength="10" required autocomplete="off" spellcheck="false" [readOnly]="isLocked('code')"
+                     [value]="value('code')" [placeholder]="placeholderFor('code')"
+                     [attr.aria-invalid]="!!err('code') || null" [attr.aria-describedby]="err('code') ? 'mf-state-code-err' : null"
+                     (input)="onInput('code', $event)" (blur)="touch('code')" />
+              @if (isLocked('code')) {
+                <small class="mf-lock"><svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('lock')" /></svg> Locked after creation</small>
+              }
+              @if (err('code'); as e) { <small class="mf-error" id="mf-state-code-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Name -->
+          <div class="mf-field" data-field="name">
+            <label for="mf-state-name">
+              Name <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-name" type="text" maxlength="80" required autocomplete="off" spellcheck="false"
+                     [value]="value('name')" [placeholder]="placeholderFor('name')"
+                     [attr.aria-invalid]="!!err('name') || null" [attr.aria-describedby]="err('name') ? 'mf-state-name-err' : null"
+                     (input)="onInput('name', $event)" (blur)="touch('name')" />
+              @if (err('name'); as e) { <small class="mf-error" id="mf-state-name-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Display name -->
+          <div class="mf-field" data-field="display">
+            <label for="mf-state-display">
+              Display name
+              <small>Shown in dropdowns</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-display" type="text" maxlength="100" autocomplete="off" spellcheck="false"
+                     [value]="value('display')" [placeholder]="placeholderFor('display')"
+                     [attr.aria-invalid]="!!err('display') || null" [attr.aria-describedby]="err('display') ? 'mf-state-display-err' : null"
+                     (input)="onInput('display', $event)" (blur)="touch('display')" />
+              @if (err('display'); as e) { <small class="mf-error" id="mf-state-display-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 Country & jurisdiction -->
+      <section class="mf-section" id="mf-sec-state-02" aria-labelledby="mf-h-state-02">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">02</span>
+            <h2 id="mf-h-state-02">Country &amp; jurisdiction</h2>
+          </div>
+          <p>Where the region sits and what kind of division it is.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Country -->
+          <div class="mf-field" data-field="country">
+            <label for="mf-state-country">
+              Country <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <ms-select inputId="mf-state-country" [options]="optionsFor('country')" [value]="value('country')" [placeholder]="placeholderFor('country')"
+                         [disabled]="isWaiting('country') || isLocked('country')" [invalid]="!!err('country')"
+                         [describedBy]="err('country') ? 'mf-state-country-err' : null" (valueChange)="pick('country', $event)" />
+              @if (err('country'); as e) { <small class="mf-error" id="mf-state-country-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Jurisdiction type -->
+          <div class="mf-field" data-field="jurisdiction">
+            <label for="mf-state-jurisdiction">
+              Jurisdiction type <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <ms-select inputId="mf-state-jurisdiction" [options]="optionsFor('jurisdiction')" [value]="value('jurisdiction')" [placeholder]="placeholderFor('jurisdiction')"
+                         [disabled]="isWaiting('jurisdiction') || isLocked('jurisdiction')" [invalid]="!!err('jurisdiction')"
+                         [describedBy]="err('jurisdiction') ? 'mf-state-jurisdiction-err' : null" (valueChange)="pick('jurisdiction', $event)" />
+              @if (err('jurisdiction'); as e) { <small class="mf-error" id="mf-state-jurisdiction-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Federal jurisdiction -->
+          <div class="mf-field" data-field="federal">
+            <label id="mf-state-federal-label">
+              Federal jurisdiction
+              <small>Governed directly by the union</small>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-state-federal-label" [class.is-invalid]="!!err('federal')"
+                   (keydown)="onChoiceKey('federal', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('federal') === 'yes'"
+                        [attr.aria-checked]="value('federal') === 'yes'" [attr.tabindex]="choiceTab('federal', 'yes', true)"
+                        (click)="pick('federal', 'yes')"><i aria-hidden="true"></i>Federal</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('federal') === 'no'"
+                        [attr.aria-checked]="value('federal') === 'no'" [attr.tabindex]="choiceTab('federal', 'no', false)"
+                        (click)="pick('federal', 'no')"><i aria-hidden="true"></i>Not federal</button>
+              </div>
+              @if (err('federal'); as e) { <small class="mf-error" id="mf-state-federal-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 Address & postal rules -->
+      <section class="mf-section" id="mf-sec-state-03" aria-labelledby="mf-h-state-03">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">03</span>
+            <h2 id="mf-h-state-03">Address &amp; postal rules</h2>
+          </div>
+          <p>Checked when an address in this region is captured.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Postal code pattern -->
+          <div class="mf-field" data-field="postal">
+            <label for="mf-state-postal">
+              Postal code pattern
+              <small>Regular expression</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-postal" type="text" class="m-mono" maxlength="120" autocomplete="off" spellcheck="false"
+                     [value]="value('postal')" [placeholder]="placeholderFor('postal')"
+                     [attr.aria-invalid]="!!err('postal') || null" [attr.aria-describedby]="err('postal') ? 'mf-state-postal-err' : null"
+                     (input)="onInput('postal', $event)" (blur)="touch('postal')" />
+              @if (err('postal'); as e) { <small class="mf-error" id="mf-state-postal-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Address format -->
+          <div class="mf-field is-wide" data-field="addressFormat">
+            <label for="mf-state-addressFormat">
+              Address format
+              <small>Shown when capturing</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-addressFormat" type="text" maxlength="160" autocomplete="off" spellcheck="false"
+                     [value]="value('addressFormat')" [placeholder]="placeholderFor('addressFormat')"
+                     [attr.aria-invalid]="!!err('addressFormat') || null" [attr.aria-describedby]="err('addressFormat') ? 'mf-state-addressFormat-err' : null"
+                     (input)="onInput('addressFormat', $event)" (blur)="touch('addressFormat')" />
+              @if (err('addressFormat'); as e) { <small class="mf-error" id="mf-state-addressFormat-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 Compliance & tax -->
+      <section class="mf-section" id="mf-sec-state-04" aria-labelledby="mf-h-state-04">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">04</span>
+            <h2 id="mf-h-state-04">Compliance &amp; tax</h2>
+          </div>
+          <p>GST state codes apply to India; other countries may use a state tax code.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- GST state code -->
+          <div class="mf-field" data-field="gst">
+            <label for="mf-state-gst">
+              GST state code
+              <small>Two digits</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-gst" type="text" class="is-short" maxlength="2" autocomplete="off" spellcheck="false"
+                     [value]="value('gst')" [placeholder]="placeholderFor('gst')"
+                     [attr.aria-invalid]="!!err('gst') || null" [attr.aria-describedby]="err('gst') ? 'mf-state-gst-err' : null"
+                     (input)="onInput('gst', $event)" (blur)="touch('gst')" />
+              @if (err('gst'); as e) { <small class="mf-error" id="mf-state-gst-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- State tax code -->
+          <div class="mf-field" data-field="taxCode">
+            <label for="mf-state-taxCode">
+              State tax code
+              <small>Where states levy tax</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-taxCode" type="text" class="is-short" maxlength="12" autocomplete="off" spellcheck="false"
+                     [value]="value('taxCode')" [placeholder]="placeholderFor('taxCode')"
+                     [attr.aria-invalid]="!!err('taxCode') || null" [attr.aria-describedby]="err('taxCode') ? 'mf-state-taxCode-err' : null"
+                     (input)="onInput('taxCode', $event)" (blur)="touch('taxCode')" />
+              @if (err('taxCode'); as e) { <small class="mf-error" id="mf-state-taxCode-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Default time zone -->
+          <div class="mf-field" data-field="timezone">
+            <label for="mf-state-timezone">
+              Default time zone
+            </label>
+            <div class="mf-control">
+              <ms-select inputId="mf-state-timezone" [options]="optionsFor('timezone')" [value]="value('timezone')" [placeholder]="placeholderFor('timezone')"
+                         [disabled]="isWaiting('timezone') || isLocked('timezone')" [invalid]="!!err('timezone')"
+                         [describedBy]="err('timezone') ? 'mf-state-timezone-err' : null" (valueChange)="pick('timezone', $event)" />
+              @if (err('timezone'); as e) { <small class="mf-error" id="mf-state-timezone-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 Status & notes -->
+      <section class="mf-section" id="mf-sec-state-05" aria-labelledby="mf-h-state-05">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">05</span>
+            <h2 id="mf-h-state-05">Status &amp; notes</h2>
+          </div>
+          <p>Drafts are saved but not offered in address forms yet.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Status -->
+          <div class="mf-field" data-field="status">
+            <label id="mf-state-status-label">
+              Status <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-state-status-label" [class.is-invalid]="!!err('status')"
+                   (keydown)="onChoiceKey('status', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'draft'"
+                        [attr.aria-checked]="value('status') === 'draft'" [attr.tabindex]="choiceTab('status', 'draft', true)"
+                        (click)="pick('status', 'draft')"><i aria-hidden="true"></i>Draft</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'active'"
+                        [attr.aria-checked]="value('status') === 'active'" [attr.tabindex]="choiceTab('status', 'active', false)"
+                        (click)="pick('status', 'active')"><i aria-hidden="true"></i>Active</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'inactive'"
+                        [attr.aria-checked]="value('status') === 'inactive'" [attr.tabindex]="choiceTab('status', 'inactive', false)"
+                        (click)="pick('status', 'inactive')"><i aria-hidden="true"></i>Inactive</button>
+              </div>
+              @if (err('status'); as e) { <small class="mf-error" id="mf-state-status-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Sort order -->
+          <div class="mf-field" data-field="sort">
+            <label for="mf-state-sort">
+              Sort order
+              <small>Lower shows first</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-state-sort" type="text" class="is-short" inputmode="decimal" autocomplete="off" spellcheck="false"
+                     [value]="value('sort')" [placeholder]="placeholderFor('sort')"
+                     [attr.aria-invalid]="!!err('sort') || null" [attr.aria-describedby]="err('sort') ? 'mf-state-sort-err' : null"
+                     (input)="onInput('sort', $event)" (blur)="touch('sort')" />
+              @if (err('sort'); as e) { <small class="mf-error" id="mf-state-sort-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Notes -->
+          <div class="mf-field is-wide" data-field="notes">
+            <label for="mf-state-notes">
+              Notes
+              <small>Internal only</small>
+            </label>
+            <div class="mf-control">
+              <textarea id="mf-state-notes" rows="3" maxlength="500" [value]="value('notes')" [placeholder]="placeholderFor('notes')"
+                        [attr.aria-invalid]="!!err('notes') || null" [attr.aria-describedby]="err('notes') ? 'mf-state-notes-err' : null"
+                        (input)="onInput('notes', $event)" (blur)="touch('notes')"></textarea>
+              @if (err('notes'); as e) { <small class="mf-error" id="mf-state-notes-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- action bar -->
+    <div class="mf-footer">
+      <div class="mf-footer-left">
+        <button type="button" class="m-btn" (click)="cancel()">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('x')" /></svg>
+          Cancel
+        </button>
+        <button type="button" class="m-text-btn" [disabled]="!dirty()" (click)="reset()">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('reset')" /></svg>
+          {{ editing ? 'Undo changes' : 'Start new' }}
+        </button>
+      </div>
+      <button type="submit" class="m-btn m-btn-primary">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(editing ? 'save' : 'check')" /></svg>
+        {{ editing ? 'Save changes' : 'Create state' }}
+      </button>
+    </div>
+  </form>
+</section>
+
+<!-- leave with unsaved changes -->
+@if (confirmLeave()) {
+  <div class="mf-overlay" (click)="confirmLeave.set(false)"></div>
+  <div class="mf-dialog" role="alertdialog" aria-modal="true" aria-labelledby="mf-leave-title-state" aria-describedby="mf-leave-text-state">
+    <h2 id="mf-leave-title-state">Discard this entry?</h2>
+    <p id="mf-leave-text-state">The values entered on this state have not been saved. Leaving now discards them.</p>
+    <div class="mf-dialog-foot">
+      <button type="button" class="m-btn" (click)="confirmLeave.set(false)">Keep editing</button>
+      <button type="button" class="m-btn m-btn-danger" (click)="leave()">Discard and leave</button>
+    </div>
+  </div>
+}

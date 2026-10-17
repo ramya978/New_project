@@ -1,0 +1,307 @@
+<!-- =====================================================================================================
+     NEW TIME ZONE / EDIT - create page (time-zone-form.ts · time-zone-form.css · config: time-zones.config.ts)
+     Workspace Kit horizontal register (create-organisation.html): live preview, required progress,
+     section links, numbered sections with left labels and right-hand controls, error summary, actions.
+     ===================================================================================================== -->
+<section class="mf-view" aria-labelledby="mf-title-timezone">
+
+  <!-- page heading -->
+  <div class="m-heading">
+    <div>
+     
+      <span class="m-eyebrow">Master data / Scheduling</span>
+      <h1 class="m-title" id="mf-title-timezone">{{ editing ? 'Edit time zone' : 'New time zone' }}</h1>
+      <p class="m-subtitle">Add an IANA time zone with its standard offset and daylight-saving behaviour.</p>
+    </div>
+    <div class="m-actions">
+  
+      <button type="button" class="m-btn" (click)="cancel()">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('back')" /></svg>
+        Back
+      </button>
+    </div>
+  </div>
+
+  <form class="mf-form" novalidate (submit)="$event.preventDefault(); save()">
+
+    <!-- live preview of the record being entered -->
+    <div class="mf-intro">
+      <div class="mf-intro-id">
+        <span class="mf-mark" aria-hidden="true">{{ preview().mark }}</span>
+        <div class="mf-intro-copy">
+          <span class="mf-intro-label">Preview</span>
+          <strong [class.is-empty]="!dirty() && !editing">{{ preview().title }}</strong>
+          <p>{{ preview().sub }}</p>
+        </div>
+      </div>
+      <dl class="mf-facts">
+        @for (f of preview().facts; track f.label) {
+          <div>
+            <dt>{{ f.label }}</dt>
+            <dd [class]="f.tone ? 'is-' + f.tone : ''">{{ f.value }}</dd>
+          </div>
+        }
+      </dl>
+      <span class="mf-state">{{ editing ? 'Editing' : dirty() ? 'Unsaved entry' : 'New entry' }}</span>
+    </div>
+
+    <!-- register note + readiness -->
+    <div class="mf-meta">
+      <div class="mf-meta-ref">
+        <span>Time zone register</span>
+        <strong>The preview shows the current local time once the zone ID is recognised. <span class="mf-req" aria-hidden="true">*</span> Required</strong>
+      </div>
+      <div class="mf-readiness">
+        <span>{{ filledRequired() }} of {{ requiredFields.length }} required values entered</span>
+        <span class="mf-bar" role="progressbar" aria-label="Required values entered" aria-valuemin="0" aria-valuemax="100"
+              [attr.aria-valuenow]="progress()"><i [style.width.%]="progress()"></i></span>
+      </div>
+    </div>
+
+
+
+    <div class="m-card mf-ledger">
+
+      <!-- 01 Identity -->
+      <section class="mf-section" id="mf-sec-timezone-01" aria-labelledby="mf-h-timezone-01">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">01</span>
+            <h2 id="mf-h-timezone-01">Identity</h2>
+          </div>
+          <p>The IANA identifier and the label offered in dropdowns.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Time zone ID -->
+          <div class="mf-field" data-field="zone">
+            <label for="mf-timezone-zone">
+              Time zone ID <span class="mf-req" aria-hidden="true">*</span>
+              <small>IANA · Area/Location</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-timezone-zone" type="text" maxlength="60" required autocomplete="off" spellcheck="false" [readOnly]="isLocked('zone')"
+                     [value]="value('zone')" [placeholder]="placeholderFor('zone')"
+                     [attr.aria-invalid]="!!err('zone') || null" [attr.aria-describedby]="err('zone') ? 'mf-timezone-zone-err' : null"
+                     (input)="onInput('zone', $event)" (blur)="touch('zone')" />
+              @if (isLocked('zone')) {
+                <small class="mf-lock"><svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('lock')" /></svg> Locked after creation</small>
+              }
+              @if (err('zone'); as e) { <small class="mf-error" id="mf-timezone-zone-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Display name -->
+          <div class="mf-field" data-field="display">
+            <label for="mf-timezone-display">
+              Display name <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <input id="mf-timezone-display" type="text" maxlength="90" required autocomplete="off" spellcheck="false"
+                     [value]="value('display')" [placeholder]="placeholderFor('display')"
+                     [attr.aria-invalid]="!!err('display') || null" [attr.aria-describedby]="err('display') ? 'mf-timezone-display-err' : null"
+                     (input)="onInput('display', $event)" (blur)="touch('display')" />
+              @if (err('display'); as e) { <small class="mf-error" id="mf-timezone-display-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Short name -->
+          <div class="mf-field" data-field="short">
+            <label for="mf-timezone-short">
+              Short name
+              <small>Compact display</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-timezone-short" type="text" class="is-short" maxlength="5" autocomplete="off" spellcheck="false"
+                     [value]="value('short')" [placeholder]="placeholderFor('short')"
+                     [attr.aria-invalid]="!!err('short') || null" [attr.aria-describedby]="err('short') ? 'mf-timezone-short-err' : null"
+                     (input)="onInput('short', $event)" (blur)="touch('short')" />
+              @if (err('short'); as e) { <small class="mf-error" id="mf-timezone-short-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 Offset & daylight saving -->
+      <section class="mf-section" id="mf-sec-timezone-02" aria-labelledby="mf-h-timezone-02">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">02</span>
+            <h2 id="mf-h-timezone-02">Offset &amp; daylight saving</h2>
+          </div>
+          <p>Standard offset in minutes from UTC.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- UTC offset -->
+          <div class="mf-field" data-field="offset">
+            <label for="mf-timezone-offset">
+              UTC offset <span class="mf-req" aria-hidden="true">*</span>
+              <small>In minutes · India 330</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-timezone-offset" type="text" class="is-short" inputmode="decimal" required autocomplete="off" spellcheck="false"
+                     [value]="value('offset')" [placeholder]="placeholderFor('offset')"
+                     [attr.aria-invalid]="!!err('offset') || null" [attr.aria-describedby]="err('offset') ? 'mf-timezone-offset-err' : null"
+                     (input)="onInput('offset', $event)" (blur)="touch('offset')" />
+              @if (err('offset'); as e) { <small class="mf-error" id="mf-timezone-offset-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Daylight saving -->
+          <div class="mf-field" data-field="dst">
+            <label id="mf-timezone-dst-label">
+              Daylight saving
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-timezone-dst-label" [class.is-invalid]="!!err('dst')"
+                   (keydown)="onChoiceKey('dst', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('dst') === 'yes'"
+                        [attr.aria-checked]="value('dst') === 'yes'" [attr.tabindex]="choiceTab('dst', 'yes', true)"
+                        (click)="pick('dst', 'yes')"><i aria-hidden="true"></i>Observed</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('dst') === 'no'"
+                        [attr.aria-checked]="value('dst') === 'no'" [attr.tabindex]="choiceTab('dst', 'no', false)"
+                        (click)="pick('dst', 'no')"><i aria-hidden="true"></i>Not observed</button>
+              </div>
+              @if (err('dst'); as e) { <small class="mf-error" id="mf-timezone-dst-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- DST rule note -->
+          <div class="mf-field is-wide" data-field="dstNote">
+            <label for="mf-timezone-dstNote">
+              DST rule note
+            </label>
+            <div class="mf-control">
+              <input id="mf-timezone-dstNote" type="text" maxlength="120" autocomplete="off" spellcheck="false"
+                     [value]="value('dstNote')" [placeholder]="placeholderFor('dstNote')"
+                     [attr.aria-invalid]="!!err('dstNote') || null" [attr.aria-describedby]="err('dstNote') ? 'mf-timezone-dstNote-err' : null"
+                     (input)="onInput('dstNote', $event)" (blur)="touch('dstNote')" />
+              @if (err('dstNote'); as e) { <small class="mf-error" id="mf-timezone-dstNote-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 Defaults & order -->
+      <section class="mf-section" id="mf-sec-timezone-03" aria-labelledby="mf-h-timezone-03">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">03</span>
+            <h2 id="mf-h-timezone-03">Defaults &amp; order</h2>
+          </div>
+          <p>Recommended zones are offered first when a state is created.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Recommended -->
+          <div class="mf-field" data-field="recommended">
+            <label id="mf-timezone-recommended-label">
+              Recommended
+              <small>Offered first to states</small>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-timezone-recommended-label" [class.is-invalid]="!!err('recommended')"
+                   (keydown)="onChoiceKey('recommended', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('recommended') === 'yes'"
+                        [attr.aria-checked]="value('recommended') === 'yes'" [attr.tabindex]="choiceTab('recommended', 'yes', true)"
+                        (click)="pick('recommended', 'yes')"><i aria-hidden="true"></i>Recommended</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('recommended') === 'no'"
+                        [attr.aria-checked]="value('recommended') === 'no'" [attr.tabindex]="choiceTab('recommended', 'no', false)"
+                        (click)="pick('recommended', 'no')"><i aria-hidden="true"></i>Not a default</button>
+              </div>
+              @if (err('recommended'); as e) { <small class="mf-error" id="mf-timezone-recommended-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Sort order -->
+          <div class="mf-field" data-field="sort">
+            <label for="mf-timezone-sort">
+              Sort order
+              <small>Lower shows first</small>
+            </label>
+            <div class="mf-control">
+              <input id="mf-timezone-sort" type="text" class="is-short" inputmode="decimal" autocomplete="off" spellcheck="false"
+                     [value]="value('sort')" [placeholder]="placeholderFor('sort')"
+                     [attr.aria-invalid]="!!err('sort') || null" [attr.aria-describedby]="err('sort') ? 'mf-timezone-sort-err' : null"
+                     (input)="onInput('sort', $event)" (blur)="touch('sort')" />
+              @if (err('sort'); as e) { <small class="mf-error" id="mf-timezone-sort-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 Status & notes -->
+      <section class="mf-section" id="mf-sec-timezone-04" aria-labelledby="mf-h-timezone-04">
+        <div class="mf-section-head">
+          <div class="mf-section-title">
+            <span class="mf-section-no">04</span>
+            <h2 id="mf-h-timezone-04">Status &amp; notes</h2>
+          </div>
+          <p>Drafts are saved but not offered for scheduling yet.</p>
+        </div>
+        <div class="mf-lanes">
+          <!-- Status -->
+          <div class="mf-field" data-field="status">
+            <label id="mf-timezone-status-label">
+              Status <span class="mf-req" aria-hidden="true">*</span>
+            </label>
+            <div class="mf-control">
+              <div class="mf-choices" role="radiogroup" aria-labelledby="mf-timezone-status-label" [class.is-invalid]="!!err('status')"
+                   (keydown)="onChoiceKey('status', $event)">
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'draft'"
+                        [attr.aria-checked]="value('status') === 'draft'" [attr.tabindex]="choiceTab('status', 'draft', true)"
+                        (click)="pick('status', 'draft')"><i aria-hidden="true"></i>Draft</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'active'"
+                        [attr.aria-checked]="value('status') === 'active'" [attr.tabindex]="choiceTab('status', 'active', false)"
+                        (click)="pick('status', 'active')"><i aria-hidden="true"></i>Active</button>
+                <button type="button" role="radio" class="mf-choice" [class.is-on]="value('status') === 'inactive'"
+                        [attr.aria-checked]="value('status') === 'inactive'" [attr.tabindex]="choiceTab('status', 'inactive', false)"
+                        (click)="pick('status', 'inactive')"><i aria-hidden="true"></i>Inactive</button>
+              </div>
+              @if (err('status'); as e) { <small class="mf-error" id="mf-timezone-status-err">{{ e }}</small> }
+            </div>
+          </div>
+          <!-- Notes -->
+          <div class="mf-field is-wide" data-field="notes">
+            <label for="mf-timezone-notes">
+              Notes
+              <small>Internal only</small>
+            </label>
+            <div class="mf-control">
+              <textarea id="mf-timezone-notes" rows="3" maxlength="500" [value]="value('notes')" [placeholder]="placeholderFor('notes')"
+                        [attr.aria-invalid]="!!err('notes') || null" [attr.aria-describedby]="err('notes') ? 'mf-timezone-notes-err' : null"
+                        (input)="onInput('notes', $event)" (blur)="touch('notes')"></textarea>
+              @if (err('notes'); as e) { <small class="mf-error" id="mf-timezone-notes-err">{{ e }}</small> }
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+
+    <!-- action bar -->
+    <div class="mf-footer">
+      <div class="mf-footer-left">
+        <button type="button" class="m-btn" (click)="cancel()">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('x')" /></svg>
+          Cancel
+        </button>
+        <button type="button" class="m-text-btn" [disabled]="!dirty()" (click)="reset()">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('reset')" /></svg>
+          {{ editing ? 'Undo changes' : 'Start new' }}
+        </button>
+      </div>
+      <button type="submit" class="m-btn m-btn-primary">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(editing ? 'save' : 'check')" /></svg>
+        {{ editing ? 'Save changes' : 'Create time zone' }}
+      </button>
+    </div>
+  </form>
+</section>
+
+<!-- leave with unsaved changes -->
+@if (confirmLeave()) {
+  <div class="mf-overlay" (click)="confirmLeave.set(false)"></div>
+  <div class="mf-dialog" role="alertdialog" aria-modal="true" aria-labelledby="mf-leave-title-timezone" aria-describedby="mf-leave-text-timezone">
+    <h2 id="mf-leave-title-timezone">Discard this entry?</h2>
+    <p id="mf-leave-text-timezone">The values entered on this time zone have not been saved. Leaving now discards them.</p>
+    <div class="mf-dialog-foot">
+      <button type="button" class="m-btn" (click)="confirmLeave.set(false)">Keep editing</button>
+      <button type="button" class="m-btn m-btn-danger" (click)="leave()">Discard and leave</button>
+    </div>
+  </div>
+}

@@ -15,7 +15,12 @@
   /* highlight tones, all mixed from the primary colour */
   --nav-active-bg: var(--cc-menu-sel, color-mix(in srgb, var(--nav-primary) 14%, var(--white)));   /* current page pill */
   --nav-active-ink: var(--cc-menu-ink, color-mix(in srgb, var(--nav-primary) 50%, var(--mix-ink, #000)));  /* current page text + icon */
-  --nav-open-bg: color-mix(in srgb, var(--nav-primary) 4%, var(--white));      /* open / holding menu pill */
+  --nav-open-bg: color-mix(in srgb, var(--cc-menu-sel, var(--nav-primary)) 4%, var(--white));      /* open / holding menu pill */
+  /* ink for that faint pill: the selection colour itself, darkened the same way as the fallback
+     below. It must NOT reuse --nav-active-ink: with Custom colour controls that token becomes
+     --cc-menu-ink - the label ink for the SOLID selection pill (a near-white tint on a dark
+     colour) - which vanishes on this 4% wash and leaves the menu looking disabled. */
+  --nav-open-ink: color-mix(in srgb, var(--cc-menu-sel, var(--nav-primary)) 50%, var(--mix-ink, #000));
   /* hover + pressed: an appearance palette (Theme Settings → Workspace) brings its own tones in
      --theme-hover / --theme-press; without one they follow the primary colour.
      Derivations mirror the OtoSolve reference: hover 12%, selected-hover 19%, press 21%,
@@ -301,7 +306,7 @@
    looks active while a page from another menu is on screen. */
 .nav-entry.has-current > .nav-link {
   background: var(--nav-open-bg);
-  color: var(--nav-active-ink);
+  color: var(--nav-open-ink);
   font-weight: 550
 }
 
@@ -311,7 +316,7 @@
 }
 
 .nav-entry.has-current > .nav-link .nav-ico {
-  color: var(--nav-active-ink)
+  color: var(--nav-open-ink)
 }
 
 /* chevron: right when closed, down when open */
@@ -445,12 +450,12 @@
 }
 
 .nav-entry.sub.has-current > .nav-child.has-kids:not(.active) {
-  color: var(--nav-active-ink);
+  color: var(--nav-open-ink);
   font-weight: 550
 }
 
 .nav-entry.sub.has-current .nav-chev {
-  stroke: var(--nav-active-ink)
+  stroke: var(--nav-open-ink)
 }
 
 .nav-toggle {
@@ -587,7 +592,9 @@
     gap: 18px;
     height: auto;
     min-height: 60px;
-    padding: 0 20px;
+    /* gutters share the page's content column (1080 / 1900 / full via --content-outer)
+       so the strip lines up with the page below */
+    padding: 0 max(28px, calc((100% - var(--content-outer, 1900px)) / 2 + 28px));
     border-right: 0;
     border-bottom: 1px solid var(--line, var(--nav-line));
     overflow: visible

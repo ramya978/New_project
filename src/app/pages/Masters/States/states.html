@@ -1,0 +1,295 @@
+<!-- =====================================================================================================
+     STATES - list page (states.ts · states.css · config: states.config.ts)
+     Workspace Kit register pattern (payments.html): heading, overview metrics, register card with search
+     and filters, sortable table with row actions (view · edit · activate · delete) and a pager.
+     ===================================================================================================== -->
+<section class="ml-view" aria-labelledby="ml-title-state">
+
+  <!-- page heading -->
+  <div class="m-heading">
+    <div>
+      <span class="m-eyebrow">Master data / Geography</span>
+      <h1 class="m-title" id="ml-title-state">States</h1>
+      <p class="m-subtitle">States, provinces and territories grouped by country, with their tax and postal rules.</p>
+    </div>
+    <div class="m-actions">
+    
+      <button type="button" class="m-btn m-btn-primary" (click)="create()">
+        <svg class="m-ico m-ico-plus" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('plus')" /></svg>
+        Create
+      </button>
+    </div>
+  </div>
+
+  <!-- overview -->
+  <div class="ml-metrics" aria-label="Overview of states">
+    @for (m of metrics(); track m.label) {
+      <div class="ml-metric" [class.is-accent]="m.accent">
+        <span class="ml-metric-label">{{ m.label }}</span>
+        <strong class="ml-metric-value">{{ m.value }}</strong>
+        <span class="ml-metric-note">{{ m.note }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- register -->
+  <section class="m-card ml-register" aria-labelledby="ml-reg-state">
+    <div class="ml-register-heading">
+      <div class="ml-register-title">
+        <span class="ml-register-icon" aria-hidden="true"><svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('map')" /></svg></span>
+        <div>
+          <h2 id="ml-reg-state">Regional divisions</h2>
+          <p>Each region belongs to one country; GST codes apply to Indian states.</p>
+        </div>
+      </div>
+      <span class="ml-register-hint">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sort')" /></svg>
+        Click a column heading to sort
+      </span>
+    </div>
+
+    <!-- search + filters -->
+    <form class="ml-filters" role="search" aria-label="Search states" (submit)="$event.preventDefault()">
+      <div class="ml-field">
+        <label for="ml-search-state">Find a state</label>
+        <div class="ml-search">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
+          <input type="search" id="ml-search-state" placeholder="Code, name or GST code" autocomplete="off"
+                 [value]="query()" (input)="setQuery($event)" />
+          <button type="submit" class="ml-search-submit">Search</button>
+        </div>
+      </div>
+      <div class="ml-field">
+        <label for="ml-f-state-country">Country</label>
+        <ms-select inputId="ml-f-state-country" [compact]="true" allLabel="All countries"
+                   [options]="filterOptions('country')" [value]="filterValue('country')" (valueChange)="setFilter('country', $event)" />
+      </div>
+      <div class="ml-field">
+        <label for="ml-f-state-jurisdiction">Jurisdiction</label>
+        <ms-select inputId="ml-f-state-jurisdiction" [compact]="true" allLabel="All jurisdictions"
+                   [options]="filterOptions('jurisdiction')" [value]="filterValue('jurisdiction')" (valueChange)="setFilter('jurisdiction', $event)" />
+      </div>
+      <div class="ml-field">
+        <label for="ml-f-state-status">Status</label>
+        <ms-select inputId="ml-f-state-status" [compact]="true" allLabel="All statuses"
+                   [options]="filterOptions('status')" [value]="filterValue('status')" (valueChange)="setFilter('status', $event)" />
+      </div>
+    </form>
+
+    <div class="ml-results">
+      <p role="status" aria-live="polite">
+        <strong>{{ sorted().length }} of {{ rows().length }}</strong> states
+        @if (hasFilters()) { <span> · filtered</span> }
+      </p>
+      @if (hasFilters()) {
+        <button type="button" class="m-text-btn" (click)="resetFilters()">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('reset')" /></svg>
+          Reset filters
+        </button>
+      }
+    </div>
+
+    <!-- table -->
+    <div class="ml-table-wrap" tabindex="0" role="region" aria-label="States table; scroll sideways on small screens">
+      <table class="ml-table">
+        <caption class="m-sr">States · Each region belongs to one country; GST codes apply to Indian states.</caption>
+        <colgroup>
+          <col class="col-name" />
+          <col class="col-country" />
+          <col class="col-jurisdiction" />
+          <col class="col-gst" />
+          <col class="col-timezone" />
+          <col class="col-status" />
+          <col class="ml-col-actions" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col" [attr.aria-sort]="ariaSort('name')">
+              <button type="button" class="ml-sort" [class.is-on]="isSorted('name')" (click)="sortBy('name')">
+                State / province
+                <svg class="m-ico" [class.is-desc]="isDesc('name')" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sort')" /></svg>
+              </button>
+            </th>
+            <th scope="col" [attr.aria-sort]="ariaSort('country')">
+              <button type="button" class="ml-sort" [class.is-on]="isSorted('country')" (click)="sortBy('country')">
+                Country
+                <svg class="m-ico" [class.is-desc]="isDesc('country')" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sort')" /></svg>
+              </button>
+            </th>
+            <th scope="col" [attr.aria-sort]="ariaSort('jurisdiction')">
+              <button type="button" class="ml-sort" [class.is-on]="isSorted('jurisdiction')" (click)="sortBy('jurisdiction')">
+                Jurisdiction
+                <svg class="m-ico" [class.is-desc]="isDesc('jurisdiction')" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sort')" /></svg>
+              </button>
+            </th>
+            <th scope="col" [attr.aria-sort]="ariaSort('gst')">
+              <button type="button" class="ml-sort" [class.is-on]="isSorted('gst')" (click)="sortBy('gst')">
+                GST
+                <svg class="m-ico" [class.is-desc]="isDesc('gst')" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sort')" /></svg>
+              </button>
+            </th>
+            <th scope="col">Time zone</th>
+            <th scope="col" [attr.aria-sort]="ariaSort('status')">
+              <button type="button" class="ml-sort" [class.is-on]="isSorted('status')" (click)="sortBy('status')">
+                Status
+                <svg class="m-ico" [class.is-desc]="isDesc('status')" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('sort')" /></svg>
+              </button>
+            </th>
+            <th scope="col" class="is-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of pageRows(); track r.id) {
+            <tr>
+              <!-- State / province -->
+              <td>
+                <div class="ml-lead">
+                  <span class="ml-code">{{ code('name', r) }}</span>
+                  <span class="ml-lead-copy">
+                    <span class="ml-lead-name">{{ cell('name', r) }}</span>
+                    <span class="ml-lead-sub">{{ sub('name', r) }}</span>
+                  </span>
+                </div>
+              </td>
+              <!-- Country -->
+              <td>
+                <span class="ml-text">{{ cell('country', r) }}</span>
+              </td>
+              <!-- Jurisdiction -->
+              <td>
+                <span class="ml-muted">{{ cell('jurisdiction', r) }}</span>
+              </td>
+              <!-- GST -->
+              <td>
+                @if (cell('gst', r) !== '—') { <span class="ml-chip">{{ cell('gst', r) }}</span> } @else { <span class="ml-muted">—</span> }
+              </td>
+              <!-- Time zone -->
+              <td>
+                <span class="ml-muted">{{ cell('timezone', r) }}</span>
+              </td>
+              <!-- Status -->
+              <td>
+                <span [class]="'m-tag ' + r['status']">{{ statusLabel(r) }}</span>
+              </td>
+              <td class="is-right">
+                <div class="ml-actions">
+                  <button type="button" class="m-icon-btn" title="View" [attr.aria-label]="'View ' + title(r)" (click)="viewing.set(r)">
+                    <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('eye')" /><circle class="eye-pupil" cx="12" cy="12" r="3" /></svg>
+                  </button>
+                  <button type="button" class="m-icon-btn" title="Edit" [attr.aria-label]="'Edit ' + title(r)" (click)="edit(r)">
+                    <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('edit')" /></svg>
+                  </button>
+                  <button type="button" class="m-icon-btn ml-power" [class.is-on]="r['status'] === 'active'"
+                          [title]="r['status'] === 'active' ? 'Deactivate' : 'Activate'"
+                          [attr.aria-label]="(r['status'] === 'active' ? 'Deactivate ' : 'Activate ') + title(r)" (click)="togglePower(r)">
+                    <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('power')" /></svg>
+                  </button>
+                  <button type="button" class="m-icon-btn is-danger" title="Delete" [attr.aria-label]="'Delete ' + title(r)" (click)="deleting.set(r)">
+                    <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('trash')" /><path class="trash-lid" [attr.d]="trashLid" /></svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (!pageRows().length) {
+      <div class="ml-empty">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('search')" /></svg>
+        <h3>No matching states</h3>
+        <p>Try another name or code, or clear the filters.</p>
+        @if (hasFilters()) { <button type="button" class="m-btn" (click)="resetFilters()">Reset filters</button> }
+      </div>
+    }
+
+    <!-- pager -->
+    <div class="ml-pagination">
+      <div class="ml-pagination-left">
+        <span>Showing {{ from() }}–{{ to() }} of {{ sorted().length }}</span>
+        <span class="ml-rows">
+          <span>Rows per page</span>
+          <ms-select class="ml-rows-select" [up]="true" ariaLabel="Rows per page" [options]="pageSizes"
+                     [value]="'' + pageSize()" (valueChange)="setPageSize($event)" />
+        </span>
+      </div>
+      <div class="ml-pager">
+        <button type="button" class="m-icon-btn" aria-label="Previous page" [disabled]="page() === 1" (click)="goPage(page() - 1)">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron-left')" /></svg>
+        </button>
+        @for (p of pages(); track p) {
+          <button type="button" class="ml-page" [attr.aria-current]="p === page() ? 'page' : null" (click)="goPage(p)">{{ p }}</button>
+        }
+        <button type="button" class="m-icon-btn" aria-label="Next page" [disabled]="page() === totalPages()" (click)="goPage(page() + 1)">
+          <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('chevron-right')" /></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+</section>
+
+<!-- view drawer -->
+@if (viewing(); as v) {
+  <div class="ml-overlay" (click)="viewing.set(null)"></div>
+  <aside class="ml-drawer" role="dialog" aria-modal="true" aria-labelledby="ml-drawer-title-state">
+    <header class="ml-drawer-head">
+      <div class="ml-drawer-id">
+        <span class="ml-code lg">{{ code('name', v) }}</span>
+        <div>
+          <span class="m-eyebrow">state</span>
+          <h2 id="ml-drawer-title-state">{{ title(v) }}</h2>
+        </div>
+      </div>
+      <button type="button" class="m-icon-btn" aria-label="Close" (click)="viewing.set(null)">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('x')" /></svg>
+      </button>
+    </header>
+    <div class="ml-drawer-body">
+      <div class="ml-drawer-status">
+        <span [class]="'m-tag ' + v['status']">{{ statusLabel(v) }}</span>
+      </div>
+      <dl class="ml-details">
+        @for (d of cfg.details(v, store.lookup); track d.label) {
+          <div><dt>{{ d.label }}</dt><dd>{{ d.value }}</dd></div>
+        }
+      </dl>
+    </div>
+    <footer class="ml-drawer-foot">
+      <button type="button" class="m-btn" (click)="togglePower(v)">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('power')" /></svg>
+        {{ v['status'] === 'active' ? 'Deactivate' : 'Activate' }}
+      </button>
+      <button type="button" class="m-btn m-btn-primary" (click)="edit(v)">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('edit')" /></svg>
+        Edit state
+      </button>
+    </footer>
+  </aside>
+}
+
+<!-- delete confirmation -->
+@if (deleting(); as d) {
+  <div class="ml-overlay is-dim" (click)="deleting.set(null)"></div>
+  <div class="ml-dialog" role="alertdialog" aria-modal="true" aria-labelledby="ml-del-title-state" aria-describedby="ml-del-text-state">
+    <h2 id="ml-del-title-state">Delete state?</h2>
+    <p id="ml-del-text-state"><strong>{{ title(d) }}</strong> will be removed from the states list.
+      Records that already use it keep their saved value. To hide it from dropdowns only, deactivate it instead.</p>
+    <div class="ml-dialog-foot">
+      <button type="button" class="m-btn" (click)="deleting.set(null)">Keep it</button>
+      <button type="button" class="m-btn m-btn-danger" (click)="confirmDelete()">
+        <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('trash')" /><path [attr.d]="trashLid" /></svg>
+        Delete
+      </button>
+    </div>
+  </div>
+}
+
+@if (toast()) {
+  <div class="ms-toast" role="status">
+    <svg class="m-ico" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('check')" /></svg>
+    {{ toast() }}
+  </div>
+}

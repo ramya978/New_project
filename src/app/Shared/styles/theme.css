@@ -3,7 +3,7 @@
 
    applyTheme() (pages/Auth/Profile/theme-settings.ts) writes on <html>:
      data-mode="light|dark"            System is resolved to light / dark and follows the device live
-     data-width="compact|normal|wide"  + --content-max (1080px / 1320px / none)
+     data-width="compact|normal|wide"  + --page-max / --content-outer (1080px / 1900px / none)
      data-motion="reduce"              while Reduce motion is on
      data-cc="on"                      while Custom colour controls are on
      --radius / --btn-radius / --shadow, --font-*, --status-*, --cc-* ...
@@ -37,8 +37,10 @@
   /* Typography -> Font size: every px font size is calc(Npx * var(--font-scale)); 13 px = 1 */
   --font-scale: 1;
 
-  /* page width - Normal */
-  --content-max: 1320px;
+  /* content width - Wide (app default): full screen width. Compact 1080 px / Normal 1900 px
+     centre the column; applyTheme writes --page-max inline and html[data-width] in styles.css
+     mirrors it to the header + menu through --content-outer, so everything stays flush */
+  --page-max: none;
 
   /* status colours: base, light wash, readable text shade, hairline */
   --status-info: #3c62a3;
@@ -89,10 +91,12 @@ html[data-mode="dark"] {
 
 /* ---- content width -------------------------------------------------------------------------------
    .content wraps both the routed page and the studio content (app.html). Compact / Normal centre
-   the page at a max width; Wide lets it use the full screen. */
+   the page at a max width (Normal = one 1900 px column, shared with the header + menu through
+   --content-outer so everything stays flush); Wide lets it use the full screen.
+   The fallback is Wide - the app default (index.html sets data-width before first paint). */
 .main > .content {
   width: 100%;
-  max-width: var(--content-max, 1320px);
+  max-width: var(--page-max, none);
   margin-inline: auto;
   transition: max-width .2s ease
 }

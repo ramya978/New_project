@@ -31,10 +31,10 @@
     <p class="pf-sub">Your identity, organisation context and account access in one place.</p>
   </div>
   <div class="pf-head-actions">
-    <button type="button" class="pf-hbtn btn-secondary" (click)="settingsOpen.set(true)">
+    <!-- <button type="button" class="pf-hbtn btn-secondary" (click)="openStudio()">
       <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'appearance' }" />
       Appearance
-    </button>
+    </button> -->
     <button type="button" class="pf-hbtn btn-primary">
       <ng-container *ngTemplateOutlet="ico; context: { $implicit: 'edit' }" />
       Edit profile
@@ -378,8 +378,4 @@
   </div>
 </ng-template>
 
-<!-- theme settings offcanvas: opens from the header Appearance button -->
-@if (settingsOpen()) {
-  <app-theme-settings (closed)="settingsOpen.set(false)" >
-  </app-theme-settings>
-}
+<!-- the Appearance studio popup is hosted by the app shell (app.html) so it opens on every page -->

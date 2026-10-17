@@ -79,7 +79,7 @@
                 <span [class]="'pr-av ' + avatarTone(r.donor)" aria-hidden="true">{{ initials(r.donor) }}</span>
                 <div class="pr-stack">
                   <span class="pr-main" [class.is-anon]="!r.donor">{{ r.donor ?? 'Anonymous donation' }}</span>
-                  <span class="pr-sub">{{ r.email ?? 'No e-mail on record' }}</span>
+                  <span class="pr-sub"> {{ r.ref }}</span>
                 </div>
               </div>
             </td>
@@ -87,8 +87,8 @@
             <!-- reference -->
             <td>
               <div class="pr-stack">
-                <span class="pr-ref">{{ r.ref }}</span>
-                <span class="pr-sub">{{ refNote(r) }}</span>
+                <span class="pr-ref">{{ r.email ?? 'No e-mail on record' }}</span>
+                <!-- <span class="pr-sub">{{ refNote(r) }}</span> -->
               </div>
             </td>
 
@@ -108,8 +108,8 @@
             <!-- receipt state -->
             <td>
               <div class="pr-stack">
-                <span class="pr-main soft">{{ receiptTitle(r.status) }}</span>
-                <span class="pr-sub">{{ receiptSub(r.status) }}</span>
+                <span [class]="'pr-main receipt-' + receiptState(r)">{{ receiptTitle(r) }}</span>
+                <span class="pr-sub">{{ receiptSub(r) }}</span>
               </div>
             </td>
 
@@ -206,7 +206,7 @@
           </div>
           <div class="pr-field">
             <dt>Receipt</dt>
-            <dd>{{ receiptNote(row.status) }}</dd>
+            <dd [class]="'receipt-' + receiptState(row)">{{ receiptNote(row) }}</dd>
           </div>
         </dl>
 

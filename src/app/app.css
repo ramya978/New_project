@@ -110,6 +110,18 @@ html[data-cc="on"] .topbar.hd-bar {
   height: 20px
 }
 
+/* ---- header brand (logo ahead of the organisation switcher) ---- */
+.hd-brand { display: none; align-items: center; gap: 11px; flex: none; padding-right: 6px; }
+/* header brand shows only in the horizontal layout above phone width
+   (the sidebar carries the brand in vertical layout and on the phone slide-over) */
+@media (min-width: 801px) {
+  html[data-layout="horizontal"] .hd-brand { display: flex; }
+}
+.hd-mark { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border-radius: 10px; background: color-mix(in srgb, var(--hd-primary) 14%, var(--white)); color: color-mix(in srgb, var(--hd-primary) 50%, var(--mix-ink, #000)); font-size: calc(23px * var(--font-scale, 1)); font-weight: 600; letter-spacing: -1px; line-height: 1; }
+.hd-brand-text { min-width: 0; line-height: 1.2; }
+.hd-brand-text strong { display: block; color: var(--hd-heading); font-size: calc(19px * var(--font-scale, 1)); font-weight: 650; letter-spacing: -.65px; line-height: 1.2; white-space: nowrap; }
+.hd-brand-text small { display: block; margin-top: 3px; color: var(--hd-muted); font-size: calc(9px * var(--font-scale, 1)); letter-spacing: 1.2px; line-height: 1.2; text-transform: uppercase; }
+
 /* ---- organisation switcher ---- */
 .hd-org-wrap {
   position: relative;

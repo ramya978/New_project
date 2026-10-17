@@ -287,6 +287,32 @@
   font-weight: 400
 }
 
+/* ---------- receipt status colours (matches reference screenshot) ---------- */
+.pr-main.receipt-issued {
+  color: var(--status-success-ink, #1a7a4c);
+  font-weight: 600;
+}
+
+.pr-main.receipt-awaiting-issue {
+  color: #8a5b00;
+  font-weight: 600;
+}
+
+.pr-main.receipt-not-issued {
+  color: var(--pr-heading, var(--ink));
+  font-weight: 600;
+}
+
+.pr-main.receipt-not-applicable {
+  color: var(--pr-muted);
+  font-weight: 600;
+}
+
+.pr-field dd.receipt-issued { color: var(--status-success-ink, #1a7a4c) }
+.pr-field dd.receipt-awaiting-issue { color: #8a5b00 }
+.pr-field dd.receipt-not-issued { color: var(--pr-ink) }
+.pr-field dd.receipt-not-applicable { color: var(--pr-muted) }
+
 .pr-main.is-anon {
   color: var(--pr-muted);
   font-style: italic;

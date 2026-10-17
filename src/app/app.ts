@@ -2,6 +2,7 @@ import { Component, DestroyRef, HostListener, ViewEncapsulation, computed, injec
 import { Router, RouterOutlet } from '@angular/router';
 import { Sidebar } from './Shared/layout/Sidebar/sidebar';
 import { ThemeSettingsService, profileImageSrc } from './pages/Auth/Profile/theme-settings';
+import { ThemeSettings } from './pages/Auth/Profile/settings';
 import { ClockSettingsService, ClockZone, cityOf } from './Shared/studio/data/clock-settings';
 
 export interface Organisation {
@@ -63,7 +64,7 @@ const SIDEBAR_KEY = 'ydot-sidebar-collapsed';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar],
+  imports: [RouterOutlet, Sidebar, ThemeSettings],
   templateUrl: './app.html',
   styleUrls: ['./app.css'],
   encapsulation: ViewEncapsulation.None
@@ -72,7 +73,7 @@ export class App {
   protected readonly title = signal('OtoSolve');
 
   private readonly router = inject(Router);
-  private readonly theme = inject(ThemeSettingsService);
+  protected readonly theme = inject(ThemeSettingsService);
   /** Shared with Theme Settings → Workspace (Clock presentation). */
   private readonly clock = inject(ClockSettingsService);
 
@@ -274,6 +275,12 @@ export class App {
   protected openProfile(): void {
     this.closeUserMenu();
     void this.router.navigateByUrl('/app/auth/profile');
+  }
+
+  /** Account menu → Preferences: opens the shared Appearance studio popup (no navigation). */
+  protected openPreferences(): void {
+    this.closeUserMenu();
+    this.theme.studioOpen.set(true);
   }
 
   /** The organisation button in the top bar: opens a floating list under it (search on top), or closes it. */

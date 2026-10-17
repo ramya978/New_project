@@ -1,0 +1,226 @@
+/* Custom dropdown in the Workspace Kit style: 41px field, 7px corners, hairline panel, theme states */
+:host {
+  --ms-accent: var(--primary, var(--accent, #087e8b));
+  --ms-accent-ink: color-mix(in srgb, var(--ms-accent) 55%, var(--mix-ink, #000));
+  --ms-hover: color-mix(in srgb, var(--theme-hover, var(--ms-accent)) 10%, var(--white, #fff));
+  --ms-hover-ink: color-mix(in srgb, var(--theme-hover, var(--ms-accent)) 60%, var(--mix-ink, #000));
+  --ms-tint: color-mix(in srgb, var(--ms-accent) 9%, var(--white, #fff));
+  --ms-field-line: color-mix(in srgb, var(--muted, #536777) 70%, var(--line, #e2e9ee));
+
+  position: relative;
+  display: block;
+  min-width: 0
+}
+
+.ms-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 41px;
+  padding: 8px 11px;
+    border: 1px solid #80808085;
+  border-radius: var(--btn-radius, 7px);
+  background: var(--white, #fff);
+  color: var(--ink, #20364a);
+  font: inherit;
+  font-size: calc(13px * var(--font-scale, 1));
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms, box-shadow 140ms
+}
+
+:host(.is-compact) .ms-trigger {
+  min-height: 42px;
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+.ms-trigger:hover:not(:disabled) {
+  border-color: var(--ms-accent-ink)
+}
+
+.ms-trigger:focus-visible,
+:host(.is-open) .ms-trigger {
+  outline: none;
+  border-color: var(--ms-accent-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ms-accent) 18%, transparent)
+}
+
+.ms-trigger.is-invalid {
+  border-color: var(--status-danger, #b42335)
+}
+
+.ms-trigger:disabled {
+  background: var(--chip, #f4f7f9);
+  color: var(--muted, #647787);
+  cursor: not-allowed
+}
+
+.ms-value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.ms-trigger.is-placeholder .ms-value {
+  color: color-mix(in srgb, var(--muted, #536777) 80%, var(--white, #fff))
+}
+
+.ms-value-hint {
+  flex: none;
+  color: var(--muted, #536777);
+  font-size: calc(11px * var(--font-scale, 1))
+}
+
+.ms-chev {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--muted, #536777);
+  transition: transform 160ms ease
+}
+
+:host(.is-open) .ms-chev {
+  transform: rotate(180deg)
+}
+
+/* ---- panel ---- */
+.ms-panel {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  z-index: 60;
+  width: 100%;
+  min-width: 200px;
+  padding: 5px;
+  border: 1px solid var(--line, #e2e9ee);
+  border-radius: var(--btn-radius, 8px);
+  background: var(--white, #fff);
+  box-shadow: 0 12px 35px #16324714, 0 2px 8px #16324708;
+  animation: ms-in 120ms ease-out
+}
+
+.ms-panel.is-up {
+  top: auto;
+  bottom: calc(100% + 5px)
+}
+
+@keyframes ms-in {
+  from { opacity: 0; transform: translateY(-3px) }
+}
+
+.ms-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 5px;
+  padding: 0 9px;
+  border: 1px solid var(--line, #e2e9ee);
+  border-radius: 6px
+}
+
+.ms-search:focus-within {
+  border-color: var(--ms-accent-ink)
+}
+
+.ms-search svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--muted, #536777);
+  stroke-width: 1.5;
+  stroke-linecap: round
+}
+
+.ms-search input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink, #20364a);
+  font: inherit;
+  font-size: calc(12px * var(--font-scale, 1))
+}
+
+.ms-list {
+  max-height: 264px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  outline: none;
+  scrollbar-width: thin
+}
+
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  color: var(--ink, #20364a);
+  font-size: calc(12.5px * var(--font-scale, 1));
+  line-height: 1.4;
+  cursor: pointer
+}
+
+.ms-option.is-active {
+  background: var(--ms-hover);
+  color: var(--ms-hover-ink)
+}
+
+.ms-option.is-selected {
+  color: var(--ms-accent-ink);
+  font-weight: 600
+}
+
+.ms-option-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.ms-option-hint {
+  flex: none;
+  color: var(--muted, #536777);
+  font-size: calc(11px * var(--font-scale, 1));
+  font-weight: 400
+}
+
+.ms-tick {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+.ms-empty {
+  padding: 14px 9px;
+  color: var(--muted, #536777);
+  font-size: calc(12px * var(--font-scale, 1));
+  text-align: center
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-panel { animation: none }
+  .ms-chev { transition: none }
+}

@@ -330,7 +330,7 @@ export class ThemeSettings {
 
   protected readonly widthOptions: WidthOption[] = [
     { id: 'compact', label: 'Compact', note: '1080 px, centred' },
-    { id: 'normal', label: 'Normal', note: '1320 px, centred' },
+    { id: 'normal', label: 'Normal', note: '1900 px, centred' },
     { id: 'wide', label: 'Wide', note: 'Full screen width' }
   ];
 
@@ -559,7 +559,7 @@ export class ThemeSettings {
   /** "Light · Normal width" - the mode and width a template brings with it. */
   protected templateMeta(t: ThemeTemplate): string {
     const mode = this.modeOptions.find((m) => m.id === t.prefs.mode)?.label ?? 'Light';
-    const width = this.widthOptions.find((w) => w.id === t.prefs.contentWidth)?.label ?? 'Normal';
+    const width = this.widthOptions.find((w) => w.id === t.prefs.contentWidth)?.label ?? 'Wide';
     return `${mode} · ${width} width`;
   }
 

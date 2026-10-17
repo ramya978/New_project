@@ -26,7 +26,7 @@ export interface ThemePrefs {
   customHeadingColors: string[];
   palette: string | null;
   navDensity: 'comfortable' | 'compact';
-  /** How wide page content may grow: compact 1080 px, normal 1320 px, wide = full width. */
+  /** How wide page content may grow: compact 1080 px, normal 1900 px (header + menu share the column), wide = full width. */
   contentWidth: 'compact' | 'normal' | 'wide';
   /** Switches off decorative animation and transitions across the app. */
   reduceMotion: boolean;
@@ -262,7 +262,7 @@ export const THEME_DEFAULTS: ThemePrefs = {
   customHeadingColors: [],
   palette: null,
   navDensity: 'comfortable',
-  contentWidth: 'normal',
+  contentWidth: 'wide',
   reduceMotion: false,
   customColourControls: false,
   ccBtn: '#7c3348',
@@ -334,9 +334,13 @@ export const contrastRatio = (a: string, b: string): number => {
 export const bestInk = (bg: string): string =>
   contrastRatio(bg, '#ffffff') >= contrastRatio(bg, '#141821') ? '#ffffff' : '#141821';
 
-/** Text colour for a coloured fill that MATCHES the fill instead of plain black / white:
-    on a dark fill a very light tint of the same hue, on a light fill a deep shade of the same hue,
-    stepped until it reads at 4.5:1 (WCAG AA). Falls back to bestInk if the hue cannot reach it. */
+/** Text colour for a coloured fill. Preference order:
+    1. on a dark fill a very light tint of the same hue (stepped until 4.5:1, WCAG AA);
+    2. on a saturated mid-tone (a green / blue that white still reads on at >= 3:1)
+       plain white - a clean label instead of a near-black shade of the hue;
+    3. only for pale fills (yellow, cream - white would wash out) a deep shade of the
+       same hue, stepped until it reads at 4.5:1. Falls back to bestInk if the hue
+       cannot reach it. */
 export const matchedInk = (bg: string): string => {
   const hex = normalizeHex(bg);
   if (!hex) return bestInk(bg);
@@ -347,6 +351,7 @@ export const matchedInk = (bg: string): string => {
     }
     return '#ffffff';
   }
+  if (contrastRatio(hex, '#ffffff') >= 3) return '#ffffff';
   for (let t = 0.55; t <= 0.951; t += 0.05) {
     const ink = darken(hex, t);
     if (contrastRatio(ink, hex) >= 4.5) return ink;
@@ -366,10 +371,11 @@ export const statusInk = (hex: string): string => {
 };
 
 
-/** Content max-width for each width option (consumed as --content-max in appearance.css). */
-export const CONTENT_WIDTHS: Record<ThemePrefs['contentWidth'], string> = {
+/** Content column for each width option (consumed as --page-max in theme.css / styles.css).
+    Header + menu gutters mirror the same column through --content-outer, so all three stay flush. */
+export const PAGE_WIDTHS: Record<ThemePrefs['contentWidth'], string> = {
   compact: '1080px',
-  normal: '1320px',
+  normal: '1900px',
   wide: 'none'
 };
 
@@ -541,9 +547,10 @@ export function applyTheme(prefs: ThemePrefs): void {
   el.dataset['layout'] = prefs.layout;
   el.dataset['density'] = prefs.navDensity;
 
-  // content width + motion (rules live in appearance.css)
+  // page width + motion (rules live in theme.css / styles.css; header + menu gutters follow
+  // the data-width attribute through --content-outer, so only --page-max is set inline here)
   el.dataset['width'] = prefs.contentWidth;
-  set('--content-max', CONTENT_WIDTHS[prefs.contentWidth]);
+  set('--page-max', PAGE_WIDTHS[prefs.contentWidth]);
   if (prefs.reduceMotion) el.dataset['motion'] = 'reduce';
   else delete el.dataset['motion'];
 }
@@ -563,7 +570,7 @@ function migrate(prefs: ThemePrefs): ThemePrefs {
   if (!paletteById(next.palette)) next.palette = null;
   if (next.navDensity !== 'compact') next.navDensity = 'comfortable';
   if (!['light', 'dark', 'system'].includes(next.mode)) next.mode = 'light';
-  if (!['compact', 'normal', 'wide'].includes(next.contentWidth)) next.contentWidth = 'normal';
+  if (!['compact', 'normal', 'wide'].includes(next.contentWidth)) next.contentWidth = 'wide';
   next.reduceMotion = next.reduceMotion === true;
   next.customColourControls = next.customColourControls === true;
   const hex = (v: unknown, fallback: string): string => (typeof v === 'string' ? normalizeHex(v) ?? fallback : fallback);
@@ -678,6 +685,10 @@ export function saveTemplates(list: ThemeTemplate[]): boolean {
 export class ThemeSettingsService {
   readonly prefs = signal<ThemePrefs>(loadTheme());
   readonly templates = signal<ThemeTemplate[]>(loadTemplates());
+
+  /** Shared open state of the Appearance studio popup: the header's Preferences item and the
+      Profile page's Appearance button open this same popup, wherever the user is. */
+  readonly studioOpen = signal(false);
 
   constructor() {
     applyTheme(this.prefs());

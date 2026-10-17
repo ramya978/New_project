@@ -1,0 +1,23 @@
+/* =====================================================================================================
+   STATES - list page styles
+   Shared register styles: app/Shared/Masters/masters-shared.css + app/Shared/Masters/master-list.css.
+   This file holds what belongs to this page only: its column widths and the overview grid.
+   ===================================================================================================== */
+
+/* overview: one row of metric cards (count set from the component) */
+.ml-metrics {
+  grid-template-columns: repeat(var(--ml-metric-count, 5), minmax(0, 1fr))
+}
+
+/* search wider, then one lane per filter */
+.ml-filters {
+  grid-template-columns: minmax(240px, 1.6fr) repeat(3, minmax(150px, .7fr))
+}
+
+/* column widths (the actions column is fixed in master-list.css) */
+.col-name { width: 28.89% }
+.col-country { width: 16.67% }
+.col-jurisdiction { width: 15.56% }
+.col-gst { width: 8.89% }
+.col-timezone { width: 16.67% }
+.col-status { width: 13.33% }

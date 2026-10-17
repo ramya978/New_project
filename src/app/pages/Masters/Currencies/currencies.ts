@@ -1,0 +1,21 @@
+import { Component } from '@angular/core';
+import { MasterListBase } from '../../../Shared/Masters/master-list.base';
+import { MsSelect } from '../../../Shared/Masters/ms-select';
+import { CURRENCY } from './currencies.config';
+
+/**
+ * Currencies - list page (/app/masters/currency).
+ * Search, filters, sorting, paging, row actions, view drawer and CSV export come from
+ * MasterListBase; the table columns and filters are written out in currencies.html and
+ * described in currencies.config.ts.
+ */
+@Component({
+  selector: 'app-currencies',
+  imports: [MsSelect],
+  templateUrl: './currencies.html',
+  styleUrls: ['../../../Shared/Masters/masters-shared.css', '../../../Shared/Masters/master-list.css', './currencies.css'],
+  host: { '[style.--ml-metric-count]': 'metrics().length' }
+})
+export class Currencies extends MasterListBase {
+  protected override readonly cfg = CURRENCY;
+}

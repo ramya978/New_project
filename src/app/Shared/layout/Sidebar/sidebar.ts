@@ -101,7 +101,8 @@ export class Sidebar implements AfterViewInit {
     effect(() => {
       const parents = this.parentsOf(this.url());
       if (parents.length) {
-        this.expanded.update((set) => new Set([...set, ...parents]));
+        // accordion: only the opened page's own branch stays open
+        this.expanded.update(() => new Set(parents));
       }
     });
     // a page change, or switching layout, closes the horizontal dropdown
@@ -221,14 +222,16 @@ export class Sidebar implements AfterViewInit {
     event?.stopPropagation();
     if (this.collapsed() && !this.horizontal()) {
       this.expandRequest.emit();
-      this.expanded.update((set) => new Set([...set, item.id]));
+      this.expanded.set(this.branchOf(item.id));
       return;
     }
     this.expanded.update((set) => {
-      const next = new Set(set);
-      if (next.has(item.id)) next.delete(item.id);
-      else next.add(item.id);
-      return next;
+      // accordion: opening a menu keeps only its own branch open; closing it also
+      // closes whatever was open inside it
+      if (set.has(item.id)) {
+        return new Set([...set].filter((id) => !this.branchOf(id).has(item.id)));
+      }
+      return this.branchOf(item.id);
     });
   }
 
@@ -279,6 +282,31 @@ export class Sidebar implements AfterViewInit {
   private matches(item: MenuItem, url: string): boolean {
     const route = item.route;
     return !!route && (url === route || url.startsWith(route + '/') || url.startsWith(route + '?'));
+  }
+
+  /** Parent id for every sub-menu, built from the menu tree (drives the accordion behaviour). */
+  private readonly parentIdOf = computed(() => {
+    const map = new Map<string, string>();
+    const walk = (items: readonly MenuItem[], parent: string | null): void => {
+      for (const item of items) {
+        if (parent) map.set(item.id, parent);
+        walk(item.children, item.id);
+      }
+    };
+    walk(this.menu(), null);
+    return map;
+  });
+
+  /** A menu plus its ancestors: opening it keeps this branch and collapses every other one. */
+  private branchOf(id: string): ReadonlySet<string> {
+    const branch = new Set<string>();
+    const parents = this.parentIdOf();
+    let current: string | undefined = id;
+    while (current !== undefined) {
+      branch.add(current);
+      current = parents.get(current);
+    }
+    return branch;
   }
 
   private parentsOf(url: string): string[] {

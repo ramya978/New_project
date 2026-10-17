@@ -1,6 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { ThemeSettings } from './settings';
 import { ThemeSettingsService, profileImageSrc } from './theme-settings';
 
 export type ProfileTab = 'overview' | 'access' | 'security';
@@ -149,7 +148,7 @@ const ICON_PATHS: Record<string, string> = {
 
 @Component({
   selector: 'app-profile',
-  imports: [NgTemplateOutlet, ThemeSettings],
+  imports: [NgTemplateOutlet],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
@@ -168,8 +167,10 @@ export class Profile {
 
   private readonly theme = inject(ThemeSettingsService);
 
-  /** Appearance offcanvas (theme settings). */
-  protected readonly settingsOpen = signal(false);
+  /** Opens the shared Appearance studio popup (the app shell hosts it, so it opens on any page). */
+  protected openStudio(): void {
+    this.theme.studioOpen.set(true);
+  }
 
   /** Selected avatar image src, or null when initials are used. */
   protected readonly avatarSrc = computed<string | null>(
